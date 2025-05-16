@@ -5,8 +5,6 @@ class AppProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return const SizedBox();
-    // TODO: fix progress layout
-    return const CircularProgressIndicator();
+    return Center(child: const CircularProgressIndicator());
   }
 }

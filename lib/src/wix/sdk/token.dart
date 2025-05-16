@@ -8,12 +8,12 @@ class Token {
   late String refreshToken;
   late DateTime expiresAt;
 
-  Token.fromString(String tokensString) {
-    final tokens = jsonDecode(tokensString);
-    grantType = GrantType.values.byName(tokens['granType']);
-    accessToken = tokens['accessToken'];
-    refreshToken = tokens['refreshToken'];
-    expiresAt = DateTime.parse(tokens['expiresAt']);
+  Token.fromString(String tokenString) {
+    final token = jsonDecode(tokenString);
+    grantType = GrantType.values.byName(token['grantType']);
+    accessToken = token['accessToken'];
+    refreshToken = token['refreshToken'];
+    expiresAt = DateTime.parse(token['expiresAt']);
   }
 
   Token.fromBody(GrantType type, String bodyString) {
@@ -33,7 +33,7 @@ class Token {
   @override
   String toString() {
     return jsonEncode({
-      'authType': grantType.toString(),
+      'grantType': grantType.name,
       'accessToken': accessToken,
       'refreshToken': refreshToken,
       'expiresAt': expiresAt.toIso8601String(),

@@ -29,9 +29,60 @@ class WixAuthentication {
   final _storage = const FlutterSecureStorage();
 
   WixAuthentication() {
-    _loadTokensFromStorage();
+    logger.t('[WixAuthentication.constructor]');
+    _loadTokenFromStorage();
   }
 
+  // Future<void> login(GrantType grantType) async {
+  //   await _loadingTokens.future;
+  //
+  //   logger.d('[WixAuthentication.login] start');
+  //   final pkcePair = PkcePair.generate();
+  //
+  //   // final appTokens = await _loginAsVisitor();
+  //   final body = await _fetchToken({
+  //     'grantType': 'anonymous',
+  //     'clientId': _clientId,
+  //   });
+  //   final token = Token.fromBody(GrantType.anonymous, body);
+  //   logger.d('[WixAuthentication.login] appAccessTokens: $token');
+  //
+  //   // final loginUrl = await _getManagedLoginUrl(token.accessToken, pkcePair.codeChallenge);
+  //   final response = await http.post(
+  //     Uri.parse('https://www.wixapis.com/redirect-session/v1/redirect-session'),
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer ${token.accessToken}',
+  //     },
+  //     body: jsonEncode({
+  //       'auth': {
+  //         'authRequest': {
+  //           'clientId': _clientId,
+  //           'redirectUri': _redirectUri,
+  //           'codeChallenge': pkcePair.codeChallenge,
+  //           'codeChallengeMethod': 'S256',
+  //           'responseType': 'code',
+  //           'responseMode': 'query',
+  //           'scope': _scope,
+  //           'state': PkcePair.generate().codeChallenge,
+  //         }
+  //       }
+  //     }),
+  //   );
+  //   final String loginUrl = jsonDecode(response.body)['redirectSession']['fullUrl'];
+  //   logger.d('[WixAuthentication.login] wixManagedLoginUrl: $loginUrl');
+  //
+  //   final authCode = await _redirectToLoginUrl(loginUrl);
+  //   logger.d('[WixAuthentication.login] code: $authCode');
+  //
+  //   // _tokens = await _getAuthCodeToken(authCode, pkcePair.codeVerifier);
+  //   final authCodeToken = await _fetchAuthCodeToken(authCode, pkcePair.codeVerifier);
+  //   logger.d('[WixAuthentication.tokens] tokens: $authCodeToken');
+  //
+  //   // await _storage.write(key: _tokensStorageKey, value: _tokens.toString());
+  //
+  //   logger.d('[WixAuthentication.login] end');
+  // }
   Future<void> login(GrantType grantType) async {
     logger.d('[WixAuthentication.login] grantType: $grantType');
     await _loadingTokens.future;
@@ -96,6 +147,7 @@ class WixAuthentication {
 
     logger.t('[WixAuthentication.login] end');
   }
+
   // Future<Member> getMyMember() async {
   //   final http.Response response = await http.post(
   //     Uri.parse('https://www.wixapis.com/members/v1/members/my'),
@@ -123,8 +175,8 @@ class WixAuthentication {
       case LoginState.loggedOut:
         logger.t('[WixAuthentication._loginAsVisitor] logged out, logging in as visitor');
         final body = await _fetchToken({
-          'grant_type': 'anonymous',
-          'client_id': _clientId,
+          'grantType': 'anonymous',
+          'clientId': _clientId,
         });
         final token = Token.fromBody(GrantType.anonymous, body);
         await _setToken(token);
@@ -134,11 +186,11 @@ class WixAuthentication {
 
   Future<Token> _fetchAuthCodeToken(String authCode, String pkCodeVerifier) async {
     final body = await _fetchToken({
-      'grant_type': 'authorization_code',
-      'client_id': _clientId,
+      'grantType': 'authorization_code',
+      'clientId': _clientId,
       'code': authCode,
-      'code_verifier': pkCodeVerifier,
-      'redirect_uri': _redirectUri,
+      'codeVerifier': pkCodeVerifier,
+      'redirectUri': _redirectUri,
     });
     return Token.fromBody(GrantType.authorizationCode, body);
   }
@@ -150,9 +202,9 @@ class WixAuthentication {
     }
 
     final body = await _fetchToken({
-      'grant_type': 'refresh_token',
-      'client_id': _clientId,
-      'refresh_token': _token!.refreshToken,
+      'grantType': 'refresh_token',
+      'clientId': _clientId,
+      'refreshToken': _token!.refreshToken,
     });
 
     final token = Token.fromBody(_token!.grantType, body);
@@ -170,7 +222,7 @@ class WixAuthentication {
       throw Exception('Token exchange failed: ${response.body}');
     }
 
-    logger.t('[fetchToken.login] Token response: ${response.body}');
+    logger.t('[WixAuthentication._fetchToken] Token response: ${response.body}');
     return response.body;
   }
 
@@ -180,11 +232,11 @@ class WixAuthentication {
     await _saveTokenToStorage();
   }
 
-  Future<void> _loadTokensFromStorage() async {
-    final authTokensValue = await _storage.read(key: _tokenStorageKey);
+  Future<void> _loadTokenFromStorage() async {
+    final token = await _storage.read(key: _tokenStorageKey);
 
-    if (authTokensValue != null) {
-      _token = Token.fromString(authTokensValue);
+    if (token != null) {
+      _token = Token.fromString(token);
     }
 
     logger.t('[WixAuthentication._loadTokens] ${_token == null ? 'No tokens found in storage' : 'tokens: $_token'}');

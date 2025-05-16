@@ -1,9 +1,14 @@
 class Item extends Fields {
+  static final String itemTypeFieldName = 'itemType';
+
   Item(super.fields);
 
   String get id => this['id'];
 
-  String get dataCollectionId => this['dataCollectionId'];
+  @override
+  String toString() {
+    return '${this['dataCollectionId']}:$id';
+  }
 }
 
 abstract class Fields {
@@ -36,12 +41,18 @@ abstract class Fields {
 
   Iterable<String> get fieldNames => _fields.keys;
 
-  _fieldEntryToStr(MapEntry<String, dynamic> entry) => '${entry.key}: ${entry.value.toString()}';
-
   @override
-  String toString() => '{'
-      '${_fields.entries.map(_fieldEntryToStr).join(', ')}'
-      '}';
+  String toString() => toFullString();
+
+  String toFullString() {
+    final buffer = StringBuffer();
+    buffer.writeln('{');
+    for (var entry in _fields.entries) {
+      buffer.writeln('  ${entry.key}: ${entry.value}');
+    }
+    buffer.writeln('}');
+    return buffer.toString();
+  }
 
   int compareTo(Fields other) {
     if (this['id'] == other['id']) return 0;

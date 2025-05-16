@@ -29,9 +29,9 @@
 //       'Content-Type': 'application/x-www-form-urlencoded',
 //     },
 //     body: {
-//       'grant_type': 'authorization_code',
+//       'grantType': 'authorization_code',
 //       'code': code,
-//       'client_id': clientId,
+//       'clientId': clientId,
 //       'redirect_uri': redirectUri,
 //     },
 //   );

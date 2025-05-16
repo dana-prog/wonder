@@ -39,6 +39,10 @@ class MainForm extends ConsumerWidget {
     logger.d('[MainForm.build] selectedTabName: $selectedTabName');
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(selectedTab.label),
+        // leading: Icon(selectedTab.icon),
+      ),
       body: selectedTab.widget(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedTabIndex,
