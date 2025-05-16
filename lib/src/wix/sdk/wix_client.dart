@@ -12,6 +12,7 @@ import '../../logger.dart';
 class WixClient {
   final authentication = WixAuthentication();
   final listsOfValues = Completer<ListsOfValues>();
+  final members = Completer<ListsOfValues>();
   bool _listsInitialized = false;
 
   WixClient();

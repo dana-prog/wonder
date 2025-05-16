@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wonder/src/widgets/media/WixImage.dart';
 
 import '../../data/facility.dart';
+import '../media/app_image.dart';
 
 class FacilityCard extends StatelessWidget {
   final Facility facility;
@@ -10,9 +10,15 @@ class FacilityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = 30.0;
     return Card(
       child: ListTile(
-        leading: AppImage(facility.mainPicture),
+        leading: SizedBox(
+            width: radius * 2,
+            height: radius * 2,
+            child: ClipOval(
+              child: AppImage(facility.mainPicture),
+            )),
         title: getTitle(),
         subtitle: Text(facility.type.title),
         // onTap: () => navigateToItem(

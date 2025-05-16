@@ -35,6 +35,6 @@ class DataItem extends Item {
 
   @override
   String toString() {
-    return '$dataItemType:$id';
+    return '${dataItemType.name}:$id';
   }
 }

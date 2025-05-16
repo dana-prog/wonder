@@ -20,7 +20,7 @@ class Facility extends DataItem {
     }).toList();
   }
 
-  int get number => this['number'];
+  int get number => (this['number']).toInt();
 
   ValueItem get type => listsOfValues.getValue(this['type']);
 
