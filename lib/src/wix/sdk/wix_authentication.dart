@@ -33,56 +33,6 @@ class WixAuthentication {
     _loadTokenFromStorage();
   }
 
-  // Future<void> login(GrantType grantType) async {
-  //   await _loadingTokens.future;
-  //
-  //   logger.d('[WixAuthentication.login] start');
-  //   final pkcePair = PkcePair.generate();
-  //
-  //   // final appTokens = await _loginAsVisitor();
-  //   final body = await _fetchToken({
-  //     'grantType': 'anonymous',
-  //     'clientId': _clientId,
-  //   });
-  //   final token = Token.fromBody(GrantType.anonymous, body);
-  //   logger.d('[WixAuthentication.login] appAccessTokens: $token');
-  //
-  //   // final loginUrl = await _getManagedLoginUrl(token.accessToken, pkcePair.codeChallenge);
-  //   final response = await http.post(
-  //     Uri.parse('https://www.wixapis.com/redirect-session/v1/redirect-session'),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Bearer ${token.accessToken}',
-  //     },
-  //     body: jsonEncode({
-  //       'auth': {
-  //         'authRequest': {
-  //           'clientId': _clientId,
-  //           'redirectUri': _redirectUri,
-  //           'codeChallenge': pkcePair.codeChallenge,
-  //           'codeChallengeMethod': 'S256',
-  //           'responseType': 'code',
-  //           'responseMode': 'query',
-  //           'scope': _scope,
-  //           'state': PkcePair.generate().codeChallenge,
-  //         }
-  //       }
-  //     }),
-  //   );
-  //   final String loginUrl = jsonDecode(response.body)['redirectSession']['fullUrl'];
-  //   logger.d('[WixAuthentication.login] wixManagedLoginUrl: $loginUrl');
-  //
-  //   final authCode = await _redirectToLoginUrl(loginUrl);
-  //   logger.d('[WixAuthentication.login] code: $authCode');
-  //
-  //   // _tokens = await _getAuthCodeToken(authCode, pkcePair.codeVerifier);
-  //   final authCodeToken = await _fetchAuthCodeToken(authCode, pkcePair.codeVerifier);
-  //   logger.d('[WixAuthentication.tokens] tokens: $authCodeToken');
-  //
-  //   // await _storage.write(key: _tokensStorageKey, value: _tokens.toString());
-  //
-  //   logger.d('[WixAuthentication.login] end');
-  // }
   Future<void> login(GrantType grantType) async {
     logger.d('[WixAuthentication.login] grantType: $grantType');
     await _loadingTokens.future;
@@ -98,6 +48,7 @@ class WixAuthentication {
   }
 
   Future<void> logout() async {
+    await _loadingTokens.future;
     logger.d('[WixAuthentication.logout]');
     _setToken(null);
   }

@@ -31,7 +31,7 @@ abstract class Fields {
     return _fields.containsKey(fieldName)
         ? _fields[fieldName]
         : throw Exception(
-            "Field $fieldName not found for Fields = '{$this()}'",
+            "Field $fieldName not found for Fields = ${toFullString()}",
           );
   }
 

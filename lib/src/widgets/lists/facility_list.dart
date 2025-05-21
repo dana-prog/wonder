@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wonder/src/providers/facilities_provider.dart';
 import 'package:wonder/src/widgets/cards/facility_card.dart';
-import 'package:wonder/src/widgets/lists/item_list_view.dart';
+import 'package:wonder/src/widgets/lists/item_list.dart';
 
-import '../../data/facility.dart';
+import '../../data/facility_item.dart';
+import '../../logger.dart';
+import '../../utils/multitap/multitap.dart';
 import '../async/async_value_widget.dart';
 
 class FacilityList extends ConsumerWidget {
   const FacilityList({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return AsyncValueProviderWidget<List<Facility>>(facilityListProvider, (
-      List<Facility> facilities,
+    return AsyncValueProviderWidget<List<FacilityItem>>(facilityListProvider, (
+      List<FacilityItem> facilities,
       _,
       __,
     ) {
-      return ItemListView<Facility>(
+      return ItemList<FacilityItem>(
         facilities,
-        itemBuilder: FacilityCard.new,
+        itemBuilder: (FacilityItem facility) => MultiTapGestureWrapper(
+            child: FacilityCard(facility),
+            onShortTap: (_) {
+              logger.t('[FacilityList.itemBuilder.onShortTap] onShortTap');
+              final route = '/facility/${facility.id}';
+              logger.d('[navigation.navigateToItem] navigate to $route');
+              context.push(route);
+            },
+            onLongTapDown: (pointer, details) {
+              logger.t('[FacilityList.itemBuilder.onLongTap] onLongTap');
+              // Handle long tap down
+            }),
       );
     });
   }
