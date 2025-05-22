@@ -22,8 +22,12 @@ class FacilityList extends ConsumerWidget {
         List<FacilityItem> facilities,
         _,
       ) {
+        final selFacilites = facilities
+            .where((facility) => facility.id == 'b98d31cf-01b4-4fb5-92b4-32dffd8f3137')
+            .toList();
+
         return ItemList<FacilityItem>(
-          facilities,
+          selFacilites,
           itemBuilder: (FacilityItem facility) => MultiTapGestureWrapper(
               child: FacilityCard(facility),
               onShortTap: (_) {

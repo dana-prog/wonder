@@ -26,7 +26,7 @@ class ItemList<T extends Item> extends StatelessWidget {
       itemBuilder: (context, index) => MultiTapGestureWrapper(
         onShortTap: (pointer) {
           logger.t('[ItemList.onShortTap] pointer: $pointer');
-          final route = '/${items[index].itemType.name}/${items[index].id}';
+          final route = '/${items[index].itemType}/${items[index].id}';
           logger.d('[ListView.builder] navigate to $route');
           context.push(route);
         },

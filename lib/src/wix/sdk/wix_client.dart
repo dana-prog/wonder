@@ -46,7 +46,8 @@ class WixClient {
     await _ensureMemberLogin();
 
     final response = await http.get(
-      Uri.parse('https://www.wixapis.com/wix-data/v2/items/$id?dataCollectionId=${itemMetadata.dataCollectionId}'),
+      Uri.parse(
+          'https://www.wixapis.com/wix-data/v2/items/$id?dataCollectionId=${itemMetadata.dataCollectionId}'),
       headers: _getHeaders(),
     );
 
@@ -75,7 +76,9 @@ class WixClient {
       body: jsonEncode({
         'dataCollectionId': itemMetadata.dataCollectionId,
         'query': {
-          'sort': itemMetadata.defaultSortBy.map((e) => {'fieldName': e.$1, 'order': e.$2.toString()}).toList()
+          'sort': itemMetadata.defaultSortBy
+              .map((e) => {'fieldName': e.$1, 'order': e.$2.toString()})
+              .toList()
         },
       }),
     );
@@ -101,7 +104,7 @@ class WixClient {
       Uri.parse('https://www.wixapis.com/wix-data/v2/items/${item.id}'),
       headers: _getHeaders(),
       body: jsonEncode({
-        'dataCollectionId': item.itemType.pluralName,
+        'dataCollectionId': _metadata.getByName(item.itemType).dataCollectionId,
         'dataItem': {'data': item.fields},
       }),
     );
@@ -121,7 +124,7 @@ class WixClient {
     final dataCollectionId = dataItem['dataCollectionId'];
     final itemMetadata = _metadata.getByCollectionId(dataCollectionId);
     if (!_cache.exists(id)) {
-      _cache.add(itemMetadata.constructor({
+      _cache.add(itemMetadata.itemConstructor({
         'id': dataItem['id'],
         'itemType': itemMetadata.name,
       }));

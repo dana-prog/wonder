@@ -1,25 +1,16 @@
 import 'package:wonder/src/data/data_item.dart';
 import 'package:wonder/src/data/item.dart';
-
-import 'image_fields.dart';
+import 'package:wonder/src/data/item_helpers.dart';
 
 class FacilityItem extends Item {
-  static final defaultPictures = [
-    ImageFields({'slug': '1246fe_888314eeeb9a4468ab2ba15e283ecbfa~mv2.png'}),
+  static final _defaultPictures = [
+    '$mediaPublicUrlPrefix/1246fe_888314eeeb9a4468ab2ba15e283ecbfa~mv2.png'
   ];
 
-  late List<ImageFields> _pictures;
-
-  FacilityItem.fromFields(super.fields) : super.fromFields() {
-    assert(this['itemType'] == 'facility', 'FacilityItem must be of type facility');
-
-    // TODO: check pictures implementation
-    if (containsField('pictures')) {
-      _pictures = this['pictures'].map<ImageFields>((fields) => ImageFields(fields)).toList();
-    } else {
-      _pictures = defaultPictures;
-    }
-  }
+  FacilityItem.fromFields(super.fields)
+      : assert(fields['itemType'] == 'facility',
+            'FacilityItem must be of type facility and not ${fields['itemType']}'),
+        super();
 
   FacilityItem({
     required int number,
@@ -28,7 +19,7 @@ class FacilityItem extends Item {
     required String subtype,
     required String owner,
     int? roomCount,
-  }) : super.fromFields({
+  }) : this.fromFields({
           'dataCollectionId': ItemType.facility.pluralName,
           'number': number,
           'status': status,
@@ -50,10 +41,22 @@ class FacilityItem extends Item {
 
   int get roomCount => (this['roomCount']).toInt();
 
-  List<ImageFields> get pictures => _pictures;
+  List<String> get pictures => getFieldValue('pictures') ?? _defaultPictures;
 
-  ImageFields get mainPicture => pictures[0];
+  String get mainPicture => pictures[0];
 
   @override
-  ItemType get itemType => ItemType.facility;
+  void operator []=(String fieldName, dynamic fieldValue) {
+    if (fieldName != 'pictures') {
+      super[fieldName] = fieldValue;
+      return;
+    }
+
+    super[fieldName] = fieldValue
+        .map((pic) {
+          return getStorageUrl(pic['src']);
+        })
+        .cast<String>()
+        .toList();
+  }
 }

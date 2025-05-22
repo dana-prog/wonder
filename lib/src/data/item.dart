@@ -1,23 +1,23 @@
-import 'package:wonder/src/data/data_item.dart';
-
 class Item extends Fields {
-  Item.fromFields(super.fields);
+  Item(super.fields);
 
   String get id => this['id'];
 
-  ItemType get itemType => this['itemType'];
+  String get itemType => this['itemType'];
 
   @override
   String toString() {
-    return '${itemType.name}:$id';
+    return '$itemType:$id';
   }
 }
 
 abstract class Fields {
-  Fields(this._fields) {
-    initializeFields();
+  Fields(Map<String, dynamic> fields) {
+    for (var entry in fields.entries) {
+      this[entry.key] = entry.value;
+    }
   }
-  late final Map<String, dynamic> _fields;
+  final Map<String, dynamic> _fields = {};
 
   void initializeFields() {}
 
@@ -25,8 +25,8 @@ abstract class Fields {
     return _fields.containsKey(fieldName);
   }
 
-  void putIfAbsent(String fieldName, dynamic fieldValue) {
-    _fields.putIfAbsent(fieldName, () => fieldValue);
+  dynamic getFieldValue(String fieldName, {dynamic defaultValue}) {
+    return containsField(fieldName) ? _fields[fieldName] : defaultValue;
   }
 
   dynamic operator [](String fieldName) {

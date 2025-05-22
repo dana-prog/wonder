@@ -1,17 +1,13 @@
-import 'package:wonder/src/data/data_item.dart';
-
-import 'image_fields.dart';
 import 'item.dart';
+import 'item_helpers.dart';
 
 class UserItem extends Item {
-  static final _defaultPicture = ImageFields({'slug': '1246fe_7609a78c62784e4788f3fb2c6a65fb95~mv2.png'});
-  late ImageFields _picture;
+  static final _defaultPicture =
+      '$mediaPublicUrlPrefix/1246fe_7609a78c62784e4788f3fb2c6a65fb95~mv2.png';
 
-  UserItem.fromFields(super.fields) : super.fromFields() {
-    assert(itemType == ItemType.user, 'UserItem must be of type user');
-
-    _picture = containsField('picture') ? ImageFields.fromWixMediaUrl(this['picture']) : _defaultPicture;
-  }
+  UserItem.fromFields(super.fields)
+      : assert(fields['itemType'] == 'user',
+            'UserItem must be of type user and not ${fields['itemType']}');
 
   String get title => [
         firstName,
@@ -30,8 +26,15 @@ class UserItem extends Item {
 
   String get email => this['email'];
 
-  ImageFields get picture => _picture;
+  String get picture => getFieldValue('picture') ?? _defaultPicture;
 
   @override
-  ItemType get itemType => ItemType.user;
+  void operator []=(String fieldName, dynamic fieldValue) {
+    if (fieldName != 'picture') {
+      super[fieldName] = fieldValue;
+      return;
+    }
+
+    super[fieldName] = getStorageUrl(fieldValue);
+  }
 }

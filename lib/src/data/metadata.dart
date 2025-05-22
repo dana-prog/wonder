@@ -21,13 +21,13 @@ enum SortOrder {
 class TypeMetadata<T extends Item> {
   final String name;
   final String dataCollectionId;
-  final T Function(Map<String, dynamic> fields) constructor;
+  final T Function(Map<String, dynamic> fields) itemConstructor;
   final List<(String, SortOrder)> defaultSortBy;
 
   TypeMetadata({
     required this.name,
     required this.dataCollectionId,
-    required this.constructor,
+    required this.itemConstructor,
     this.defaultSortBy = const [],
   });
 }
@@ -35,7 +35,7 @@ class TypeMetadata<T extends Item> {
 final facilityMetadata = TypeMetadata(
   name: 'facility',
   dataCollectionId: 'facilities',
-  constructor: FacilityItem.fromFields,
+  itemConstructor: FacilityItem.fromFields,
   defaultSortBy: [
     ('number', SortOrder.ascending),
   ],
@@ -44,7 +44,7 @@ final facilityMetadata = TypeMetadata(
 final userMetadata = TypeMetadata(
   name: 'user',
   dataCollectionId: 'users',
-  constructor: UserItem.fromFields,
+  itemConstructor: UserItem.fromFields,
   defaultSortBy: [
     ('firstName', SortOrder.ascending),
     ('nickname', SortOrder.ascending),
@@ -55,7 +55,7 @@ final userMetadata = TypeMetadata(
 final listValueMetadata = TypeMetadata(
   name: 'listValue',
   dataCollectionId: 'lists_of_values',
-  constructor: ListValueItem.fromFields,
+  itemConstructor: ListValueItem.fromFields,
   defaultSortBy: [
     ('type', SortOrder.ascending),
     ('name', SortOrder.ascending),
@@ -84,7 +84,8 @@ class Metadata {
     }
   }
 
-  TypeMetadata getByName(String name) => _byName[name] ?? (throw Exception('No metadata found for $name'));
+  TypeMetadata getByName(String name) =>
+      _byName[name] ?? (throw Exception('No metadata found for $name'));
 
   TypeMetadata getByCollectionId(String collectionId) =>
       _byCollectionId[collectionId] ?? (throw Exception('No metadata found for $collectionId'));

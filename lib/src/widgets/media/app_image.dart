@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:wonder/src/data/image_fields.dart';
 
 import '../../logger.dart';
 
 class AppImage extends StatelessWidget {
-  final ImageFields imageFields;
+  final String url;
   final double? width;
   final double? height;
 
   const AppImage(
-    this.imageFields, {
+    this.url, {
     this.width,
     this.height,
     super.key,
@@ -18,9 +17,9 @@ class AppImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.t('[AppImage:build]: url: ${imageFields.url}');
+    logger.d('[AppImage:build]: url: $url');
     return Image.network(
-      imageFields.url,
+      url,
       width: width,
       height: height,
       fit: BoxFit.cover,
