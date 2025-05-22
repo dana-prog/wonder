@@ -1,6 +1,4 @@
-import 'package:wonder/src/data/item.dart';
-
-enum DataItemType {
+enum ItemType {
   facility,
   ticket,
   listsOfValues,
@@ -8,36 +6,29 @@ enum DataItemType {
 
   String get pluralName {
     switch (this) {
-      case DataItemType.facility:
+      case ItemType.facility:
         return 'facilities';
-      case DataItemType.ticket:
+      case ItemType.ticket:
         return 'tickets';
-      case DataItemType.listsOfValues:
+      case ItemType.listsOfValues:
         return 'lists_of_values';
-      case DataItemType.user:
+      case ItemType.user:
         return 'users';
     }
   }
 
-  static DataItemType fromPluralName(String name) {
+  static ItemType fromPluralName(String name) {
     switch (name) {
       case 'facilities':
-        return DataItemType.facility;
+        return ItemType.facility;
       case 'tickets':
-        return DataItemType.ticket;
+        return ItemType.ticket;
+      case 'users':
+        return ItemType.user;
+      case 'lists_of_values':
+        return ItemType.listsOfValues;
       default:
         throw Exception('Unknown type: $name');
     }
-  }
-}
-
-abstract class DataItem extends Item {
-  DataItem.fromDataCollection(super.fields);
-
-  DataItemType get dataItemType;
-
-  @override
-  String toString() {
-    return '${dataItemType.name}:$id';
   }
 }

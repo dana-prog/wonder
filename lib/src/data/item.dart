@@ -1,13 +1,15 @@
-class Item extends Fields {
-  static final String itemTypeFieldName = 'itemType';
+import 'package:wonder/src/data/data_item.dart';
 
-  Item(super.fields);
+class Item extends Fields {
+  Item.fromFields(super.fields);
 
   String get id => this['id'];
 
+  ItemType get itemType => this['itemType'];
+
   @override
   String toString() {
-    return '${this['dataCollectionId']}:$id';
+    return '${itemType.name}:$id';
   }
 }
 
@@ -40,6 +42,8 @@ abstract class Fields {
   }
 
   Iterable<String> get fieldNames => _fields.keys;
+
+  Iterable<MapEntry<String, dynamic>> get fields => _fields.entries;
 
   @override
   String toString() => toFullString();

@@ -2,26 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:wonder/src/data/metadata.dart';
 import 'package:wonder/src/wix/sdk/token.dart';
 import 'package:wonder/src/wix/sdk/wix_authentication.dart';
 
-import '../../data/data_item.dart';
+import '../../data/item.dart';
 import '../../logger.dart';
-
-enum SortOrder {
-  ascending,
-  descending;
-
-  @override
-  String toString() {
-    switch (this) {
-      case SortOrder.ascending:
-        return 'ASC';
-      case SortOrder.descending:
-        return 'DESC';
-    }
-  }
-}
 
 enum _HeaderContentType {
   json,
@@ -40,15 +26,46 @@ enum _HeaderContentType {
 
 class WixClient {
   final authentication = WixAuthentication();
+  final _metadata = Metadata();
+  final _cache = _Cache();
 
   WixClient();
 
-  Future<List<T>> fetchItems<T extends DataItem>({
-    required String dataCollectionId,
-    required T Function(Map<String, dynamic>) itemConstructor,
-    List<(String, SortOrder?)>? sortBy,
+  Future<T> fetchItem<T extends Item>({
+    required String itemType,
+    required String id,
   }) async {
-    logger.t('[WixClient.fetchItems] itemType: $dataCollectionId');
+    logger.t('[WixClient.fetchItem] $itemType/$id');
+
+    if (_cache.exists(id)) {
+      return _cache[id] as T;
+    }
+
+    final itemMetadata = _metadata.getByName(itemType);
+
+    await _ensureMemberLogin();
+
+    final response = await http.get(
+      Uri.parse('https://www.wixapis.com/wix-data/v2/items/$id?dataCollectionId=${itemMetadata.dataCollectionId}'),
+      headers: _getHeaders(),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('[WixClient.fetchItem] Failed to fetch $itemType: ${response.body}');
+    }
+
+    logger.t('[WixClient.fetchItem] response.body: ${response.body}');
+
+    final dataItem = jsonDecode(response.body)['dataItem'];
+    return getItemObject(dataItem) as T;
+  }
+
+  Future<List<T>> fetchItems<T extends Item>({
+    required String itemType,
+  }) async {
+    logger.t('[WixClient.fetchItems] $itemType');
+
+    final itemMetadata = _metadata.getByName(itemType);
 
     await _ensureMemberLogin();
 
@@ -56,32 +73,68 @@ class WixClient {
       Uri.parse('https://www.wixapis.com/wix-data/v2/items/query'),
       headers: _getHeaders(),
       body: jsonEncode({
-        'dataCollectionId': dataCollectionId,
+        'dataCollectionId': itemMetadata.dataCollectionId,
         'query': {
-          'sort': sortBy
-              ?.map((e) => {
-                    'fieldName': e.$1,
-                    'order': (e.$2 ?? SortOrder.ascending).toString(),
-                  })
-              .toList(),
-        }
+          'sort': itemMetadata.defaultSortBy.map((e) => {'fieldName': e.$1, 'order': e.$2.toString()}).toList()
+        },
       }),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('[WixClient.fetchItems] Failed to fetch $dataCollectionId: ${response.body}');
+      throw Exception('[WixClient.fetchItems] Failed to fetch $itemType: ${response.body}');
     }
 
     logger.t('[WixClient.fetchItems] response.body: ${response.body}');
 
     return (jsonDecode(response.body)['dataItems'] as List)
         .cast<Map<String, dynamic>>()
-        .map((dataItem) => itemConstructor({
-              'id': dataItem['id'],
-              'dataCollectionId': dataItem['dataCollectionId'],
-              ...(dataItem['data'] as Map<String, dynamic>),
-            }))
+        .map((dataItem) => getItemObject(dataItem) as T)
         .toList();
+  }
+
+  Future<T> updateItem<T extends Item>(T item) async {
+    logger.t('[WixClient.updateItem] item: $item');
+
+    await _ensureMemberLogin();
+
+    final response = await http.put(
+      Uri.parse('https://www.wixapis.com/wix-data/v2/items/${item.id}'),
+      headers: _getHeaders(),
+      body: jsonEncode({
+        'dataCollectionId': item.itemType.pluralName,
+        'dataItem': {'data': item.fields},
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('[WixClient.updateItem] Failed to updateItem $item: ${response.body}');
+    }
+
+    logger.t('[WixClient.updateItem] response.body: ${response.body}');
+
+    final dataItem = jsonDecode(response.body)['dataItem'];
+    return getItemObject(dataItem) as T;
+  }
+
+  Item getItemObject(Map<String, dynamic> dataItem) {
+    final id = dataItem['id'];
+    final dataCollectionId = dataItem['dataCollectionId'];
+    final itemMetadata = _metadata.getByCollectionId(dataCollectionId);
+    if (!_cache.exists(id)) {
+      _cache.add(itemMetadata.constructor({
+        'id': dataItem['id'],
+        'itemType': itemMetadata.name,
+      }));
+    }
+
+    final item = _cache[id];
+    final data = dataItem['data'] as Map<String, dynamic>;
+
+    for (var entry in data.entries) {
+      item[entry.key] = entry.value;
+    }
+
+    return item;
   }
 
   Map<String, String> _getHeaders({_HeaderContentType contentType = _HeaderContentType.json}) => {
@@ -106,4 +159,34 @@ class WixClient {
 
     await authentication.login(GrantType.authorizationCode);
   }
+}
+
+class _Cache {
+  static final _Cache _instance = _Cache._internal();
+
+  factory _Cache() {
+    return _instance;
+  }
+
+  _Cache._internal();
+
+  final Map<String, Item> _itemsById = {};
+
+  bool exists(String id) {
+    return _itemsById.containsKey(id);
+  }
+
+  dynamic operator [](String id) {
+    return _itemsById.containsKey(id)
+        ? _itemsById[id]
+        : throw Exception(
+            "Item with id $id not found in cache",
+          );
+  }
+
+  void add(Item item) {
+    _itemsById[item.id] = item;
+  }
+
+  void clear() => _itemsById.clear();
 }

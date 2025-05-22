@@ -1,24 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/data/data_item.dart';
 import 'package:wonder/src/providers/wix_client_provider.dart';
 
 import '../data/user_item.dart';
-import '../wix/sdk/wix_client.dart';
 
 final _allUsersProvider = FutureProvider<_UserList>((
   ref,
 ) async {
   if (_userList == null) {
     final wixClient = ref.watch(wixClientProvider);
-    final users = await wixClient.fetchItems(
-      dataCollectionId: DataItemType.user.pluralName,
-      itemConstructor: UserItem.fromDataCollection,
-      sortBy: [
-        ('firstName', SortOrder.ascending),
-        ('nickname', SortOrder.ascending),
-        ('lastName', SortOrder.ascending),
-      ],
-    );
+    final users = await wixClient.fetchItems<UserItem>(itemType: 'user');
 
     _userList = _UserList(users);
   }
@@ -37,8 +27,15 @@ final userProvider = FutureProvider.family<UserItem, String>((
   ref,
   id,
 ) async {
-  final userList = await ref.watch(_allUsersProvider.future);
-  return userList.getUserById(id);
+  final wixClient = ref.watch(wixClientProvider);
+  return await wixClient.fetchItem<UserItem>(
+    itemType: 'user',
+    id: id,
+  );
+});
+
+final noUserProvider = FutureProvider((_) async {
+  return null;
 });
 
 _UserList? _userList;

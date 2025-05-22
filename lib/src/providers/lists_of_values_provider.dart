@@ -2,23 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/data/list_value_item.dart';
 import 'package:wonder/src/providers/wix_client_provider.dart';
 
-import '../data/data_item.dart';
-import '../wix/sdk/wix_client.dart';
-
 final _allValuesProvider = FutureProvider<_ListsOfValues>((
   ref,
 ) async {
   if (_listsOfValues == null) {
     final wixClient = ref.watch(wixClientProvider);
-    final values = await wixClient.fetchItems(
-      dataCollectionId: DataItemType.listsOfValues.pluralName,
-      itemConstructor: ListValueItem.fromDataCollection,
-      sortBy: [
-        ('type', SortOrder.ascending),
-        ('order', SortOrder.ascending),
-        ('title', SortOrder.ascending),
-      ],
-    );
+    final values = await wixClient.fetchItems<ListValueItem>(itemType: 'listValue');
 
     _listsOfValues = _ListsOfValues(values);
   }

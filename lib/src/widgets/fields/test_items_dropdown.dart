@@ -22,8 +22,8 @@ class TestItemsDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AsyncValueProviderWidget<List<UserItem>>(
-      usersProvider,
-      (values, _, __) {
+      provider: usersProvider,
+      dataBuilder: (values, _, __) {
         return DropdownButtonFormField<String>(
           value: value,
           decoration: decoration,

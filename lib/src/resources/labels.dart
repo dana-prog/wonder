@@ -1,6 +1,7 @@
 class Labels {
   static const String ticketsTitle = 'Tickets';
   static const String facilitiesTitle = 'Facilities';
+  static const String debugTitle = 'Debug';
   static const String noDataFound = 'No Data Found';
   static const String noOwner = 'No Owner';
   static const String save = 'Save';

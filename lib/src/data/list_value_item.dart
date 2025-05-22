@@ -1,6 +1,7 @@
 import 'dart:core';
 
 import 'data_item.dart';
+import 'item.dart';
 
 enum ValueItemType {
   facilityStatus,
@@ -28,9 +29,9 @@ enum ValueItemType {
   }
 }
 
-class ListValueItem extends DataItem {
-  ListValueItem.fromDataCollection(super.fields) : super.fromDataCollection() {
-    assert(dataItemType == DataItemType.listsOfValues, 'ListValueItem must be of type listValue');
+class ListValueItem extends Item {
+  ListValueItem.fromFields(super.fields) : super.fromFields() {
+    assert(itemType == ItemType.listsOfValues, 'ListValueItem must be of type listValue');
   }
 
   ValueItemType get valueItemType => ValueItemType.values.byName(this['type']);
@@ -44,7 +45,7 @@ class ListValueItem extends DataItem {
   int get order => this['order'] ?? -1;
 
   @override
-  DataItemType get dataItemType => DataItemType.listsOfValues;
+  ItemType get itemType => ItemType.listsOfValues;
 
   @override
   String toString() => '${valueItemType.name}:$name';

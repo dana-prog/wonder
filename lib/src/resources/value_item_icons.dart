@@ -10,14 +10,14 @@ class ValueItemIcons {
       'underConstruction': Icons.construction,
       'ready': Icons.check_circle_outline,
       'operational': Icons.check_circle,
-    }
+    },
   };
 
-  static IconData getIcon(ListValueItem item) {
+  static IconData? getIcon(ListValueItem item) {
     return _getIcon(item.valueItemType.name, item.name);
   }
 
-  static IconData _getIcon(String type, String name) {
-    return icons[type]?[name] ?? Icons.question_mark;
+  static IconData? _getIcon(String type, String name) {
+    return icons[type]?[name];
   }
 }

@@ -24,8 +24,8 @@ class ValueItemsDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AsyncValueProviderWidget<List<ListValueItem>>(
-      listOfValuesProvider(type),
-      (values, _, __) {
+      provider: listOfValuesProvider(type),
+      dataBuilder: (values, _, __) {
         return DropdownButtonFormField<String>(
           value: value,
           decoration: decoration,
@@ -39,12 +39,18 @@ class ValueItemsDropdown extends StatelessWidget {
   }
 
   DropdownMenuItem<String> getMenuItem(ListValueItem value) {
+    final widgets = <Widget>[];
+    final icon = ValueItemIcons.getIcon(value);
+    if (icon != null) {
+      widgets.add(Icon(icon, size: 16));
+      widgets.add(const SizedBox(width: 16));
+    }
+
     return DropdownMenuItem<String>(
       value: value.id,
       child: Row(
         children: [
-          Icon(ValueItemIcons.getIcon(value), size: 16),
-          const SizedBox(width: 8),
+          ...widgets,
           Text(value.title),
         ],
       ),

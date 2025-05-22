@@ -1,16 +1,17 @@
 import 'package:wonder/src/data/data_item.dart';
+import 'package:wonder/src/data/item.dart';
 
 import 'image_fields.dart';
 
-class FacilityItem extends DataItem {
+class FacilityItem extends Item {
   static final defaultPictures = [
     ImageFields({'slug': '1246fe_888314eeeb9a4468ab2ba15e283ecbfa~mv2.png'}),
   ];
 
   late List<ImageFields> _pictures;
 
-  FacilityItem.fromDataCollection(super.fields) : super.fromDataCollection() {
-    assert(this['dataCollectionId'] == DataItemType.facility.pluralName, 'FacilityItem must be of type facility');
+  FacilityItem.fromFields(super.fields) : super.fromFields() {
+    assert(this['itemType'] == 'facility', 'FacilityItem must be of type facility');
 
     // TODO: check pictures implementation
     if (containsField('pictures')) {
@@ -27,8 +28,8 @@ class FacilityItem extends DataItem {
     required String subtype,
     required String owner,
     int? roomCount,
-  }) : super.fromDataCollection({
-          'dataCollectionId': DataItemType.facility.pluralName,
+  }) : super.fromFields({
+          'dataCollectionId': ItemType.facility.pluralName,
           'number': number,
           'status': status,
           'type': type,
@@ -54,5 +55,5 @@ class FacilityItem extends DataItem {
   ImageFields get mainPicture => pictures[0];
 
   @override
-  DataItemType get dataItemType => DataItemType.facility;
+  ItemType get itemType => ItemType.facility;
 }

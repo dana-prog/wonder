@@ -1,20 +1,27 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../resources/labels.dart';
-import '../progress_indicator/progress_indicator.dart';
+
+enum ProgressIndicatorType {
+  none,
+  circular,
+  shimmer,
+}
+
+Widget _defaultLoadingBuilder(BuildContext context) => const SizedBox();
 
 class AsyncValueWidget<T> extends StatelessWidget {
   final AsyncValue<T> asyncValue;
   final Widget Function(T, BuildContext) dataBuilder;
-  final bool? showProgressIndicator;
+  final Widget Function(BuildContext)? loadingBuilder;
   final bool? showNoDataIndicator;
   final bool? showErrorIndicator;
 
-  const AsyncValueWidget(
-    this.asyncValue,
-    this.dataBuilder, {
-    this.showProgressIndicator,
+  const AsyncValueWidget({
+    required this.asyncValue,
+    required this.dataBuilder,
+    this.loadingBuilder,
     this.showNoDataIndicator,
     this.showErrorIndicator,
   });
@@ -22,9 +29,9 @@ class AsyncValueWidget<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _AsyncValuesWidget(
-      [asyncValue],
-      (values, context) => dataBuilder(values[0], context),
-      showProgressIndicator: showProgressIndicator,
+      asyncValues: [asyncValue],
+      dataBuilder: (values, context) => dataBuilder(values[0], context),
+      loadingBuilder: loadingBuilder,
       showNoDataIndicator: showNoDataIndicator,
       showErrorIndicator: showErrorIndicator,
     );
@@ -35,15 +42,15 @@ class AsyncValuesWidget2<T1, T2> extends StatelessWidget {
   final AsyncValue<T1> asyncValue1;
   final AsyncValue<T2> asyncValue2;
   final Widget Function(T1, T2, BuildContext) dataBuilder;
-  final bool? showProgressIndicator;
+  final Widget Function(BuildContext)? loadingBuilder;
   final bool? showNoDataIndicator;
   final bool? showErrorIndicator;
 
-  const AsyncValuesWidget2(
-    this.asyncValue1,
-    this.asyncValue2,
-    this.dataBuilder, {
-    this.showProgressIndicator,
+  const AsyncValuesWidget2({
+    required this.asyncValue1,
+    required this.asyncValue2,
+    required this.dataBuilder,
+    this.loadingBuilder,
     this.showNoDataIndicator,
     this.showErrorIndicator,
   });
@@ -51,13 +58,13 @@ class AsyncValuesWidget2<T1, T2> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _AsyncValuesWidget(
-      [asyncValue1, asyncValue2],
-      (values, context) => dataBuilder(
+      asyncValues: [asyncValue1, asyncValue2],
+      dataBuilder: (values, context) => dataBuilder(
         values[0],
         values[1],
         context,
       ),
-      showProgressIndicator: showProgressIndicator,
+      loadingBuilder: loadingBuilder,
       showNoDataIndicator: showNoDataIndicator,
       showErrorIndicator: showErrorIndicator,
     );
@@ -69,16 +76,16 @@ class AsyncValuesWidget3<T1, T2, T3> extends StatelessWidget {
   final AsyncValue<T2> asyncValue2;
   final AsyncValue<T3> asyncValue3;
   final Widget Function(T1, T2, T3, BuildContext) dataBuilder;
-  final bool? showProgressIndicator;
+  final Widget Function(BuildContext)? loadingBuilder;
   final bool? showNoDataIndicator;
   final bool? showErrorIndicator;
 
-  const AsyncValuesWidget3(
-    this.asyncValue1,
-    this.asyncValue2,
-    this.asyncValue3,
-    this.dataBuilder, {
-    this.showProgressIndicator,
+  const AsyncValuesWidget3({
+    required this.asyncValue1,
+    required this.asyncValue2,
+    required this.asyncValue3,
+    required this.dataBuilder,
+    this.loadingBuilder,
     this.showNoDataIndicator,
     this.showErrorIndicator,
   });
@@ -86,14 +93,14 @@ class AsyncValuesWidget3<T1, T2, T3> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _AsyncValuesWidget(
-      [asyncValue1, asyncValue2, asyncValue3],
-      (values, context) => dataBuilder(
+      asyncValues: [asyncValue1, asyncValue2, asyncValue3],
+      dataBuilder: (values, context) => dataBuilder(
         values[0],
         values[1],
         values[2],
         context,
       ),
-      showProgressIndicator: showProgressIndicator,
+      loadingBuilder: loadingBuilder,
       showNoDataIndicator: showNoDataIndicator,
       showErrorIndicator: showErrorIndicator,
     );
@@ -103,14 +110,14 @@ class AsyncValuesWidget3<T1, T2, T3> extends StatelessWidget {
 class _AsyncValuesWidget extends StatelessWidget {
   final List<AsyncValue> asyncValues;
   final Widget Function(List, BuildContext) dataBuilder;
-  final bool? showProgressIndicator;
+  final Widget Function(BuildContext)? loadingBuilder;
   final bool? showNoDataIndicator;
   final bool? showErrorIndicator;
 
-  const _AsyncValuesWidget(
-    this.asyncValues,
-    this.dataBuilder, {
-    this.showProgressIndicator,
+  const _AsyncValuesWidget({
+    required this.asyncValues,
+    required this.dataBuilder,
+    this.loadingBuilder,
     this.showNoDataIndicator,
     this.showErrorIndicator,
   });
@@ -119,7 +126,7 @@ class _AsyncValuesWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // Check if any of the AsyncValue objects are still loading
     if (asyncValues.any((av) => av.isLoading)) {
-      return showProgressIndicator != false ? const AppProgressIndicator() : const SizedBox();
+      return (loadingBuilder ?? _defaultLoadingBuilder)(context);
     }
 
     final errorIndex = asyncValues.indexWhere((av) => av.hasError);
@@ -140,8 +147,8 @@ class _AsyncValuesWidget extends StatelessWidget {
     }
 
     final values = asyncValues.map((av) => av.value).toList();
-    if (values.any((v) => v == null)) {
-      return showNoDataIndicator != false ? const Center(child: Text(Labels.noDataFound)) : const SizedBox();
+    if (showNoDataIndicator == true && values.any((v) => v == null)) {
+      return const Center(child: Text(Labels.noDataFound));
     }
 
     return dataBuilder(values, context);
@@ -151,14 +158,14 @@ class _AsyncValuesWidget extends StatelessWidget {
 class AsyncValueProviderWidget<T> extends ConsumerWidget {
   final ProviderListenable<AsyncValue<T>> provider;
   final Widget Function(T, BuildContext, WidgetRef) dataBuilder;
-  final bool? showProgressIndicator;
+  final Widget Function(BuildContext)? loadingBuilder;
   final bool? showNoDataIndicator;
   final bool? showErrorIndicator;
 
-  const AsyncValueProviderWidget(
-    this.provider,
-    this.dataBuilder, {
-    this.showProgressIndicator,
+  const AsyncValueProviderWidget({
+    required this.provider,
+    required this.dataBuilder,
+    this.loadingBuilder,
     this.showNoDataIndicator,
     this.showErrorIndicator,
   });
@@ -167,9 +174,9 @@ class AsyncValueProviderWidget<T> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncValue = ref.watch(provider);
     return AsyncValueWidget<T>(
-      asyncValue,
-      (value, _) => dataBuilder(value, context, ref),
-      showProgressIndicator: showProgressIndicator,
+      asyncValue: asyncValue,
+      dataBuilder: (value, _) => dataBuilder(value, context, ref),
+      loadingBuilder: loadingBuilder,
       showNoDataIndicator: showNoDataIndicator,
       showErrorIndicator: showErrorIndicator,
     );
@@ -180,15 +187,15 @@ class AsyncValueProviderWidget2<T1, T2> extends ConsumerWidget {
   final ProviderListenable<AsyncValue<T1>> provider1;
   final ProviderListenable<AsyncValue<T2>> provider2;
   final Widget Function(T1, T2, BuildContext, WidgetRef) dataBuilder;
-  final bool? showProgressIndicator;
+  final Widget Function(BuildContext)? loadingBuilder;
   final bool? showNoDataIndicator;
   final bool? showErrorIndicator;
 
-  const AsyncValueProviderWidget2(
-    this.provider1,
-    this.provider2,
-    this.dataBuilder, {
-    this.showProgressIndicator,
+  const AsyncValueProviderWidget2({
+    required this.provider1,
+    required this.provider2,
+    required this.dataBuilder,
+    this.loadingBuilder,
     this.showNoDataIndicator,
     this.showErrorIndicator,
   });
@@ -196,14 +203,14 @@ class AsyncValueProviderWidget2<T1, T2> extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return _AsyncValuesProviderWidget(
-      [provider1, provider2],
-      (values, _, __) => dataBuilder(
+      providers: [provider1, provider2],
+      dataBuilder: (values, _, __) => dataBuilder(
         values[0],
         values[1],
         context,
         ref,
       ),
-      showProgressIndicator: showProgressIndicator,
+      loadingBuilder: loadingBuilder,
       showNoDataIndicator: showNoDataIndicator,
       showErrorIndicator: showErrorIndicator,
     );
@@ -215,16 +222,16 @@ class AsyncValueProviderWidget3<T1, T2, T3> extends ConsumerWidget {
   final ProviderListenable<AsyncValue<T2>> provider2;
   final ProviderListenable<AsyncValue<T3>> provider3;
   final Widget Function(T1, T2, T3, BuildContext, WidgetRef) dataBuilder;
-  final bool? showProgressIndicator;
+  final Widget Function(BuildContext)? loadingBuilder;
   final bool? showNoDataIndicator;
   final bool? showErrorIndicator;
 
-  const AsyncValueProviderWidget3(
-    this.provider1,
-    this.provider2,
-    this.provider3,
-    this.dataBuilder, {
-    this.showProgressIndicator,
+  const AsyncValueProviderWidget3({
+    required this.provider1,
+    required this.provider2,
+    required this.provider3,
+    required this.dataBuilder,
+    this.loadingBuilder,
     this.showNoDataIndicator,
     this.showErrorIndicator,
   });
@@ -232,15 +239,15 @@ class AsyncValueProviderWidget3<T1, T2, T3> extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return _AsyncValuesProviderWidget(
-      [provider1, provider2, provider3],
-      (values, _, __) => dataBuilder(
+      providers: [provider1, provider2, provider3],
+      dataBuilder: (values, _, __) => dataBuilder(
         values[0],
         values[1],
         values[2],
         context,
         ref,
       ),
-      showProgressIndicator: showProgressIndicator,
+      loadingBuilder: loadingBuilder,
       showNoDataIndicator: showNoDataIndicator,
       showErrorIndicator: showErrorIndicator,
     );
@@ -253,26 +260,26 @@ class AsyncValueProviderWidget4<T1, T2, T3, T4> extends ConsumerWidget {
   final ProviderListenable<AsyncValue<T3>> provider3;
   final ProviderListenable<AsyncValue<T4>> provider4;
   final Widget Function(T1, T2, T3, T4, BuildContext, WidgetRef) dataBuilder;
-  final bool showProgressIndicator;
-  final bool showNoDataIndicator;
-  final bool showErrorIndicator;
+  final Widget Function(BuildContext)? loadingBuilder;
+  final bool? showNoDataIndicator;
+  final bool? showErrorIndicator;
 
-  const AsyncValueProviderWidget4(
-    this.provider1,
-    this.provider2,
-    this.provider3,
-    this.provider4,
-    this.dataBuilder, {
-    this.showProgressIndicator = true,
-    this.showNoDataIndicator = true,
-    this.showErrorIndicator = true,
+  const AsyncValueProviderWidget4({
+    required this.provider1,
+    required this.provider2,
+    required this.provider3,
+    required this.provider4,
+    required this.dataBuilder,
+    this.loadingBuilder,
+    this.showNoDataIndicator,
+    this.showErrorIndicator,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return _AsyncValuesProviderWidget(
-      [provider1, provider2, provider3, provider4],
-      (values, _, __) => dataBuilder(
+      providers: [provider1, provider2, provider3, provider4],
+      dataBuilder: (values, _, __) => dataBuilder(
         values[0],
         values[1],
         values[2],
@@ -280,7 +287,7 @@ class AsyncValueProviderWidget4<T1, T2, T3, T4> extends ConsumerWidget {
         context,
         ref,
       ),
-      showProgressIndicator: showProgressIndicator,
+      loadingBuilder: loadingBuilder,
       showNoDataIndicator: showNoDataIndicator,
       showErrorIndicator: showErrorIndicator,
     );
@@ -290,14 +297,14 @@ class AsyncValueProviderWidget4<T1, T2, T3, T4> extends ConsumerWidget {
 class _AsyncValuesProviderWidget extends ConsumerWidget {
   final List<ProviderListenable<AsyncValue>> providers;
   final Widget Function(List, BuildContext, WidgetRef) dataBuilder;
-  final bool? showProgressIndicator;
+  final Widget Function(BuildContext)? loadingBuilder;
   final bool? showNoDataIndicator;
   final bool? showErrorIndicator;
 
-  const _AsyncValuesProviderWidget(
-    this.providers,
-    this.dataBuilder, {
-    this.showProgressIndicator,
+  const _AsyncValuesProviderWidget({
+    required this.providers,
+    required this.dataBuilder,
+    this.loadingBuilder,
     this.showNoDataIndicator,
     this.showErrorIndicator,
   });
@@ -311,13 +318,13 @@ class _AsyncValuesProviderWidget extends ConsumerWidget {
         .toList();
 
     return _AsyncValuesWidget(
-      asyncValues,
-      (values, _) => dataBuilder(
+      asyncValues: asyncValues,
+      dataBuilder: (values, _) => dataBuilder(
         values,
         context,
         ref,
       ),
-      showProgressIndicator: showProgressIndicator,
+      loadingBuilder: loadingBuilder,
       showNoDataIndicator: showNoDataIndicator,
       showErrorIndicator: showErrorIndicator,
     );

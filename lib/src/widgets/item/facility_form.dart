@@ -60,6 +60,8 @@ class _FacilityFormState extends State<FacilityForm> {
     );
   }
 
+  Future<void> save() async {}
+
   List<Widget> get fieldsLayout => spaceWidgets([
         Row(
           children: spaceWidgets([
@@ -92,6 +94,7 @@ class _FacilityFormState extends State<FacilityForm> {
         initialValue: _number.toString(),
         decoration: InputDecoration(labelText: fields['number']),
         validator: (value) => int.tryParse(value ?? '') == null ? 'Enter a valid number' : null,
+        // onChanged: saveForm,
         onSaved: (value) => _number = int.parse(value!),
       );
 
@@ -171,8 +174,8 @@ class FacilityFormConsumer extends ConsumerWidget {
     final asyncFacility = ref.watch(facilityProvider(id));
 
     return AsyncValueWidget<FacilityItem>(
-      asyncFacility,
-      (item, _) {
+      asyncValue: asyncFacility,
+      dataBuilder: (item, _) {
         return FacilityForm(initialItem: item);
       },
     );

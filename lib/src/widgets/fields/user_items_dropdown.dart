@@ -33,13 +33,13 @@ class UserItemsDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AsyncValueProviderWidget2<List<UserItem>, UserItem?>(
-      usersProvider,
-      value != null
+      provider1: usersProvider,
+      provider2: value != null
           ? userProvider(value!)
           : FutureProvider((_) async {
               return null;
             }),
-      (users, selectedUser, _, __) {
+      dataBuilder: (users, selectedUser, _, __) {
         return DropdownButtonFormField<String>(
           isExpanded: true,
           value: value,
