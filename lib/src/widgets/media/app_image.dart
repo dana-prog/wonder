@@ -17,7 +17,7 @@ class AppImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.d('[AppImage:build]: url: $url');
+    logger.t('[AppImage:build]: url: $url');
     return Image.network(
       url,
       width: width,

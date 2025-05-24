@@ -35,6 +35,6 @@ class UserItem extends Item {
       return;
     }
 
-    super[fieldName] = getStorageUrl(fieldValue);
+    super[fieldName] = (fieldValue is String) ? fieldValue : getStorageUrl(fieldValue);
   }
 }

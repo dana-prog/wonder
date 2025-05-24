@@ -5,4 +5,6 @@ class Locations {
   static const facilities = '/facilities';
   static const item = '/:itemType/:itemId';
   static const debug = '/debug';
+  static const themeSettings = '/theme_settings';
+  static const more = '/more';
 }

@@ -8,6 +8,7 @@ import 'package:wonder/src/wix/sdk/wix_authentication.dart';
 
 import '../../data/item.dart';
 import '../../logger.dart';
+import 'client.dart';
 
 enum _HeaderContentType {
   json,
@@ -24,13 +25,14 @@ enum _HeaderContentType {
   }
 }
 
-class WixClient {
-  final authentication = WixAuthentication();
+class WixClient extends Client {
+  final _authentication = WixAuthentication();
   final _metadata = Metadata();
   final _cache = _Cache();
 
   WixClient();
 
+  @override
   Future<T> fetchItem<T extends Item>({
     required String itemType,
     required String id,
@@ -58,9 +60,10 @@ class WixClient {
     logger.t('[WixClient.fetchItem] response.body: ${response.body}');
 
     final dataItem = jsonDecode(response.body)['dataItem'];
-    return getItemObject(dataItem) as T;
+    return _getItemObject(dataItem) as T;
   }
 
+  @override
   Future<List<T>> fetchItems<T extends Item>({
     required String itemType,
   }) async {
@@ -91,10 +94,11 @@ class WixClient {
 
     return (jsonDecode(response.body)['dataItems'] as List)
         .cast<Map<String, dynamic>>()
-        .map((dataItem) => getItemObject(dataItem) as T)
+        .map((dataItem) => _getItemObject(dataItem) as T)
         .toList();
   }
 
+  @override
   Future<T> updateItem<T extends Item>(T item) async {
     logger.t('[WixClient.updateItem] item: $item');
 
@@ -116,15 +120,15 @@ class WixClient {
     logger.t('[WixClient.updateItem] response.body: ${response.body}');
 
     final dataItem = jsonDecode(response.body)['dataItem'];
-    return getItemObject(dataItem) as T;
+    return _getItemObject(dataItem) as T;
   }
 
-  Item getItemObject(Map<String, dynamic> dataItem) {
+  Item _getItemObject(Map<String, dynamic> dataItem) {
     final id = dataItem['id'];
     final dataCollectionId = dataItem['dataCollectionId'];
     final itemMetadata = _metadata.getByCollectionId(dataCollectionId);
     if (!_cache.exists(id)) {
-      _cache.add(itemMetadata.itemConstructor({
+      _cache.add(itemMetadata.deserializer({
         'id': dataItem['id'],
         'itemType': itemMetadata.name,
       }));
@@ -146,7 +150,7 @@ class WixClient {
       };
 
   String get _userAuth {
-    final accessToken = authentication.accessToken;
+    final accessToken = _authentication.accessToken;
     if (accessToken == null) {
       throw Exception('Access token is null, please login first');
     }
@@ -155,12 +159,23 @@ class WixClient {
   }
 
   Future<void> _ensureMemberLogin() async {
-    final loginState = await authentication.getLoginState();
+    final loginState = await _authentication.getLoginState();
     if (loginState == LoginState.loggedInAsMember) {
       return;
     }
 
-    await authentication.login(GrantType.authorizationCode);
+    await _authentication.login(GrantType.authorizationCode);
+  }
+
+  @override
+  void printCachedItems() {
+    final itemFields = _cache.itemsById.values.map((item) {
+      final fields = item.fields;
+      fields.removeWhere((fieldName, fieldValue) => fieldName.startsWith('_'));
+      return fields;
+    }).toList();
+    final str = jsonEncode(itemFields);
+    logger.i(str);
   }
 }
 
@@ -173,23 +188,23 @@ class _Cache {
 
   _Cache._internal();
 
-  final Map<String, Item> _itemsById = {};
+  final Map<String, Item> itemsById = {};
 
   bool exists(String id) {
-    return _itemsById.containsKey(id);
+    return itemsById.containsKey(id);
   }
 
   dynamic operator [](String id) {
-    return _itemsById.containsKey(id)
-        ? _itemsById[id]
+    return itemsById.containsKey(id)
+        ? itemsById[id]
         : throw Exception(
             "Item with id $id not found in cache",
           );
   }
 
   void add(Item item) {
-    _itemsById[item.id] = item;
+    itemsById[item.id] = item;
   }
 
-  void clear() => _itemsById.clear();
+  void clear() => itemsById.clear();
 }

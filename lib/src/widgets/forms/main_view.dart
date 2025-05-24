@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wonder/src/logger.dart';
-import 'package:wonder/src/widgets/forms/debug_view.dart';
+import 'package:wonder/src/widgets/forms/more_view.dart';
 
 import '../../resources/labels.dart';
 import '../lists/facility_list.dart';
@@ -23,28 +23,28 @@ class _Page {
 
 const String ticketsPageName = 'tickets';
 const String facilitiesPageName = 'facilities';
-const String debugPageName = 'debug';
+const String morePageName = 'more';
 
 class MainView extends StatelessWidget {
   final String selectedPageName;
   final _pages = [
     _Page(
       name: ticketsPageName,
-      label: Labels.ticketsTitle,
+      label: Titles.tickets,
       icon: Icons.confirmation_num,
       widget: TicketList(),
     ),
     _Page(
       name: facilitiesPageName,
-      label: Labels.facilitiesTitle,
+      label: Titles.facilities,
       icon: Icons.house,
       widget: FacilityList(),
     ),
     _Page(
-      name: debugPageName,
-      label: Labels.debugTitle,
-      icon: Icons.bug_report,
-      widget: DebugView(),
+      name: morePageName,
+      label: Titles.more,
+      icon: Icons.more,
+      widget: MoreView(),
     ),
   ];
 

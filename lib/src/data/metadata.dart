@@ -18,16 +18,20 @@ enum SortOrder {
   }
 }
 
+Map<String, dynamic> _defaultSerializer(Item item) => item.fields;
+
 class TypeMetadata<T extends Item> {
   final String name;
   final String dataCollectionId;
-  final T Function(Map<String, dynamic> fields) itemConstructor;
+  final Map<String, dynamic> Function(T item) serializer;
+  final T Function(Map<String, dynamic> fields) deserializer;
   final List<(String, SortOrder)> defaultSortBy;
 
   TypeMetadata({
     required this.name,
     required this.dataCollectionId,
-    required this.itemConstructor,
+    required this.deserializer,
+    this.serializer = _defaultSerializer,
     this.defaultSortBy = const [],
   });
 }
@@ -35,7 +39,7 @@ class TypeMetadata<T extends Item> {
 final facilityMetadata = TypeMetadata(
   name: 'facility',
   dataCollectionId: 'facilities',
-  itemConstructor: FacilityItem.fromFields,
+  deserializer: FacilityItem.fromFields,
   defaultSortBy: [
     ('number', SortOrder.ascending),
   ],
@@ -44,7 +48,7 @@ final facilityMetadata = TypeMetadata(
 final userMetadata = TypeMetadata(
   name: 'user',
   dataCollectionId: 'users',
-  itemConstructor: UserItem.fromFields,
+  deserializer: UserItem.fromFields,
   defaultSortBy: [
     ('firstName', SortOrder.ascending),
     ('nickname', SortOrder.ascending),
@@ -55,7 +59,7 @@ final userMetadata = TypeMetadata(
 final listValueMetadata = TypeMetadata(
   name: 'listValue',
   dataCollectionId: 'lists_of_values',
-  itemConstructor: ListValueItem.fromFields,
+  deserializer: ListValueItem.fromFields,
   defaultSortBy: [
     ('type', SortOrder.ascending),
     ('name', SortOrder.ascending),

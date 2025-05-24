@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/providers/wix_client_provider.dart';
+import 'package:wonder/src/providers/client_provider.dart';
 
 import '../data/facility_item.dart';
 
@@ -14,7 +14,7 @@ class FacilityListNotifier extends StateNotifier<AsyncValue<List<FacilityItem>>>
   final Ref ref;
 
   Future<void> _load() async {
-    final wixClient = ref.read(wixClientProvider);
+    final wixClient = ref.read(clientProvider);
     try {
       final items = await wixClient.fetchItems<FacilityItem>(itemType: 'facility');
       state = AsyncData(items);
@@ -26,12 +26,13 @@ class FacilityListNotifier extends StateNotifier<AsyncValue<List<FacilityItem>>>
   Future<void> refresh() => _load();
 
   Future<FacilityItem> update(FacilityItem item) async {
-    final wixClient = ref.read(wixClientProvider);
+    final wixClient = ref.read(clientProvider);
     return await wixClient.updateItem(item);
   }
 }
 
-final facilityListProvider = StateNotifierProvider<FacilityListNotifier, AsyncValue<List<FacilityItem>>>(
+final facilityListProvider =
+    StateNotifierProvider<FacilityListNotifier, AsyncValue<List<FacilityItem>>>(
   (ref) => FacilityListNotifier(ref),
 );
 
@@ -39,7 +40,7 @@ final facilityProvider = FutureProvider.family<FacilityItem, String>((
   ref,
   id,
 ) async {
-  final wixClient = ref.watch(wixClientProvider);
+  final wixClient = ref.watch(clientProvider);
   return await wixClient.fetchItem<FacilityItem>(
     itemType: 'facility',
     id: id,

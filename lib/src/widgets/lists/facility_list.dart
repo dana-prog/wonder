@@ -22,12 +22,8 @@ class FacilityList extends ConsumerWidget {
         List<FacilityItem> facilities,
         _,
       ) {
-        final selFacilites = facilities
-            .where((facility) => facility.id == 'b98d31cf-01b4-4fb5-92b4-32dffd8f3137')
-            .toList();
-
         return ItemList<FacilityItem>(
-          selFacilites,
+          facilities,
           itemBuilder: (FacilityItem facility) => MultiTapGestureWrapper(
               child: FacilityCard(facility),
               onShortTap: (_) {
@@ -35,6 +31,10 @@ class FacilityList extends ConsumerWidget {
                 final route = '/facility/${facility.id}';
                 logger.d('[FacilityList.itemBuilder] navigate to $route');
                 context.push(route);
+                // showBlurredOverlay(
+                //   context,
+                //   FacilityForm(initialItem: facility),
+                // );
               },
               onLongTapDown: (pointer, details) {
                 logger.t('[FacilityList.itemBuilder.onLongTap] onLongTap');

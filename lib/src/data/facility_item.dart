@@ -41,7 +41,8 @@ class FacilityItem extends Item {
 
   int get roomCount => (this['roomCount']).toInt();
 
-  List<String> get pictures => getFieldValue('pictures') ?? _defaultPictures;
+  List<String> get pictures =>
+      getFieldValue<List<String>>('pictures', defaultValue: _defaultPictures)!;
 
   String get mainPicture => pictures[0];
 
@@ -54,7 +55,7 @@ class FacilityItem extends Item {
 
     super[fieldName] = fieldValue
         .map((pic) {
-          return getStorageUrl(pic['src']);
+          return (pic is String) ? pic : getStorageUrl(pic['src']);
         })
         .cast<String>()
         .toList();

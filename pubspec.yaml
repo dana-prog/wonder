@@ -24,6 +24,8 @@ dependencies:
   flutter_riverpod: ^2.6.1
   recase: ^4.1.0
   shimmer: ^3.0.0
+  flex_color_picker: ^3.7.1
+  hive: ^2.2.3
 
 dev_dependencies:
   test: ^1.25.8

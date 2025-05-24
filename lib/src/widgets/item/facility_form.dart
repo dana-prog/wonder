@@ -2,19 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/data/facility_item.dart';
 import 'package:wonder/src/data/list_value_item.dart';
+import 'package:wonder/src/providers/lists_of_values_provider.dart';
 import 'package:wonder/src/resources/labels.dart';
 import 'package:wonder/src/widgets/fields/value_items_dropdown.dart';
 
 import '../../logger.dart';
 import '../../providers/facilities_provider.dart';
 import '../async/async_value_widget.dart';
-import '../fields/test_items_dropdown.dart';
 import '../fields/user_items_dropdown.dart';
 
 class FacilityForm extends StatefulWidget {
   final FacilityItem? initialItem;
-
-  // final Set<String> readonlyFields; // e.g. {'number', 'type'}
 
   const FacilityForm({
     this.initialItem,
@@ -34,7 +32,6 @@ class _FacilityFormState extends State<FacilityForm> {
   String? _status;
   String? _owner;
   int? _roomCount;
-  String? _test;
 
   @override
   void initState() {
@@ -60,15 +57,14 @@ class _FacilityFormState extends State<FacilityForm> {
     );
   }
 
-  Future<void> save() async {}
+  Future<void> save() async {
+    logger.w(
+        '[FacilityForm] NOT IMPLEMENTED save: $_number, $_type, $_subtype, $_status, $_owner, $_roomCount');
+  }
 
   List<Widget> get fieldsLayout => spaceWidgets([
-        Row(
-          children: spaceWidgets([
-            Expanded(flex: 1, child: numberFormField),
-            Expanded(flex: 3, child: ownerFormField),
-          ]),
-        ),
+        _FormTitle(_number!, _type!),
+        ownerFormField,
         statusFormField,
         Row(
           children: spaceWidgets([
@@ -114,6 +110,14 @@ class _FacilityFormState extends State<FacilityForm> {
         // validator: (value) => value == null ? 'Required' : null,
       );
 
+  Widget get titleFormField => ValueItemsDropdown(
+        type: ValueItemType.facilitySubtype,
+        value: _subtype,
+        decoration: InputDecoration(labelText: fields['subtype']),
+        onChanged: (value) => setState(() => _subtype = value),
+        // validator: (value) => value == null ? 'Required' : null,
+      );
+
   Widget get statusFormField => ValueItemsDropdown(
         type: ValueItemType.facilityStatus,
         value: _status,
@@ -135,13 +139,6 @@ class _FacilityFormState extends State<FacilityForm> {
         keyboardType: TextInputType.number,
         validator: (value) => int.tryParse(value ?? '') == null ? 'Enter a valid number' : null,
         onSaved: (value) => _roomCount = int.parse(value!),
-      );
-
-  Widget get testFormField => TestItemsDropdown(
-        value: _test,
-        decoration: InputDecoration(labelText: 'Test'),
-        onChanged: (value) => setState(() => _test = value),
-        validator: (value) => value == null ? 'Required' : null,
       );
 
   Widget get saveButton => ElevatedButton(
@@ -179,5 +176,27 @@ class FacilityFormConsumer extends ConsumerWidget {
         return FacilityForm(initialItem: item);
       },
     );
+  }
+}
+
+class _FormTitle extends StatelessWidget {
+  final int number;
+  final String typeName;
+
+  const _FormTitle(this.number, this.typeName);
+
+  @override
+  Widget build(BuildContext context) {
+    return AsyncValueProviderWidget<ListValueItem>(
+        provider: listValueProvider(typeName),
+        dataBuilder: (
+          ListValueItem type,
+          _,
+          __,
+        ) =>
+            Text(
+              '${type.title} #$number',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ));
   }
 }

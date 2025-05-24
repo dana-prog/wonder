@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/providers/wix_client_provider.dart';
+import 'package:wonder/src/providers/client_provider.dart';
 
 import '../data/user_item.dart';
 
@@ -7,7 +7,7 @@ final _allUsersProvider = FutureProvider<_UserList>((
   ref,
 ) async {
   if (_userList == null) {
-    final wixClient = ref.watch(wixClientProvider);
+    final wixClient = ref.watch(clientProvider);
     final users = await wixClient.fetchItems<UserItem>(itemType: 'user');
 
     _userList = _UserList(users);
@@ -27,7 +27,7 @@ final userProvider = FutureProvider.family<UserItem, String>((
   ref,
   id,
 ) async {
-  final wixClient = ref.watch(wixClientProvider);
+  final wixClient = ref.watch(clientProvider);
   return await wixClient.fetchItem<UserItem>(
     itemType: 'user',
     id: id,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wonder/src/widgets/forms/debug_view.dart';
 import 'package:wonder/src/widgets/forms/main_view.dart';
 import 'package:wonder/src/widgets/forms/single_view_form.dart';
 import 'package:wonder/src/widgets/item/facility_form.dart';
@@ -40,7 +41,6 @@ final router = GoRouter(
 
         return SingleViewScaffold(
           // TODO: [P0] remove hard coded
-          title: 'Edit Villa',
           viewBuilder: (BuildContext context) => FacilityFormConsumer(id),
         );
       },
@@ -49,7 +49,17 @@ final router = GoRouter(
     GoRoute(
       path: Locations.debug,
       builder: (context, state) {
-        return MainView(debugPageName);
+        return SingleViewScaffold(
+          // TODO: [P0] remove hard coded
+          viewBuilder: (BuildContext context) => DebugView(),
+        );
+      },
+    ),
+    // more
+    GoRoute(
+      path: Locations.more,
+      builder: (context, state) {
+        return MainView(morePageName);
       },
     ),
   ],

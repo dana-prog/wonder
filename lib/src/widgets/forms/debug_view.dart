@@ -23,7 +23,7 @@ class _DebugViewState extends State<DebugView> {
               onChanged: (val) => setState(() => _input = val),
             ),
             const SizedBox(width: 8),
-            getDebugWidget(),
+            Expanded(child: getDebugWidget()),
           ],
         ),
       ),

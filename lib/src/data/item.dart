@@ -25,7 +25,7 @@ abstract class Fields {
     return _fields.containsKey(fieldName);
   }
 
-  dynamic getFieldValue(String fieldName, {dynamic defaultValue}) {
+  T? getFieldValue<T>(String fieldName, {T? defaultValue}) {
     return containsField(fieldName) ? _fields[fieldName] : defaultValue;
   }
 
@@ -43,7 +43,7 @@ abstract class Fields {
 
   Iterable<String> get fieldNames => _fields.keys;
 
-  Iterable<MapEntry<String, dynamic>> get fields => _fields.entries;
+  Map<String, dynamic> get fields => Map<String, dynamic>.fromEntries(_fields.entries);
 
   @override
   String toString() => toFullString();
