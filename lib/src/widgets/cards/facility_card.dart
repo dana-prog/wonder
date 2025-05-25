@@ -18,6 +18,14 @@ typedef Builder = Widget Function(BuildContext context);
 
 const _cardHeight = 48.0;
 
+const _roomCountColors = <int, Color>{
+  1: Color(0xFFe07657),
+  2: Color(0xFF8465c6),
+  3: Color(0xFFa2c65b),
+  4: Color(0xFF6e9ce3),
+  5: Color(0xFF32BB87),
+};
+
 class FacilityCard extends StatelessWidget {
   final FacilityItem facility;
 
@@ -43,10 +51,16 @@ class FacilityCard extends StatelessWidget {
           enabled: true,
           child: _cardContentBuilder(
             context: context,
-            ownerBuilder: _ownerPlaceholderBuilder,
-            typeBuilder: _typePlaceholderBuilder,
-            statusBuilder: _statusPlaceholderBuilder,
-            buttonBuilders: [_buttonPlaceholderBuilder, _buttonPlaceholderBuilder],
+            numberBuilder: (_) => _placeholderBuilder(55, _cardHeight),
+            ownerBuilder: (_) => _placeholderBuilder(170, 20),
+            typeBuilder: (_) => _placeholderBuilder(45, 16),
+            subtypeBuilder: (_) => _placeholderBuilder(25, 16),
+            roomCountBuilder: (_) => _placeholderBuilder(85, 16),
+            statusBuilder: (_) => _placeholderBuilder(100, 40),
+            buttonBuilders: [
+              (_) => _placeholderBuilder(32, 32),
+              (_) => _placeholderBuilder(32, 32),
+            ],
           )),
     );
   }
@@ -59,19 +73,17 @@ class FacilityCard extends StatelessWidget {
     BuildContext context,
     WidgetRef _,
   ) {
-    // return loadingBuilder(context);
     return Card(
       child: _cardContentBuilder(
         context: context,
+        numberBuilder: _numberBuilder,
         ownerBuilder: (context) => _ownerBuilder(
           context: context,
           owner: owner,
         ),
-        typeBuilder: (context) => _typeBuilder(
-          type: type,
-          subtype: subtype,
-          context: context,
-        ),
+        typeBuilder: (_) => _typeBuilder(type),
+        subtypeBuilder: (_) => _subtypeBuilder(subtype),
+        roomCountBuilder: (_) => _roomCountBuilder(facility.roomCount),
         statusBuilder: (_) => _statusBuilder(status: status),
         buttonBuilders: [
           (BuildContext context) => _buttonBuilder(
@@ -89,8 +101,11 @@ class FacilityCard extends StatelessWidget {
 
   Widget _cardContentBuilder({
     required BuildContext context,
+    required Builder numberBuilder,
     required Builder ownerBuilder,
     required Builder typeBuilder,
+    required Builder subtypeBuilder,
+    required Builder roomCountBuilder,
     required Builder statusBuilder,
     required List<Builder> buttonBuilders,
   }) {
@@ -103,22 +118,30 @@ class FacilityCard extends StatelessWidget {
           children: [
             // image
             _imageBuilder(),
+            // number
+            numberBuilder(context),
             // owner / type
             Expanded(
               flex: 3,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ownerBuilder(context),
-                    Spacer(),
-                    typeBuilder(context),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ownerBuilder(context),
+                  Spacer(),
+                  Row(
+                    children: [
+                      typeBuilder(context),
+                      SizedBox(width: 8),
+                      subtypeBuilder(context),
+                      SizedBox(width: 8),
+                      roomCountBuilder(context),
+                    ],
+                  ),
+                ],
               ),
             ),
+
             Expanded(child: statusBuilder(context)),
             ...buttonBuilders.map((buttonBuilder) => buttonBuilder(context)),
           ],
@@ -127,29 +150,26 @@ class FacilityCard extends StatelessWidget {
     );
   }
 
-  TextStyle _getSubtitleTextStyle(BuildContext context) {
-    final theme = Theme.of(context);
-    return theme.textTheme.bodyMedium!.copyWith(
-      color: theme.colorScheme.onSurfaceVariant,
+  Widget _numberBuilder(BuildContext context) {
+    return SizedBox(
+      height: _cardHeight,
+      width: 45,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          '# ${facility.number.toString()}',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+      ),
     );
   }
 
   Widget _imageBuilder() {
-    return ClipOval(child: AppImage(facility.mainPicture));
+    return SizedBox(
+        width: _cardHeight,
+        height: _cardHeight,
+        child: ClipOval(child: AppImage(facility.mainPicture)));
   }
-
-  // Widget _getImagePlaceholder() {
-  //   final radius = 30.0;
-  //
-  //   return Container(
-  //     width: radius * 2,
-  //     height: radius * 2,
-  //     decoration: BoxDecoration(
-  //       color: Colors.black,
-  //       borderRadius: BorderRadius.circular(radius),
-  //     ),
-  //   );
-  // }
 
   Widget _ownerBuilder({
     required BuildContext context,
@@ -171,63 +191,39 @@ class FacilityCard extends StatelessWidget {
   Widget _statusBuilder({required ListValueItem status}) {
     return AsyncValueProviderWidget<ListValueItem>(
       provider: listValueProvider(facility.status),
-      dataBuilder: (status, _, __) => ListValueField(value: status),
+      dataBuilder: (status, _, __) => ListValueField(
+        listValueItem: status,
+        size: ValueChipSize.large,
+      ),
     );
   }
 
-  Widget _typeBuilder({
-    required ListValueItem? type,
-    required ListValueItem? subtype,
-    required BuildContext context,
-  }) {
-    return Text(
-      [
-        type!.title,
-        Labels.facilityRoomCount(facility.roomCount),
-        subtype!.title,
-      ].join(' - '),
-      style: _getSubtitleTextStyle(context),
-    );
-  }
+  Widget _typeBuilder(ListValueItem type) => ListValueField(listValueItem: type);
+
+  Widget _subtypeBuilder(ListValueItem subtype) => ListValueField(listValueItem: subtype);
+
+  Widget _roomCountBuilder(int roomCount) =>
+      ValueChip(title: Labels.facilityRoomCount(roomCount), color: _roomCountColors[roomCount]!);
 
   Widget _buttonBuilder({required IconData icon, GestureTapCallback? onTap}) {
-    return IconButton(onPressed: onTap, icon: Icon(icon));
-    // return GestureDetector(
-    //   onTap: onTap,
-    //   child: Padding(
-    //     padding: EdgeInsets.all(4),
-    //     child: Icon(icon, size: 16),
-    //   ),
-    // );
-  }
-
-  Widget _ownerPlaceholderBuilder(BuildContext _) {
-    // return Text(Labels.noOwner);
-    return Container(
-      width: 150,
-      height: 8.0,
-      color: Colors.white,
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.all(4),
+        child: Icon(icon, size: 20),
+      ),
     );
   }
 
-  Widget _statusPlaceholderBuilder(BuildContext _) {
+  Widget _placeholderBuilder(double? width, double? height) {
     return Container(
-      width: 100,
-      height: 12.0,
-      color: Colors.white,
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
     );
-  }
-
-  Widget _typePlaceholderBuilder(BuildContext _) {
-    return Container(
-      width: 200,
-      height: 8.0,
-      color: Colors.white,
-    );
-  }
-
-  Widget _buttonPlaceholderBuilder(BuildContext _) {
-    return Container(color: Colors.white, height: 14, width: 14);
   }
 
   void onEdit(BuildContext context) {
