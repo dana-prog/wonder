@@ -9,8 +9,10 @@ class Titles {
 
 class Labels {
   static const String noDataFound = 'No Data Found';
-  static const String noOwner = 'No Owner';
+  static const String noOwner = '<No Owner>';
   static const String save = 'Save';
+  static const String edit = 'Edit';
+  static const String delete = 'Delete';
   static String facilityRoomCount(int count) {
     return count == 1 ? '$count Bedroom' : '$count Bedrooms';
   }
@@ -23,7 +25,7 @@ class ItemsLabels {
     'subtype': 'Subtype',
     'status': 'Status',
     'owner': 'Owner',
-    'roomCount': 'Rooms',
+    'roomCount': '# Rooms',
   });
 }
 

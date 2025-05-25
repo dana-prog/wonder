@@ -17,7 +17,7 @@ class _RootState extends ConsumerState<Root> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      // theme: ref.watch(darkThemeProvider),
+      theme: getLightTheme(),
       darkTheme: AppTheme.dark,
       routerConfig: router,
       locale: _locale,

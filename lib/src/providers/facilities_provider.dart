@@ -29,6 +29,12 @@ class FacilityListNotifier extends StateNotifier<AsyncValue<List<FacilityItem>>>
     final wixClient = ref.read(clientProvider);
     return await wixClient.updateItem(item);
   }
+
+  Future<void> delete(String id) async {
+    final wixClient = ref.read(clientProvider);
+    await wixClient.deleteItem(itemType: 'facility', id: id);
+    await refresh();
+  }
 }
 
 final facilityListProvider =

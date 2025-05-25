@@ -51,9 +51,7 @@ class _FacilityFormState extends State<FacilityForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(
-        children: spaceWidgets(fieldsLayout),
-      ),
+      child: Column(children: spaceWidgets(fieldsLayout)),
     );
   }
 
@@ -63,21 +61,17 @@ class _FacilityFormState extends State<FacilityForm> {
   }
 
   List<Widget> get fieldsLayout => spaceWidgets([
-        _FormTitle(_number!, _type!),
-        ownerFormField,
-        statusFormField,
-        Row(
-          children: spaceWidgets([
-            Expanded(child: subtypeFormField),
-            Expanded(child: roomCountFormField),
-          ]),
-        ),
-        saveButton,
-      ], spaceTop: true);
+        Align(alignment: Alignment.centerLeft, child: _FormTitle(_number!, _type!)),
+        _ownerFormField,
+        _statusFormField,
+        _subtypeFormField,
+        _roomCountFormField,
+        _saveButton,
+      ]);
 
-  List<Widget> spaceWidgets(List<Widget> widgets, {bool spaceTop = false}) =>
-      widgets.fold(<Widget>[], (previous, element) {
-        return !spaceTop && previous.isEmpty
+  // TODO: replace with padding instead of SizedBox
+  List<Widget> spaceWidgets(List<Widget> widgets) => widgets.fold(<Widget>[], (previous, element) {
+        return previous.isEmpty
             ? [element]
             : [
                 ...previous,
@@ -86,62 +80,47 @@ class _FacilityFormState extends State<FacilityForm> {
               ];
       });
 
-  Widget get numberFormField => TextFormField(
-        initialValue: _number.toString(),
-        decoration: InputDecoration(labelText: fields['number']),
-        validator: (value) => int.tryParse(value ?? '') == null ? 'Enter a valid number' : null,
-        // onChanged: saveForm,
-        onSaved: (value) => _number = int.parse(value!),
-      );
-
-  Widget get typeFormField => ValueItemsDropdown(
-        type: ValueItemType.facilityType,
-        value: _type,
-        decoration: InputDecoration(labelText: fields['type']),
-        onChanged: (value) => setState(() => _type = value),
-        // validator: (value) => value == null ? 'Required' : null,
-      );
-
-  Widget get subtypeFormField => ValueItemsDropdown(
+  Widget get _subtypeFormField => ValueItemsDropdownConsumer(
+        labelText: fields['subtype'],
         type: ValueItemType.facilitySubtype,
         value: _subtype,
-        decoration: InputDecoration(labelText: fields['subtype']),
         onChanged: (value) => setState(() => _subtype = value),
         // validator: (value) => value == null ? 'Required' : null,
       );
 
-  Widget get titleFormField => ValueItemsDropdown(
-        type: ValueItemType.facilitySubtype,
-        value: _subtype,
-        decoration: InputDecoration(labelText: fields['subtype']),
-        onChanged: (value) => setState(() => _subtype = value),
-        // validator: (value) => value == null ? 'Required' : null,
-      );
-
-  Widget get statusFormField => ValueItemsDropdown(
+  Widget get _statusFormField => ValueItemsDropdownConsumer(
+        labelText: fields['status'],
         type: ValueItemType.facilityStatus,
         value: _status,
-        decoration: InputDecoration(labelText: 'Status'),
         onChanged: (value) => setState(() => _status = value),
-        // validator: (value) => value == null ? 'Required' : null,
       );
 
-  Widget get ownerFormField => UserItemsDropdown(
-        value: _owner,
-        decoration: InputDecoration(labelText: fields['owner']),
-        onChanged: (value) => setState(() => _owner = value),
-        validator: (value) => value == null ? 'Required' : null,
+  Widget get _ownerFormField => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(fields['owner']!, style: Theme.of(context).inputDecorationTheme.labelStyle),
+          UserItemsDropdown(
+            value: _owner,
+            onChanged: (value) => setState(() => _owner = value),
+            validator: (value) => value == null ? 'Required' : null,
+          )
+        ],
       );
 
-  Widget get roomCountFormField => TextFormField(
-        decoration: InputDecoration(labelText: 'Room Count'),
-        initialValue: _roomCount.toString(),
-        keyboardType: TextInputType.number,
-        validator: (value) => int.tryParse(value ?? '') == null ? 'Enter a valid number' : null,
-        onSaved: (value) => _roomCount = int.parse(value!),
+  Widget get _roomCountFormField => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(fields['roomCount']!, style: Theme.of(context).inputDecorationTheme.labelStyle),
+          TextFormField(
+            initialValue: _roomCount.toString(),
+            keyboardType: TextInputType.number,
+            validator: (value) => int.tryParse(value ?? '') == null ? 'Enter a valid number' : null,
+            onSaved: (value) => _roomCount = int.parse(value!),
+          )
+        ],
       );
 
-  Widget get saveButton => ElevatedButton(
+  Widget get _saveButton => ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             _formKey.currentState!.save();
@@ -195,8 +174,9 @@ class _FormTitle extends StatelessWidget {
           __,
         ) =>
             Text(
+              textAlign: TextAlign.left,
               '${type.title} #$number',
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: Theme.of(context).textTheme.headlineMedium,
             ));
   }
 }

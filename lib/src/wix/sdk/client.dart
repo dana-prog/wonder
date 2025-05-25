@@ -8,6 +8,8 @@ abstract class Client {
 
   Future<T> updateItem<T extends Item>(T item);
 
+  Future<void> deleteItem<T extends Item>({required String itemType, required String id});
+
   // for debugging
   void printCachedItems() {
     logger.e('[Client.printCachedItems] Unimplemented');

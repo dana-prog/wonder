@@ -10,6 +10,8 @@ import '../../data/item.dart';
 import '../../logger.dart';
 import 'client.dart';
 
+const _itemsApiBaseUrl = 'https://www.wixapis.com/wix-data/v2/items';
+
 enum _HeaderContentType {
   json,
   formUrlEncoded;
@@ -48,8 +50,7 @@ class WixClient extends Client {
     await _ensureMemberLogin();
 
     final response = await http.get(
-      Uri.parse(
-          'https://www.wixapis.com/wix-data/v2/items/$id?dataCollectionId=${itemMetadata.dataCollectionId}'),
+      Uri.parse('$_itemsApiBaseUrl/$id?dataCollectionId=${itemMetadata.dataCollectionId}'),
       headers: _getHeaders(),
     );
 
@@ -74,7 +75,7 @@ class WixClient extends Client {
     await _ensureMemberLogin();
 
     final response = await http.post(
-      Uri.parse('https://www.wixapis.com/wix-data/v2/items/query'),
+      Uri.parse('$_itemsApiBaseUrl/query'),
       headers: _getHeaders(),
       body: jsonEncode({
         'dataCollectionId': itemMetadata.dataCollectionId,
@@ -104,23 +105,42 @@ class WixClient extends Client {
 
     await _ensureMemberLogin();
 
+    final dataCollectionId = _metadata.getByName(item.itemType).dataCollectionId;
     final response = await http.put(
-      Uri.parse('https://www.wixapis.com/wix-data/v2/items/${item.id}'),
+      Uri.parse('$_itemsApiBaseUrl/${item.id}'),
       headers: _getHeaders(),
       body: jsonEncode({
-        'dataCollectionId': _metadata.getByName(item.itemType).dataCollectionId,
+        'dataCollectionId': dataCollectionId,
         'dataItem': {'data': item.fields},
       }),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('[WixClient.updateItem] Failed to updateItem $item: ${response.body}');
+      throw Exception('[WixClient.updateItem] Failed to update item $item: ${response.body}');
     }
 
     logger.t('[WixClient.updateItem] response.body: ${response.body}');
 
     final dataItem = jsonDecode(response.body)['dataItem'];
     return _getItemObject(dataItem) as T;
+  }
+
+  @override
+  Future<void> deleteItem<T extends Item>({required String itemType, required String id}) async {
+    logger.t('[WixClient.deleteItem] $itemType/$id');
+
+    await _ensureMemberLogin();
+
+    final dataCollectionId = _metadata.getByName(itemType).dataCollectionId;
+    final response = await http.delete(
+      Uri.parse('$_itemsApiBaseUrl/$id?dataCollectionId=$dataCollectionId'),
+      headers: _getHeaders(),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+          '[WixClient.deleteItem] Failed to delete item $itemType/$id: ${response.body}');
+    }
   }
 
   Item _getItemObject(Map<String, dynamic> dataItem) {

@@ -44,7 +44,7 @@ class UserItemsDropdown extends StatelessWidget {
           isExpanded: true,
           value: value,
           items: users.map(getMenuItem).toList(),
-          // decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: 30)),
+          decoration: decoration,
           onChanged: onChanged,
           validator: validator,
         );

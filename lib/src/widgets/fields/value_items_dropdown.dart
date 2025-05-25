@@ -3,19 +3,18 @@ import 'package:wonder/src/data/list_value_item.dart';
 import 'package:wonder/src/widgets/async/async_value_widget.dart';
 
 import '../../providers/lists_of_values_provider.dart';
-import '../../resources/value_item_icons.dart';
 
 class ValueItemsDropdown extends StatelessWidget {
-  final ValueItemType type;
+  final List<ListValueItem> values;
   final String? value;
-  final InputDecoration? decoration;
+  final String? labelText;
   final ValueChanged<String?>? onChanged;
   final FormFieldValidator<String>? validator;
 
   const ValueItemsDropdown({
-    required this.type,
+    required this.values,
     this.value,
-    this.decoration,
+    this.labelText,
     this.onChanged,
     this.validator,
     super.key,
@@ -23,36 +22,83 @@ class ValueItemsDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AsyncValueProviderWidget<List<ListValueItem>>(
-      provider: listOfValuesProvider(type),
-      dataBuilder: (values, _, __) {
-        return DropdownButtonFormField<String>(
-          value: value,
-          decoration: decoration,
-          items: values.map(getMenuItem).toList(),
-          onChanged: onChanged,
-          validator: validator,
-          isExpanded: true,
-        );
-      },
+    if (labelText != null) {
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(labelText!, style: Theme.of(context).inputDecorationTheme.labelStyle),
+        buildDropdown(context)
+      ]);
+    } else {
+      return buildDropdown(context);
+    }
+  }
+
+  Widget buildDropdown(BuildContext context) {
+    final selectedListValue = values.firstWhere(
+      (item) => item.id == value,
+    );
+
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+          filled: true,
+          fillColor: values.isEmpty ? Colors.transparent : selectedListValue.color,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          )),
+      icon: const SizedBox.shrink(),
+      items: values.map((listValueItem) => getMenuItem(listValueItem, context)).toList(),
+      onChanged: onChanged,
+      validator: validator,
+      isExpanded: true,
     );
   }
 
-  DropdownMenuItem<String> getMenuItem(ListValueItem value) {
-    final widgets = <Widget>[];
-    final icon = ValueItemIcons.getIcon(value);
-    if (icon != null) {
-      widgets.add(Icon(icon, size: 16));
-      widgets.add(const SizedBox(width: 16));
-    }
-
+  DropdownMenuItem<String> getMenuItem(ListValueItem listValueItem, BuildContext context) {
     return DropdownMenuItem<String>(
-      value: value.id,
-      child: Row(
-        children: [
-          ...widgets,
-          Text(value.title),
-        ],
+      value: listValueItem.id,
+      child: Container(
+        // TODO: [P2] replace the hard-coded kMinInteractiveDimension with an option to expand to fill the container
+        height: kMinInteractiveDimension,
+        width: double.infinity,
+        color: listValueItem.color,
+        child: Text(listValueItem.title,
+            textAlign: TextAlign.center,
+            style: DefaultTextStyle.of(context).style.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                )),
+      ),
+    );
+  }
+}
+
+class ValueItemsDropdownConsumer extends StatelessWidget {
+  final ValueItemType type;
+  final String? labelText;
+  final String? value;
+  final ValueChanged<String?>? onChanged;
+  final FormFieldValidator<String>? validator;
+
+  const ValueItemsDropdownConsumer({
+    super.key,
+    this.labelText,
+    required this.type,
+    this.value,
+    this.onChanged,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AsyncValueProviderWidget<List<ListValueItem>>(
+      provider: listOfValuesProvider(type),
+      dataBuilder: (values, _, __) => ValueItemsDropdown(
+        values: values,
+        labelText: labelText,
+        value: value,
+        onChanged: onChanged,
+        validator: validator,
       ),
     );
   }
