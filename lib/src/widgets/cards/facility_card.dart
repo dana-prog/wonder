@@ -122,26 +122,29 @@ class FacilityCard extends StatelessWidget {
             // owner / type, subtype, room count
             Expanded(
               flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ownerBuilder(context),
-                  Spacer(),
-                  Row(
-                    children: [
-                      typeBuilder(context),
-                      SizedBox(width: 8),
-                      subtypeBuilder(context),
-                      SizedBox(width: 8),
-                      roomCountBuilder(context),
-                    ],
-                  ),
-                ],
+              child: DefaultTextStyle(
+                style: const TextStyle(fontSize: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ownerBuilder(context),
+                    Spacer(),
+                    Row(
+                      children: [
+                        typeBuilder(context),
+                        SizedBox(width: 8),
+                        subtypeBuilder(context),
+                        SizedBox(width: 8),
+                        roomCountBuilder(context),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             // status
-            Expanded(child: statusBuilder(context)),
+            statusBuilder(context),
             SizedBox(width: 10),
             // buttons
             ...buttonBuilders.map((buttonBuilder) => buttonBuilder(context)),
@@ -195,11 +198,13 @@ class FacilityCard extends StatelessWidget {
       dataBuilder: (status, _, __) => ListValueField(
         listValueItem: status,
         size: ValueChipSize.large,
+        width: 120,
       ),
     );
   }
 
-  Widget _typeBuilder(ListValueItem type) => ListValueField(listValueItem: type);
+  Widget _typeBuilder(ListValueItem type) =>
+      ListValueField(listValueItem: type, textStyle: TextStyle(fontSize: 11));
 
   Widget _subtypeBuilder(ListValueItem subtype) => ListValueField(listValueItem: subtype);
 

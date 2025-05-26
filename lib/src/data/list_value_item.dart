@@ -34,7 +34,7 @@ const _icons = {
   'facilityStatus': {
     'notStarted': Icons.not_started_outlined,
     'planning': Icons.design_services,
-    'underConstruction': Icons.construction,
+    'construction': Icons.construction,
     'ready': Icons.check_circle_outline,
     'operational': Icons.check_circle,
   },
@@ -50,7 +50,7 @@ const _colors = {
   'facilityStatus': {
     'notStarted': Color(0xFF6e7289),
     'planning': Color(0xFF8465c6),
-    'underConstruction': Color(0xFFe07657),
+    'construction': Color(0xFFa86e3c),
     'ready': Color(0xFF6e9ce3),
     'operational': Color(0xFF32BB87)
   },

@@ -23,7 +23,7 @@ class FacilityList extends ConsumerWidget {
         BuildContext context,
       ) {
         return ItemList<FacilityItem>(
-          facilities,
+          facilities.where((f) => f.number > 100).toList(),
           itemBuilder: (FacilityItem facility) => FacilityCard(
             facility: facility,
             onDelete: (FacilityItem item) =>

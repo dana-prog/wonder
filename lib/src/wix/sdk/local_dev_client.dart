@@ -571,7 +571,7 @@ const _itemsFields = <Map<String, dynamic>>[
   {
     "id": "126cd917-9ee1-45a7-8bdf-190ed1f67e3c",
     "itemType": "listValue",
-    "name": "underConstruction",
+    "name": "construction",
     "description": "Construction work is currently in progress.",
     "order": 3.0,
     "title": "Under Construction",
