@@ -7,7 +7,7 @@ import 'package:wonder/src/providers/lists_of_values_provider.dart';
 import 'package:wonder/src/providers/users_provider.dart';
 import 'package:wonder/src/resources/labels.dart';
 import 'package:wonder/src/widgets/async/async_value_widget.dart';
-import 'package:wonder/src/widgets/fields/list_value_field.dart';
+import 'package:wonder/src/widgets/fields/value_chip.dart';
 
 import '../../data/facility_item.dart';
 import '../../data/user_item.dart';
@@ -28,8 +28,12 @@ const _roomCountColors = <int, Color>{
 
 class FacilityCard extends StatelessWidget {
   final FacilityItem facility;
+  final void Function(FacilityItem) onDelete;
 
-  FacilityCard(this.facility) : super(key: ValueKey(facility.id));
+  FacilityCard({
+    required this.facility,
+    required this.onDelete,
+  }) : super(key: ValueKey(facility.id));
 
   @override
   Widget build(BuildContext context) {
@@ -86,14 +90,8 @@ class FacilityCard extends StatelessWidget {
         roomCountBuilder: (_) => _roomCountBuilder(facility.roomCount),
         statusBuilder: (_) => _statusBuilder(status: status),
         buttonBuilders: [
-          (BuildContext context) => _buttonBuilder(
-                icon: Icons.edit,
-                onTap: () => onEdit(context),
-              ),
-          (BuildContext _) => _buttonBuilder(
-                icon: Icons.delete,
-                onTap: onDelete,
-              ),
+          _editButtonBuilder,
+          _deleteButtonBuilder,
         ],
       ),
     );
@@ -114,15 +112,16 @@ class FacilityCard extends StatelessWidget {
       child: SizedBox(
         height: _cardHeight,
         child: Row(
-          spacing: 12,
           children: [
             // image
             _imageBuilder(),
+            SizedBox(width: 10),
             // number
             numberBuilder(context),
-            // owner / type
+            SizedBox(width: 10),
+            // owner / type, subtype, room count
             Expanded(
-              flex: 3,
+              flex: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,8 +140,10 @@ class FacilityCard extends StatelessWidget {
                 ],
               ),
             ),
-
+            // status
             Expanded(child: statusBuilder(context)),
+            SizedBox(width: 10),
+            // buttons
             ...buttonBuilders.map((buttonBuilder) => buttonBuilder(context)),
           ],
         ),
@@ -153,11 +154,11 @@ class FacilityCard extends StatelessWidget {
   Widget _numberBuilder(BuildContext context) {
     return SizedBox(
       height: _cardHeight,
-      width: 45,
+      width: 65,
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
-          '# ${facility.number.toString()}',
+          '# ${facility.number.toString().padLeft(3, '0')}',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
       ),
@@ -206,14 +207,25 @@ class FacilityCard extends StatelessWidget {
       ValueChip(title: Labels.facilityRoomCount(roomCount), color: _roomCountColors[roomCount]!);
 
   Widget _buttonBuilder({required IconData icon, GestureTapCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.all(4),
-        child: Icon(icon, size: 20),
-      ),
+    return RawMaterialButton(
+      onPressed: onTap,
+      constraints: BoxConstraints.tight(Size(32, 32)),
+      child: Icon(icon, size: 20),
     );
   }
+
+  Widget _editButtonBuilder(BuildContext context) => _buttonBuilder(
+        icon: Icons.edit,
+        onTap: () => _onEdit(context),
+      );
+
+  Widget _deleteButtonBuilder(BuildContext context) => _buttonBuilder(
+        icon: Icons.delete,
+        onTap: () {
+          logger.t('[FacilityCard._deleteButtonBuilder] ${facility.id}');
+          onDelete(facility);
+        },
+      );
 
   Widget _placeholderBuilder(double? width, double? height) {
     return Container(
@@ -226,11 +238,9 @@ class FacilityCard extends StatelessWidget {
     );
   }
 
-  void onEdit(BuildContext context) {
+  void _onEdit(BuildContext context) {
     final route = '/facility/${facility.id}';
     logger.t('[FacilityCard.onEdit] navigate to $route');
     context.push(route);
   }
-
-  void onDelete() {}
 }

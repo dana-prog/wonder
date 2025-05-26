@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/providers/client_provider.dart';
 
 import '../data/facility_item.dart';
+import '../logger.dart';
 
 // TODO: generalize to create ItemProvider
 // TODO: add an option to refresh the data (and validate that until refresh all clients use the same list)
@@ -31,6 +32,7 @@ class FacilityListNotifier extends StateNotifier<AsyncValue<List<FacilityItem>>>
   }
 
   Future<void> delete(String id) async {
+    logger.d('[FacilityListNotifier.delete] id: $id');
     final wixClient = ref.read(clientProvider);
     await wixClient.deleteItem(itemType: 'facility', id: id);
     await refresh();

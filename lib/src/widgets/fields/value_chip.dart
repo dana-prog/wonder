@@ -44,7 +44,7 @@ class ValueChip extends StatelessWidget {
         child: Padding(
           padding: padding,
           child: Text(
-            title,
+            title == 'Not Started' ? 'Started' : title,
             textAlign: TextAlign.center,
             style: getTextStyle(context),
           ),
@@ -66,21 +66,21 @@ class ValueChip extends StatelessWidget {
 
   TextStyle getTextStyle(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    TextStyle textStyle;
+    TextStyle? textStyle;
 
     switch (size) {
       case ValueChipSize.small:
-        textStyle = textTheme.bodySmall ?? const TextStyle();
+        textStyle = textTheme.labelSmall;
         break;
       case ValueChipSize.medium:
-        textStyle = textTheme.bodyMedium ?? const TextStyle();
+        textStyle = textTheme.bodyMedium;
         break;
       case ValueChipSize.large:
-        textStyle = textTheme.bodyLarge ?? const TextStyle();
+        textStyle = textTheme.bodyLarge;
         break;
     }
 
-    return textStyle.copyWith(
+    return (textStyle ?? DefaultTextStyle.of(context).style).copyWith(
       color: Colors.white,
       fontWeight: size == ValueChipSize.small ? FontWeight.w600 : FontWeight.bold,
     );

@@ -1,3 +1,8 @@
+import 'package:wonder/src/utils/string_extension.dart';
+
+import '../data/facility_item.dart';
+import '../data/item.dart';
+
 class Titles {
   static const String app = 'Facility Management';
   static const String tickets = 'Tickets';
@@ -13,24 +18,81 @@ class Labels {
   static const String save = 'Save';
   static const String edit = 'Edit';
   static const String delete = 'Delete';
-  static String facilityRoomCount(int count) {
-    return count == 1 ? '$count Bedroom' : '$count Bedrooms';
-  }
+  static String facilityRoomCount(int count) => count == 1 ? '$count Bedroom' : '$count Bedrooms';
+}
+
+class Confirmations {
+  static String delete(Item item) =>
+      'Are you sure you want to delete ${ItemsLabels.getShortTitle(item)}?';
+
+  static String update(Item item) =>
+      'Are you sure you want to update ${ItemsLabels.getShortTitle(item)}?';
+}
+
+class Notifications {
+  static String deleted(Item item) =>
+      '${ItemsLabels.getShortTitle(item)} deleted successfully.'.capitalize();
+
+  static String updated(Item item) =>
+      '${ItemsLabels.getShortTitle(item)} updated successfully.'.capitalize();
 }
 
 class ItemsLabels {
-  static final facility = ItemLabels({
-    'number': 'Number',
-    'type': 'Type',
-    'subtype': 'Subtype',
-    'status': 'Status',
-    'owner': 'Owner',
-    'roomCount': '# Rooms',
-  });
+  static final itemsLabels = <String, ItemLabels>{
+    'facility': ItemLabels(
+      // TODO: currently we have only 'villa' facilities. in the future either separate to different item types or change the itemType here to 'facility'
+      itemType: 'villa',
+      shortTitle: (Item item) {
+        if (item is! FacilityItem) {
+          throw Exception('Expected FacilityItem, got ${item.runtimeType}');
+        }
+
+        return '${ItemsLabels.getTypeLabel(item.itemType)} #${item.number}';
+      },
+      fieldTitles: {
+        'number': 'Number',
+        'type': 'Type',
+        'subtype': 'Subtype',
+        'status': 'Status',
+        'owner': 'Owner',
+        'roomCount': '# Rooms',
+      },
+    ),
+  };
+
+  static Map<String, String> getFieldLabels(String itemType) {
+    final labels = itemsLabels[itemType];
+    if (labels == null) {
+      throw Exception('No labels found for item type: $itemType');
+    }
+    return labels.fieldTitles;
+  }
+
+  static String getTypeLabel(String itemType) {
+    final labels = itemsLabels[itemType];
+    if (labels == null) {
+      throw Exception('No labels found for item type: $itemType');
+    }
+    return labels.itemType;
+  }
+
+  static String getShortTitle(Item item) {
+    final ItemLabels? labels = itemsLabels[item.itemType];
+    if (labels == null) {
+      throw Exception('No labels found for item type: ${item.itemType}');
+    }
+    return labels.shortTitle(item);
+  }
 }
 
 class ItemLabels {
-  final Map<String, String> fields;
+  final Map<String, String> fieldTitles;
+  final String itemType;
+  final String Function(Item item) shortTitle;
 
-  ItemLabels(this.fields);
+  ItemLabels({
+    required this.itemType,
+    required this.shortTitle,
+    required this.fieldTitles,
+  });
 }

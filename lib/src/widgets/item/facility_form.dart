@@ -25,7 +25,7 @@ class FacilityForm extends StatefulWidget {
 
 class _FacilityFormState extends State<FacilityForm> {
   final _formKey = GlobalKey<FormState>();
-  final fields = ItemsLabels.facility.fields;
+  final fields = ItemsLabels.getFieldLabels('facility');
   int? _number;
   String? _type;
   String? _subtype;

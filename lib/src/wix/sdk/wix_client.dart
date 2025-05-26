@@ -122,11 +122,13 @@ class WixClient extends Client {
     logger.t('[WixClient.updateItem] response.body: ${response.body}');
 
     final dataItem = jsonDecode(response.body)['dataItem'];
-    return _getItemObject(dataItem) as T;
+    final updatedItem = _getItemObject(dataItem) as T;
+    notifyItemUpdated(updatedItem);
+    return updatedItem;
   }
 
   @override
-  Future<void> deleteItem<T extends Item>({required String itemType, required String id}) async {
+  Future<T> deleteItem<T extends Item>({required String itemType, required String id}) async {
     logger.t('[WixClient.deleteItem] $itemType/$id');
 
     await _ensureMemberLogin();
@@ -141,6 +143,11 @@ class WixClient extends Client {
       throw Exception(
           '[WixClient.deleteItem] Failed to delete item $itemType/$id: ${response.body}');
     }
+
+    final dataItem = jsonDecode(response.body)['dataItem'];
+    final deletedItem = _getItemObject(dataItem) as T;
+    notifyItemDeleted(deletedItem);
+    return deletedItem;
   }
 
   Item _getItemObject(Map<String, dynamic> dataItem) {

@@ -1168,17 +1168,20 @@ class LocalDevClient extends Client {
       updatedItem[field.key] = field.value;
     }
     _itemsById[item.id] = updatedItem;
+    notifyItemUpdated(updatedItem);
     return updatedItem;
   }
 
   @override
-  Future<void> deleteItem<T extends Item>({
+  Future<T> deleteItem<T extends Item>({
     required String itemType,
     required String id,
   }) async {
     logger.t('[LocalDevClient.deleteItem] $itemType/$id');
 
-    _itemsById.remove(id);
+    final deletedItem = _itemsById.remove(id)!;
     _itemsByType[itemType]!.removeWhere((item) => item.id == id);
+    notifyItemDeleted(deletedItem);
+    return deletedItem as T;
   }
 }
