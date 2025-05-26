@@ -35,7 +35,11 @@ class AppImage extends StatelessWidget {
           baseColor: Colors.grey.shade300,
           highlightColor: Colors.grey.shade100,
           enabled: true,
-          child: child,
+          child: Container(
+            width: width,
+            height: height,
+            color: Colors.grey.shade300,
+          ),
         );
       },
     );

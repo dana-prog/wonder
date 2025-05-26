@@ -1,47 +1,133 @@
+import 'package:flutter/cupertino.dart';
+
 import '../../data/item.dart';
+import '../../data/metadata.dart';
 import '../../logger.dart';
 
 typedef ItemCallback = void Function(Item);
 
 abstract class Client {
-  final List<ItemCallback> _itemCreatedCallbacks = [];
-  final List<ItemCallback> _itemUpdatedCallbacks = [];
-  final List<ItemCallback> _itemDeletedCallbacks = [];
+  @protected
+  final cache = _Cache();
 
-  void addItemCreatedCallback(ItemCallback callback) => _itemCreatedCallbacks.add(callback);
-
-  void addItemUpdatedCallback(ItemCallback callback) => _itemUpdatedCallbacks.add(callback);
-
-  void addItemDeletedCallback(ItemCallback callback) => _itemDeletedCallbacks.add(callback);
+  @protected
+  final metadata = Metadata();
 
   Future<T> fetchItem<T extends Item>({required String itemType, required String id});
 
   Future<List<T>> fetchItems<T extends Item>({required String itemType});
 
-  Future<T> updateItem<T extends Item>(T item);
-
-  Future<T> deleteItem<T extends Item>({required String itemType, required String id});
-
-  void notifyItemCreated(Item item) {
-    for (var callback in _itemCreatedCallbacks) {
-      callback(item);
+  Future<T> updateItem<T extends Item>(T updatedItem) async {
+    logger.d('[LocalDevClient.updateItem] item: $updatedItem');
+    if (!cache.exists(updatedItem.id)) {
+      return cache.add(updatedItem);
+    } else {
+      return cache.update(updatedItem);
     }
   }
 
-  void notifyItemUpdated(Item item) {
-    for (var callback in _itemUpdatedCallbacks) {
-      callback(item);
-    }
-  }
+  Future<T> deleteItem<T extends Item>(T item) async => cache.delete(item);
 
-  void notifyItemDeleted(Item item) {
-    for (var callback in _itemDeletedCallbacks) {
-      callback(item);
+  @protected
+  T getItemObject<T extends Item>(Map<String, dynamic> dataItem) {
+    final id = dataItem['id'];
+    final dataCollectionId = dataItem['dataCollectionId'];
+    final itemMetadata = metadata.getByCollectionId(dataCollectionId);
+    if (!cache.exists(id)) {
+      cache.add(itemMetadata.deserializer({
+        'id': dataItem['id'],
+        'itemType': itemMetadata.name,
+      }));
     }
+
+    final item = cache[id];
+    final data = dataItem['data'] as Map<String, dynamic>;
+
+    for (var entry in data.entries) {
+      item[entry.key] = entry.value;
+    }
+
+    return item;
   }
 
   // for debugging
-  void printCachedItems() {
-    logger.e('[Client.printCachedItems] Unimplemented');
+  void printCachedItems() => logger.e('[Client.printCachedItems] Unimplemented');
+
+  void printMyMember() => logger.e('[Client.printMyMember] Unimplemented');
+
+  Future<void> logout() async => logger.e('[Client.logout] Unimplemented');
+
+  // TODO: remove?
+  void resetCache() async => cache.clear();
+}
+
+class _Cache {
+  static final _Cache _instance = _Cache._internal();
+
+  factory _Cache() {
+    return _instance;
   }
+
+  _Cache._internal();
+
+  final Map<String, Item> itemsById = {};
+
+  bool exists(String id) {
+    return itemsById.containsKey(id);
+  }
+
+  dynamic operator [](String id) {
+    return itemsById.containsKey(id)
+        ? itemsById[id]
+        : throw Exception(
+            "Item with id $id not found in cache",
+          );
+  }
+
+  T getByName<T extends Item>(String itemType, String name) {
+    return itemsById.values.firstWhere(
+      (item) => item.itemType == itemType && name == name,
+      orElse: () => throw Exception('Item with name $name not found in cache for type $itemType'),
+    ) as T;
+  }
+
+  List<T> getByType<T extends Item>(String itemType) {
+    List<T> result = [];
+    for (final item in itemsById.values) {
+      if (item.itemType == itemType) {
+        result.add(item as T);
+      }
+    }
+
+    return result;
+  }
+
+  T add<T extends Item>(T item) {
+    itemsById[item.id] = item;
+    return item;
+  }
+
+  T update<T extends Item>(T updatedItem) {
+    if (!exists(updatedItem.id)) {
+      throw Exception('[_Cache.updateItem] Item with id ${updatedItem.id} not found in cache');
+    }
+
+    final oldItem = this[updatedItem.id] as T;
+
+    for (MapEntry<String, dynamic> field in updatedItem.fields.entries) {
+      oldItem[field.key] = field.value;
+    }
+
+    return oldItem;
+  }
+
+  T delete<T extends Item>(T deletedItem) {
+    if (!exists(deletedItem.id)) {
+      throw Exception('[_Cache.deleteItem] Item with id ${deletedItem.id} not found in cache');
+    }
+
+    return itemsById.remove(deletedItem.id) as T;
+  }
+
+  void clear() => itemsById.clear();
 }

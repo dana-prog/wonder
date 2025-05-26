@@ -7,10 +7,7 @@ class FacilityItem extends Item {
     '$mediaPublicUrlPrefix/1246fe_888314eeeb9a4468ab2ba15e283ecbfa~mv2.png'
   ];
 
-  FacilityItem.fromFields(super.fields)
-      : assert(fields['itemType'] == 'facility',
-            'FacilityItem must be of type facility and not ${fields['itemType']}'),
-        super();
+  FacilityItem.fromFields(Map<String, dynamic> fields) : super({'itemType': 'facility', ...fields});
 
   FacilityItem({
     required int number,

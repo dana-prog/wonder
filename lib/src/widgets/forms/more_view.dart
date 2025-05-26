@@ -1,39 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../providers/client_provider.dart';
 import '../../resources/labels.dart';
 import '../../routes/locations.dart';
 
-final items = [
-  {
-    'name': 'theme',
-    'title': Titles.theme,
-    'icon': Icons.palette,
-    'route': Locations.themeSettings,
-  },
-  {
-    'name': 'debug',
-    'title': Titles.debug,
-    'icon': Icons.bug_report,
-    'route': Locations.debug,
-  },
+class MoreItem {
+  final String name;
+  final String title;
+  final IconData icon;
+  final String? route;
+  final Function(BuildContext, WidgetRef)? onTap;
+
+  MoreItem({
+    required this.name,
+    required this.title,
+    required this.icon,
+    this.route,
+    this.onTap,
+  });
+}
+
+final _moreItems = [
+  MoreItem(
+    name: 'theme',
+    title: Titles.theme,
+    icon: Icons.palette,
+    route: Locations.themeSettings,
+  ),
+  MoreItem(
+    name: 'debug',
+    title: Titles.debug,
+    icon: Icons.bug_report,
+    route: Locations.debug,
+  ),
+  MoreItem(
+    name: 'printMyMember',
+    title: Titles.printMyMember,
+    icon: Icons.person,
+    onTap: (BuildContext context, WidgetRef ref) {
+      final client = ref.watch(clientProvider);
+      client.printMyMember();
+    },
+  ),
+  MoreItem(
+    name: 'logout',
+    title: 'Logout',
+    icon: Icons.logout,
+    onTap: (BuildContext context, WidgetRef ref) async {
+      final client = ref.watch(clientProvider);
+      await client.logout();
+    },
+  ),
 ];
 
-class MoreView extends StatelessWidget {
+class MoreView extends ConsumerWidget {
   const MoreView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView.separated(
-      itemCount: items.length,
+      itemCount: _moreItems.length,
       separatorBuilder: (_, __) => const Divider(height: 0),
       itemBuilder: (context, index) {
-        final item = items[index];
+        final item = _moreItems[index];
         return ListTile(
-          leading: Icon(item['icon'] as IconData),
-          title: Text(item['title'] as String),
+          leading: Icon(item.icon),
+          title: Text(item.title),
           onTap: () {
-            context.push(item['route'] as String); // navigate to target
+            if (item.onTap != null) {
+              item.onTap!(context, ref);
+              return;
+            }
+
+            if (item.route != null) {
+              context.push(item.route!);
+              return;
+            }
           },
         );
       },

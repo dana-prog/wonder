@@ -75,7 +75,7 @@ class ListValueItem extends Item {
       : assert(fields['itemType'] == 'listValue',
             'ListValueItem must be of type listValue and not ${fields['itemType']}');
 
-  ValueItemType get valueItemType => ValueItemType.values.byName(this['type']);
+  String get valueItemType => this['type'];
 
   String get name => this['name'];
 
@@ -86,21 +86,19 @@ class ListValueItem extends Item {
   int get order => this['order'] ?? -1;
 
   IconData get icon {
-    assert(_icons.containsKey(valueItemType.name), 'No icon defined for ${valueItemType.name}');
-    assert(_icons[valueItemType.name]!.containsKey(name),
-        'No icon defined for ${valueItemType.name}:$name');
+    assert(_icons.containsKey(valueItemType), 'No icon defined for $valueItemType');
+    assert(_icons[valueItemType]!.containsKey(name), 'No icon defined for $valueItemType');
 
-    return _icons[valueItemType.name]![name] ?? Icons.question_mark_outlined;
+    return _icons[valueItemType]![name] ?? Icons.question_mark_outlined;
   }
 
   Color get color {
-    assert(_colors.containsKey(valueItemType.name), 'No color defined for ${valueItemType.name}');
-    assert(_colors[valueItemType.name]!.containsKey(name),
-        'No color defined for ${valueItemType.name}:$name');
+    assert(_colors.containsKey(valueItemType), 'No color defined for $valueItemType');
+    assert(_colors[valueItemType]!.containsKey(name), 'No color defined for $valueItemType:$name');
 
-    return _colors[valueItemType.name]![name] ?? Colors.white;
+    return _colors[valueItemType]![name] ?? Colors.white;
   }
 
   @override
-  String toString() => '${valueItemType.name}:$name';
+  String toString() => '$valueItemType:$name';
 }

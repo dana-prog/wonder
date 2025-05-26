@@ -1,50 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/providers/client_provider.dart';
 
 import '../data/user_item.dart';
 
-final _allUsersProvider = FutureProvider<_UserList>((
-  ref,
-) async {
-  if (_userList == null) {
-    final wixClient = ref.watch(clientProvider);
-    final users = await wixClient.fetchItems<UserItem>(itemType: 'user');
+final usersProvider =
+    Provider<UsersCache>((ref) => throw Exception('userListProvider state was not set'));
 
-    _userList = _UserList(users);
-  }
-
-  return _userList!;
-});
-
-final usersProvider = FutureProvider<List<UserItem>>((
-  ref,
-) async {
-  final userList = await ref.watch(_allUsersProvider.future);
+final userListProvider = Provider<List<UserItem>>((ref) {
+  final userList = ref.watch(usersProvider);
   return userList.users;
 });
 
-final userProvider = FutureProvider.family<UserItem, String>((
-  ref,
-  id,
-) async {
-  final wixClient = ref.watch(clientProvider);
-  return await wixClient.fetchItem<UserItem>(
-    itemType: 'user',
-    id: id,
-  );
+final userProvider = Provider.family<UserItem, String>((ref, id) {
+  final userList = ref.watch(usersProvider);
+  return userList.getUserById(id);
 });
 
-final noUserProvider = FutureProvider((_) async {
-  return null;
-});
-
-_UserList? _userList;
-
-class _UserList {
+class UsersCache {
   late List<UserItem> _users;
   late Map<String, UserItem> _usersById;
 
-  _UserList(List<UserItem> users) {
+  UsersCache(List<UserItem> users) {
     _users = users;
     _usersById = {};
     for (var item in users) {

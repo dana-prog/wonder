@@ -10,6 +10,7 @@ class Titles {
   static const String more = 'More';
   static const String theme = 'Theme';
   static const String debug = 'Debug';
+  static const String printMyMember = 'Print My Member';
 }
 
 class Labels {
@@ -18,6 +19,7 @@ class Labels {
   static const String save = 'Save';
   static const String edit = 'Edit';
   static const String delete = 'Delete';
+  static const String loading = 'Loading';
   static String facilityRoomCount(int count) => count == 1 ? '$count Bedroom' : '$count Bedrooms';
 }
 

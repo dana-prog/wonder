@@ -61,13 +61,26 @@ class WixAuthentication {
     }
 
     if (_token!.isExpired) {
-      return _token!.grantType == GrantType.anonymous ? LoginState.visitorLoginExpired : LoginState.memberLoginExpired;
+      return _token!.grantType == GrantType.anonymous
+          ? LoginState.visitorLoginExpired
+          : LoginState.memberLoginExpired;
     }
 
-    return _token!.grantType == GrantType.anonymous ? LoginState.loggedInAsVisitor : LoginState.loggedInAsMember;
+    return _token!.grantType == GrantType.anonymous
+        ? LoginState.loggedInAsVisitor
+        : LoginState.loggedInAsMember;
   }
 
   String? get accessToken => (_token != null) ? _token!.accessToken : null;
+
+  Future<dynamic> getMyMember() async {
+    final http.Response response = await http.get(
+      Uri.parse('https://www.wixapis.com/members/v1/members/my'),
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $accessToken'},
+    );
+
+    return jsonDecode(response.body)['member'];
+  }
 
   Future<void> _loginAsMember() async {
     logger.t('[WixAuthentication._loginAsMember] start');
@@ -98,13 +111,6 @@ class WixAuthentication {
 
     logger.t('[WixAuthentication.login] end');
   }
-
-  // Future<Member> getMyMember() async {
-  //   final http.Response response = await http.post(
-  //     Uri.parse('https://www.wixapis.com/members/v1/members/my'),
-  //     headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $accessToken'},
-  //   );
-  // }
 
   Future<void> _loginAsVisitor() async {
     final loginState = await getLoginState();
@@ -148,7 +154,8 @@ class WixAuthentication {
 
   Future<void> _renewToken() async {
     final loginState = await getLoginState();
-    if (loginState != LoginState.visitorLoginExpired && loginState != LoginState.memberLoginExpired) {
+    if (loginState != LoginState.visitorLoginExpired &&
+        loginState != LoginState.memberLoginExpired) {
       throw Exception('Cannot renew token, current state: $loginState');
     }
 
@@ -190,7 +197,8 @@ class WixAuthentication {
       _token = Token.fromString(token);
     }
 
-    logger.t('[WixAuthentication._loadTokens] ${_token == null ? 'No tokens found in storage' : 'tokens: $_token'}');
+    logger.t(
+        '[WixAuthentication._loadTokens] ${_token == null ? 'No tokens found in storage' : 'tokens: $_token'}');
 
     _loadingTokens.complete();
   }
@@ -237,7 +245,8 @@ class WixAuthentication {
       throw Exception('Failed to get login URL: ${response.body}');
     }
 
-    logger.t('[WixAuthentication._getWixManagedLoginUrl] redirectSession response.body: ${response.body}');
+    logger.t(
+        '[WixAuthentication._getWixManagedLoginUrl] redirectSession response.body: ${response.body}');
     return jsonDecode(response.body)['redirectSession']['fullUrl'];
   }
 

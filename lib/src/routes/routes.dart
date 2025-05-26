@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wonder/src/widgets/forms/debug_view.dart';
-import 'package:wonder/src/widgets/forms/main_view.dart';
-import 'package:wonder/src/widgets/forms/single_view_form.dart';
-import 'package:wonder/src/widgets/item/facility_form.dart';
 
 import '../logger.dart';
+import '../widgets/facility/facility_form.dart';
+import '../widgets/forms/debug_view.dart';
+import '../widgets/forms/main_view.dart';
+import '../widgets/forms/single_view_form.dart';
 import 'locations.dart';
 
 final router = GoRouter(

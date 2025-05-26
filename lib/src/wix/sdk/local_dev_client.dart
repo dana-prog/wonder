@@ -1,5 +1,4 @@
 import '../../data/item.dart';
-import '../../data/metadata.dart';
 import '../../logger.dart';
 import 'client.dart';
 
@@ -1129,20 +1128,7 @@ const _itemsFields = <Map<String, dynamic>>[
 ];
 
 class LocalDevClient extends Client {
-  final _metadata = Metadata();
-
-  final Map<String, Item> _itemsById = {};
-  final Map<String, List<Item>> _itemsByType = {};
-
-  LocalDevClient() {
-    for (final itemFields in _itemsFields) {
-      final String itemType = itemFields['itemType']!;
-      final item = _metadata.getByName(itemType).deserializer(itemFields);
-      _itemsById[item.id] = item;
-      _itemsByType.putIfAbsent(itemType, () => []);
-      _itemsByType[itemType]!.add(item);
-    }
-  }
+  LocalDevClient();
 
   @override
   Future<T> fetchItem<T extends Item>({
@@ -1150,38 +1136,21 @@ class LocalDevClient extends Client {
     required String id,
   }) async {
     logger.t('[LocalDevClient.fetchItem] $itemType/$id');
-    return _itemsById[id] as T;
+    return cache[id];
   }
 
   @override
   Future<List<T>> fetchItems<T extends Item>({required String itemType}) async {
     logger.t('[LocalDevClient.fetchItems] $itemType');
-    return _itemsByType[itemType]?.cast<T>() ?? [];
+    return cache.getByType<T>(itemType);
   }
 
   @override
-  Future<T> updateItem<T extends Item>(T item) async {
-    logger.t('[LocalDevClient.updateItem] item: $item');
-    final updatedItem = (_itemsById[item.id] ?? item) as T;
-
-    for (MapEntry<String, dynamic> field in item.fields.entries) {
-      updatedItem[field.key] = field.value;
+  void resetCache() {
+    super.resetCache();
+    for (final itemFields in _itemsFields) {
+      final item = getItemObject(itemFields);
+      cache.add(item);
     }
-    _itemsById[item.id] = updatedItem;
-    notifyItemUpdated(updatedItem);
-    return updatedItem;
-  }
-
-  @override
-  Future<T> deleteItem<T extends Item>({
-    required String itemType,
-    required String id,
-  }) async {
-    logger.t('[LocalDevClient.deleteItem] $itemType/$id');
-
-    final deletedItem = _itemsById.remove(id)!;
-    _itemsByType[itemType]!.removeWhere((item) => item.id == id);
-    notifyItemDeleted(deletedItem);
-    return deletedItem as T;
   }
 }

@@ -1,41 +1,30 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/data/list_value_item.dart';
-import 'package:wonder/src/providers/client_provider.dart';
 
-final _allValuesProvider = FutureProvider<_ListsOfValues>((
-  ref,
-) async {
-  if (_listsOfValues == null) {
-    final wixClient = ref.watch(clientProvider);
-    final values = await wixClient.fetchItems<ListValueItem>(itemType: 'listValue');
+final listsValuesProvider =
+    Provider<ListsValuesCache>((ref) => throw Exception('listsValuesProvider state was not set'));
 
-    _listsOfValues = _ListsOfValues(values);
-  }
-
-  return _listsOfValues!;
-});
-
-final listOfValuesProvider = FutureProvider.family<List<ListValueItem>, ValueItemType>((
+final listValuesProvider = Provider.family<List<ListValueItem>, String>((
   ref,
   listType,
-) async {
-  final listsOfValues = await ref.watch(_allValuesProvider.future);
+) {
+  final listsOfValues = ref.watch(listsValuesProvider);
   return listsOfValues.getList(listType);
 });
 
-final listValueProvider = FutureProvider.family<ListValueItem, String>((
+final listValueProvider = Provider.family<ListValueItem, String>((
   ref,
   id,
-) async {
-  final listsOfValues = await ref.watch(_allValuesProvider.future);
+) {
+  final listsOfValues = ref.watch(listsValuesProvider);
   return listsOfValues.getValueById(id);
 });
 
-class _ListsOfValues {
+class ListsValuesCache {
   late Map<String, ListValueItem> _itemsById;
-  late Map<ValueItemType, Map<String, ListValueItem>> _listsByType;
+  late Map<String, Map<String, ListValueItem>> _listsByType;
 
-  _ListsOfValues(List<ListValueItem> valueItems) {
+  ListsValuesCache(List<ListValueItem> valueItems) {
     _itemsById = {};
     _listsByType = {};
 
@@ -57,13 +46,13 @@ class _ListsOfValues {
     return item;
   }
 
-  List<ListValueItem> getList(ValueItemType type) {
+  List<ListValueItem> getList(String type) {
     final list = _listsByType[type];
     if (list == null) {
       throw Exception('No items found for type $type');
     }
     return list.values.toList();
   }
-}
 
-_ListsOfValues? _listsOfValues;
+  bool get empty => _itemsById.isEmpty;
+}

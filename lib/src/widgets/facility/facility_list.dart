@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/providers/facilities_provider.dart';
-import 'package:wonder/src/widgets/cards/facility_card.dart';
-import 'package:wonder/src/widgets/lists/item_list.dart';
 
 import '../../data/facility_item.dart';
+import '../../providers/facilities_provider.dart';
 import '../../resources/labels.dart';
 import '../async/async_value_widget.dart';
+import '../item/item_list.dart';
 import '../progress_indicator/circular_progress_indicator.dart';
+import 'facility_card.dart';
 
 class FacilityList extends ConsumerWidget {
   const FacilityList({super.key});
@@ -22,13 +22,16 @@ class FacilityList extends ConsumerWidget {
         List<FacilityItem> facilities,
         BuildContext context,
       ) {
-        return ItemList<FacilityItem>(
-          facilities.where((f) => f.number > 100).toList(),
-          itemBuilder: (FacilityItem facility) => FacilityCard(
-            facility: facility,
-            onDelete: (FacilityItem item) =>
-                _onDelete(context: context, item: item, notifier: facilityListNotifier),
+        return RefreshIndicator(
+          child: ItemList<FacilityItem>(
+            items: facilities.where((f) => f.number > 100).toList(),
+            itemBuilder: (FacilityItem facility) => FacilityCard(
+              facility: facility,
+              onDelete: (FacilityItem item) =>
+                  _onDelete(context: context, item: item, notifier: facilityListNotifier),
+            ),
           ),
+          onRefresh: () async => await facilityListNotifier.refresh(),
         );
       },
     );
@@ -43,7 +46,7 @@ class FacilityList extends ConsumerWidget {
     final confirmed = await _confirmDelete(context: context, facility: item);
     if (confirmed != true) return;
 
-    await notifier.delete(item.id);
+    await notifier.delete(item);
 
     _notifyDeleted(messenger, item);
   }

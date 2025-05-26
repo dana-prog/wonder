@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/data/facility_item.dart';
-import 'package:wonder/src/data/list_value_item.dart';
 import 'package:wonder/src/providers/lists_of_values_provider.dart';
 import 'package:wonder/src/resources/labels.dart';
-import 'package:wonder/src/widgets/fields/value_items_dropdown.dart';
+import 'package:wonder/src/widgets/fields/dropdown.dart';
 
 import '../../logger.dart';
 import '../../providers/facilities_provider.dart';
 import '../async/async_value_widget.dart';
 import '../fields/user_items_dropdown.dart';
+import 'room_count_dropdown.dart';
 
 class FacilityForm extends StatefulWidget {
   final FacilityItem? initialItem;
+  final void Function(FacilityItem item) save;
 
   const FacilityForm({
     this.initialItem,
+    required this.save,
     super.key,
   });
 
@@ -51,13 +53,8 @@ class _FacilityFormState extends State<FacilityForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(children: spaceWidgets(fieldsLayout)),
+      child: SingleChildScrollView(child: Column(children: spaceWidgets(fieldsLayout))),
     );
-  }
-
-  Future<void> save() async {
-    logger.w(
-        '[FacilityForm] NOT IMPLEMENTED save: $_number, $_type, $_subtype, $_status, $_owner, $_roomCount');
   }
 
   List<Widget> get fieldsLayout => spaceWidgets([
@@ -75,49 +72,41 @@ class _FacilityFormState extends State<FacilityForm> {
             ? [element]
             : [
                 ...previous,
-                const SizedBox(height: 10, width: 10),
+                const SizedBox(height: 8, width: 10),
                 element,
               ];
       });
 
   Widget get _subtypeFormField => ValueItemsDropdownConsumer(
         labelText: fields['subtype'],
-        type: ValueItemType.facilitySubtype,
+        type: 'facilitySubtype',
         value: _subtype,
-        onChanged: (value) => setState(() => _subtype = value),
+        onChanged: (value) => onChanged(context, () => _subtype = value),
         // validator: (value) => value == null ? 'Required' : null,
       );
 
   Widget get _statusFormField => ValueItemsDropdownConsumer(
         labelText: fields['status'],
-        type: ValueItemType.facilityStatus,
+        type: 'facilityStatus',
         value: _status,
-        onChanged: (value) => setState(() => _status = value),
+        onChanged: (value) => onChanged(context, () => _status = value),
       );
 
   Widget get _ownerFormField => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(fields['owner']!, style: Theme.of(context).inputDecorationTheme.labelStyle),
-          UserItemsDropdown(
+          UserItemsDropdownConsumer(
             value: _owner,
-            onChanged: (value) => setState(() => _owner = value),
+            onChanged: (value) => onChanged(context, () => _owner = value),
             validator: (value) => value == null ? 'Required' : null,
           )
         ],
       );
 
-  Widget get _roomCountFormField => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(fields['roomCount']!, style: Theme.of(context).inputDecorationTheme.labelStyle),
-          TextFormField(
-            initialValue: _roomCount.toString(),
-            keyboardType: TextInputType.number,
-            validator: (value) => int.tryParse(value ?? '') == null ? 'Enter a valid number' : null,
-            onSaved: (value) => _roomCount = int.parse(value!),
-          )
-        ],
+  Widget get _roomCountFormField => RoomCountDropdown(
+        value: _roomCount,
+        onChanged: (value) => onChanged(context, () => _roomCount = value),
       );
 
   Widget get _saveButton => ElevatedButton(
@@ -138,6 +127,18 @@ class _FacilityFormState extends State<FacilityForm> {
         },
         child: const Text(Labels.save),
       );
+
+  void onChanged(BuildContext context, VoidCallback fn) async {
+    setState(fn);
+    widget.save(FacilityItem.fromFields({
+      // TODO: remove !
+      ...widget.initialItem!.fields,
+      'status': _status,
+      'type': _type,
+      'subtype': _subtype,
+      'owner': _owner,
+    }));
+  }
 }
 
 class FacilityFormConsumer extends ConsumerWidget {
@@ -152,31 +153,33 @@ class FacilityFormConsumer extends ConsumerWidget {
     return AsyncValueWidget<FacilityItem>(
       asyncValue: asyncFacility,
       dataBuilder: (item, _) {
-        return FacilityForm(initialItem: item);
+        return FacilityForm(
+          initialItem: item,
+          save: (item) => save(item, ref),
+        );
       },
     );
   }
+
+  void save(FacilityItem item, WidgetRef ref) async {
+    final notifier = ref.read(facilityListProvider.notifier);
+    await notifier.update(item);
+  }
 }
 
-class _FormTitle extends StatelessWidget {
+class _FormTitle extends ConsumerWidget {
   final int number;
   final String typeName;
 
   const _FormTitle(this.number, this.typeName);
 
   @override
-  Widget build(BuildContext context) {
-    return AsyncValueProviderWidget<ListValueItem>(
-        provider: listValueProvider(typeName),
-        dataBuilder: (
-          ListValueItem type,
-          _,
-          __,
-        ) =>
-            Text(
-              textAlign: TextAlign.left,
-              '${type.title} #$number',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final type = ref.watch(listValueProvider(typeName));
+    return Text(
+      textAlign: TextAlign.left,
+      '${type.title} #$number',
+      style: Theme.of(context).textTheme.headlineMedium,
+    );
   }
 }

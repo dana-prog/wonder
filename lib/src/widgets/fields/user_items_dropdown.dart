@@ -1,30 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/widgets/async/async_value_widget.dart';
 
 import '../../data/user_item.dart';
 import '../../providers/users_provider.dart';
 import '../media/app_image.dart';
 
-Map<String, String> cities = <String, String>{
-  'New York': 'NYC',
-  'Los Angeles': 'LA',
-  'San Francisco': 'SF',
-  'Chicago': 'CH',
-  'Miami': 'MI',
-};
-
 class UserItemsDropdown extends StatelessWidget {
   final String? value;
-  final InputDecoration? decoration;
-  final List<DropdownMenuItem<String>>? items;
+  final List<UserItem> users;
   final ValueChanged<String?>? onChanged;
   final FormFieldValidator<String>? validator;
 
   const UserItemsDropdown({
+    required this.users,
     this.value,
-    this.decoration,
-    this.items,
     this.onChanged,
     this.validator,
     super.key,
@@ -32,27 +21,17 @@ class UserItemsDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AsyncValueProviderWidget2<List<UserItem>, UserItem?>(
-      provider1: usersProvider,
-      provider2: value != null
-          ? userProvider(value!)
-          : FutureProvider((_) async {
-              return null;
-            }),
-      dataBuilder: (users, selectedUser, _, __) {
-        return DropdownButtonFormField<String>(
-          isExpanded: true,
-          value: value,
-          items: users.map(getMenuItem).toList(),
-          decoration: decoration,
-          onChanged: onChanged,
-          validator: validator,
-        );
-      },
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      value: value,
+      items: users.map(getMenuItem).toList(),
+      onChanged: onChanged,
+      validator: validator,
     );
   }
 
   DropdownMenuItem<String> getMenuItem(UserItem item) {
+    // TODO: move radius to a constant
     final radius = 12.0;
 
     return DropdownMenuItem<String>(
@@ -73,6 +52,31 @@ class UserItemsDropdown extends StatelessWidget {
           )),
         ],
       )),
+    );
+  }
+}
+
+class UserItemsDropdownConsumer extends ConsumerWidget {
+  final String? value;
+  final InputDecoration? decoration;
+  final ValueChanged<String?>? onChanged;
+  final FormFieldValidator<String>? validator;
+
+  const UserItemsDropdownConsumer({
+    this.value,
+    this.decoration,
+    this.onChanged,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final users = ref.watch(userListProvider);
+    return UserItemsDropdown(
+      users: users,
+      value: value,
+      onChanged: onChanged,
+      validator: validator,
     );
   }
 }

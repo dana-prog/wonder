@@ -88,9 +88,13 @@ class Metadata {
     }
   }
 
-  TypeMetadata getByName(String name) =>
-      _byName[name] ?? (throw Exception('No metadata found for $name'));
+  TypeMetadata getByName(String name) {
+    assert(_byName.containsKey(name), 'No metadata found for $name');
+    return _byName[name]!;
+  }
 
-  TypeMetadata getByCollectionId(String collectionId) =>
-      _byCollectionId[collectionId] ?? (throw Exception('No metadata found for $collectionId'));
+  TypeMetadata getByCollectionId(String collectionId) {
+    assert(_byCollectionId.containsKey(collectionId), 'No metadata found for $collectionId');
+    return _byCollectionId[collectionId]!;
+  }
 }

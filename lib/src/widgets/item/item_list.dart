@@ -4,15 +4,14 @@ import 'package:go_router/go_router.dart';
 import '../../data/item.dart';
 import '../../logger.dart';
 import '../../utils/multitap/multitap.dart';
-import '../cards/default_item_card.dart';
 
 class ItemList<T extends Item> extends StatelessWidget {
   final List<T> items;
   final Widget Function(T) itemBuilder;
 
-  const ItemList(
-    this.items, {
-    this.itemBuilder = DefaultItemCard.new,
+  const ItemList({
+    required this.items,
+    required this.itemBuilder,
   });
 
   @override
@@ -22,6 +21,7 @@ class ItemList<T extends Item> extends StatelessWidget {
     );
 
     return ListView.builder(
+      physics: AlwaysScrollableScrollPhysics(),
       itemCount: items.length,
       itemBuilder: (context, index) => MultiTapGestureWrapper(
         onShortTap: (pointer) {

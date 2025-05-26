@@ -4,8 +4,8 @@ import 'package:wonder/src/logger.dart';
 import 'package:wonder/src/widgets/forms/more_view.dart';
 
 import '../../resources/labels.dart';
-import '../lists/facility_list.dart';
-import '../lists/ticket_list.dart';
+import '../facility/facility_list.dart';
+import '../item/ticket_list.dart';
 
 class _Page {
   final String name;

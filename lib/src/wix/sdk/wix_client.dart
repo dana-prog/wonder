@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:wonder/src/data/metadata.dart';
 import 'package:wonder/src/wix/sdk/token.dart';
 import 'package:wonder/src/wix/sdk/wix_authentication.dart';
 
@@ -29,8 +28,6 @@ enum _HeaderContentType {
 
 class WixClient extends Client {
   final _authentication = WixAuthentication();
-  final _metadata = Metadata();
-  final _cache = _Cache();
 
   WixClient();
 
@@ -41,11 +38,11 @@ class WixClient extends Client {
   }) async {
     logger.t('[WixClient.fetchItem] $itemType/$id');
 
-    if (_cache.exists(id)) {
-      return _cache[id] as T;
+    if (cache.exists(id)) {
+      return cache[id] as T;
     }
 
-    final itemMetadata = _metadata.getByName(itemType);
+    final itemMetadata = metadata.getByName(itemType);
 
     await _ensureMemberLogin();
 
@@ -61,7 +58,7 @@ class WixClient extends Client {
     logger.t('[WixClient.fetchItem] response.body: ${response.body}');
 
     final dataItem = jsonDecode(response.body)['dataItem'];
-    return _getItemObject(dataItem) as T;
+    return getItemObject(dataItem) as T;
   }
 
   @override
@@ -70,7 +67,7 @@ class WixClient extends Client {
   }) async {
     logger.t('[WixClient.fetchItems] $itemType');
 
-    final itemMetadata = _metadata.getByName(itemType);
+    final itemMetadata = metadata.getByName(itemType);
 
     await _ensureMemberLogin();
 
@@ -95,95 +92,77 @@ class WixClient extends Client {
 
     return (jsonDecode(response.body)['dataItems'] as List)
         .cast<Map<String, dynamic>>()
-        .map((dataItem) => _getItemObject(dataItem) as T)
+        .map((dataItem) => getItemObject(dataItem) as T)
         .toList();
   }
 
   @override
-  Future<T> updateItem<T extends Item>(T item) async {
-    logger.t('[WixClient.updateItem] item: $item');
+  Future<T> updateItem<T extends Item>(T updatedItem) async {
+    logger.d('[WixClient.updateItem] item: $updatedItem');
 
     await _ensureMemberLogin();
 
-    final dataCollectionId = _metadata.getByName(item.itemType).dataCollectionId;
+    final dataCollectionId = metadata.getByName(updatedItem.itemType).dataCollectionId;
     final response = await http.put(
-      Uri.parse('$_itemsApiBaseUrl/${item.id}'),
+      Uri.parse('$_itemsApiBaseUrl/${updatedItem.id}'),
       headers: _getHeaders(),
       body: jsonEncode({
         'dataCollectionId': dataCollectionId,
-        'dataItem': {'data': item.fields},
+        'dataItem': {'data': updatedItem.fields},
       }),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('[WixClient.updateItem] Failed to update item $item: ${response.body}');
+      throw Exception(
+          '[WixClient.updateItem] Failed to update item $updatedItem: ${response.body}');
     }
 
-    logger.t('[WixClient.updateItem] response.body: ${response.body}');
+    logger.d('[WixClient.updateItem] response.body: ${response.body}');
 
     final dataItem = jsonDecode(response.body)['dataItem'];
-    final updatedItem = _getItemObject(dataItem) as T;
-    notifyItemUpdated(updatedItem);
-    return updatedItem;
+    return getItemObject(dataItem) as T;
   }
 
   @override
-  Future<T> deleteItem<T extends Item>({required String itemType, required String id}) async {
-    logger.t('[WixClient.deleteItem] $itemType/$id');
+  Future<T> deleteItem<T extends Item>(T item) async {
+    logger.t('[WixClient.deleteItem] $item');
 
     await _ensureMemberLogin();
 
-    final dataCollectionId = _metadata.getByName(itemType).dataCollectionId;
+    final id = item.id;
+    final dataCollectionId = metadata.getByName(item.itemType).dataCollectionId;
     final response = await http.delete(
       Uri.parse('$_itemsApiBaseUrl/$id?dataCollectionId=$dataCollectionId'),
       headers: _getHeaders(),
     );
 
     if (response.statusCode != 200) {
-      throw Exception(
-          '[WixClient.deleteItem] Failed to delete item $itemType/$id: ${response.body}');
+      throw Exception('[WixClient.deleteItem] Failed to delete item $item: ${response.body}');
     }
 
-    final dataItem = jsonDecode(response.body)['dataItem'];
-    final deletedItem = _getItemObject(dataItem) as T;
-    notifyItemDeleted(deletedItem);
-    return deletedItem;
-  }
-
-  Item _getItemObject(Map<String, dynamic> dataItem) {
-    final id = dataItem['id'];
-    final dataCollectionId = dataItem['dataCollectionId'];
-    final itemMetadata = _metadata.getByCollectionId(dataCollectionId);
-    if (!_cache.exists(id)) {
-      _cache.add(itemMetadata.deserializer({
-        'id': dataItem['id'],
-        'itemType': itemMetadata.name,
-      }));
-    }
-
-    final item = _cache[id];
-    final data = dataItem['data'] as Map<String, dynamic>;
-
-    for (var entry in data.entries) {
-      item[entry.key] = entry.value;
-    }
-
-    return item;
+    cache.delete(item);
+    return getItemObject<T>(jsonDecode(response.body)['dataItem']);
   }
 
   Map<String, String> _getHeaders({_HeaderContentType contentType = _HeaderContentType.json}) => {
-        'Authorization': _userAuth,
+        'Authorization': _apiKeyAuth,
+        'wix-site-id': _siteId,
         'Content-Type': contentType.toString(),
       };
 
-  String get _userAuth {
-    final accessToken = _authentication.accessToken;
-    if (accessToken == null) {
-      throw Exception('Access token is null, please login first');
-    }
+  // String get _userAuth {
+  //   final accessToken = _authentication.accessToken;
+  //   if (accessToken == null) {
+  //     throw Exception('Access token is null, please login first');
+  //   }
+  //
+  //   return 'Bearer $accessToken';
+  // }
 
-    return 'Bearer $accessToken';
-  }
+  String get _siteId => 'd03a309f-520f-4b7e-9162-dbb99244ceb7';
+
+  String get _apiKeyAuth =>
+      'IST.eyJraWQiOiJQb3pIX2FDMiIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjoie1wiaWRcIjpcIjEyZjhlMWQ1LTRmOWQtNDM0Ni1hNzk4LTA2ZGE1MjFhMzRmNVwiLFwiaWRlbnRpdHlcIjp7XCJ0eXBlXCI6XCJhcHBsaWNhdGlvblwiLFwiaWRcIjpcIjk2NDlhYWM2LTgwMzAtNDlmMy1iMmYzLTBjNTFiYTk5ZTY3MlwifSxcInRlbmFudFwiOntcInR5cGVcIjpcImFjY291bnRcIixcImlkXCI6XCIxMjQ2ZmU0ZC1jMmU0LTQwNmItOWNiOS1iMmZlZGJmNTJjM2RcIn19IiwiaWF0IjoxNzQ3NDE5NDI1fQ.fxH6Kq8Udf9N_2eXS0l0Zd9ahNldSxleA8KHwCpOSo-yhMiD2pdJN4d3sVVED-vY_r8OF9Z7QzslNv8OSLuRvdadEPkdP6xatVCQ4U72TOnK-NAzStftyBJ5TsDCJRL-wsKqQ8Q29ZTgWMCBBLnmAJS0pGLZ6QLcaA1DWRK6SwhpKf3TBjqY7QmUG0TtdUQsfiaKxlZn0U2EjFz5A-yDQZ4UaV9k5Rb8LTaZTyJxxymPhOJVYeZdQ5ej3U6mwSuxhPpS7S6G6XN77CLsTU7iODb5PPrIkSF3nllZ4H2x_Q4FL5IIjDnqvkjit8hMi-fQBjP8uMIQR5MsoYn3Q9Zx_Q';
 
   Future<void> _ensureMemberLogin() async {
     final loginState = await _authentication.getLoginState();
@@ -196,7 +175,7 @@ class WixClient extends Client {
 
   @override
   void printCachedItems() {
-    final itemFields = _cache.itemsById.values.map((item) {
+    final itemFields = cache.itemsById.values.map((item) {
       final fields = item.fields;
       fields.removeWhere((fieldName, fieldValue) => fieldName.startsWith('_'));
       return fields;
@@ -204,34 +183,18 @@ class WixClient extends Client {
     final str = jsonEncode(itemFields);
     logger.i(str);
   }
-}
 
-class _Cache {
-  static final _Cache _instance = _Cache._internal();
+  @override
+  Future<void> printMyMember() async {
+    final member = await _authentication.getMyMember();
+    if (member == null) {
+      logger.w('No current member found');
+      return;
+    }
 
-  factory _Cache() {
-    return _instance;
+    logger.i('[WixClient.printMyMember] response: $member');
   }
 
-  _Cache._internal();
-
-  final Map<String, Item> itemsById = {};
-
-  bool exists(String id) {
-    return itemsById.containsKey(id);
-  }
-
-  dynamic operator [](String id) {
-    return itemsById.containsKey(id)
-        ? itemsById[id]
-        : throw Exception(
-            "Item with id $id not found in cache",
-          );
-  }
-
-  void add(Item item) {
-    itemsById[item.id] = item;
-  }
-
-  void clear() => itemsById.clear();
+  @override
+  Future<void> logout() async => await _authentication.logout();
 }

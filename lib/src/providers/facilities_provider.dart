@@ -24,17 +24,23 @@ class FacilityListNotifier extends StateNotifier<AsyncValue<List<FacilityItem>>>
     }
   }
 
-  Future<void> refresh() => _load();
+  Future<void> refresh() {
+    logger.d('[FacilityListNotifier.refresh]');
+    state = AsyncData([]);
+    state = const AsyncLoading();
+    return _load();
+  }
 
   Future<FacilityItem> update(FacilityItem item) async {
+    logger.d('[FacilityListNotifier.update] $item');
     final wixClient = ref.read(clientProvider);
     return await wixClient.updateItem(item);
   }
 
-  Future<void> delete(String id) async {
-    logger.d('[FacilityListNotifier.delete] id: $id');
+  Future<void> delete(FacilityItem item) async {
+    logger.d('[FacilityListNotifier.delete] $item');
     final wixClient = ref.read(clientProvider);
-    await wixClient.deleteItem(itemType: 'facility', id: id);
+    await wixClient.deleteItem(item);
     await refresh();
   }
 }

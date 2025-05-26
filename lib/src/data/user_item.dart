@@ -30,11 +30,14 @@ class UserItem extends Item {
 
   @override
   void operator []=(String fieldName, dynamic fieldValue) {
-    if (fieldName != 'picture') {
-      super[fieldName] = fieldValue;
-      return;
+    dynamic resolvedValue;
+    if (fieldName == 'picture') {
+      assert(fieldValue is String, 'Picture field must be a String');
+      resolvedValue = isWixImageUrl(fieldValue) ? getStorageUrl(fieldValue) : fieldValue;
+    } else {
+      resolvedValue = fieldValue;
     }
 
-    super[fieldName] = (fieldValue is String) ? fieldValue : getStorageUrl(fieldValue);
+    super[fieldName] = resolvedValue;
   }
 }
