@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/providers/client_provider.dart';
+import 'package:wonder/src/wix/sdk/client.dart';
 
 import '../data/facility_item.dart';
 import '../logger.dart';
@@ -8,16 +9,17 @@ import '../logger.dart';
 // TODO: add an option to refresh the data (and validate that until refresh all clients use the same list)
 
 class FacilityListNotifier extends StateNotifier<AsyncValue<List<FacilityItem>>> {
-  FacilityListNotifier(this.ref) : super(const AsyncLoading()) {
+  final Client client;
+
+  FacilityListNotifier(Ref ref)
+      : client = ref.read(clientProvider),
+        super(const AsyncLoading()) {
     _load();
   }
 
-  final Ref ref;
-
   Future<void> _load() async {
-    final wixClient = ref.read(clientProvider);
     try {
-      final items = await wixClient.fetchItems<FacilityItem>(itemType: 'facility');
+      final items = await client.fetchItems<FacilityItem>(itemType: 'facility');
       state = AsyncData(items);
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -33,21 +35,33 @@ class FacilityListNotifier extends StateNotifier<AsyncValue<List<FacilityItem>>>
 
   Future<FacilityItem> update(FacilityItem item) async {
     logger.d('[FacilityListNotifier.update] $item');
-    final wixClient = ref.read(clientProvider);
-    return await wixClient.updateItem(item);
+    return await client.updateItem(item);
   }
 
   Future<void> delete(FacilityItem item) async {
     logger.d('[FacilityListNotifier.delete] $item');
-    final wixClient = ref.read(clientProvider);
-    await wixClient.deleteItem(item);
-    await refresh();
+    await client.deleteItem(item);
+    state = state.whenData((items) {
+      return [
+        for (final i in items)
+          if (i.id != item.id) i
+      ];
+    });
+  }
+
+  void onItemDeleted(FacilityItem item) {
+    state = state.whenData((items) {
+      return [
+        for (final i in items)
+          if (i.id != item.id) i
+      ];
+    });
   }
 }
 
 final facilityListProvider =
     StateNotifierProvider<FacilityListNotifier, AsyncValue<List<FacilityItem>>>(
-  (ref) => FacilityListNotifier(ref),
+  ((ref) => FacilityListNotifier(ref)),
 );
 
 final facilityProvider = FutureProvider.family<FacilityItem, String>((

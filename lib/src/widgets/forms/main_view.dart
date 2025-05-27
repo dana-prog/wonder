@@ -6,6 +6,7 @@ import 'package:wonder/src/widgets/forms/more_view.dart';
 import '../../resources/labels.dart';
 import '../facility/facility_list.dart';
 import '../item/ticket_list.dart';
+import '../notifications/event_messenger.dart';
 
 class _Page {
   final String name;
@@ -55,13 +56,12 @@ class MainView extends StatelessWidget {
     logger.d('[MainView.build] selectedPageName: ${_selectedPage.name}');
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_selectedPage.label),
-        // leading: Icon(selectedTab.icon),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: _selectedPage.widget,
+      appBar: AppBar(title: Text(_selectedPage.label)),
+      body: EventMessenger(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: _selectedPage.widget,
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedPageIndex,

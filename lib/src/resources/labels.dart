@@ -23,7 +23,7 @@ class Labels {
   static String facilityRoomCount(int count) => count == 1 ? '$count Bedroom' : '$count Bedrooms';
 }
 
-class Confirmations {
+class ConfirmationMessages {
   static String delete(Item item) =>
       'Are you sure you want to delete ${ItemsLabels.getShortTitle(item)}?';
 
@@ -31,7 +31,24 @@ class Confirmations {
       'Are you sure you want to update ${ItemsLabels.getShortTitle(item)}?';
 }
 
-class Notifications {
+class NotificationMessages {
+  static String itemEvent(String itemEventType, Item item) {
+    final shortTitle = ItemsLabels.getShortTitle(item);
+    switch (itemEventType) {
+      case 'create':
+        return created(item);
+      case 'update':
+        return updated(item);
+      case 'delete':
+        return deleted(item);
+      default:
+        return 'Unknown event $itemEventType for $shortTitle';
+    }
+  }
+
+  static String created(Item item) =>
+      '${ItemsLabels.getShortTitle(item)} created successfully.'.capitalize();
+
   static String deleted(Item item) =>
       '${ItemsLabels.getShortTitle(item)} deleted successfully.'.capitalize();
 

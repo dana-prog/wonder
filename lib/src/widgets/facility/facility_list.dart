@@ -42,13 +42,10 @@ class FacilityList extends ConsumerWidget {
     required FacilityItem item,
     required FacilityListNotifier notifier,
   }) async {
-    final messenger = ScaffoldMessenger.of(context);
     final confirmed = await _confirmDelete(context: context, facility: item);
     if (confirmed != true) return;
 
     await notifier.delete(item);
-
-    _notifyDeleted(messenger, item);
   }
 
   Future<bool> _confirmDelete({
@@ -59,7 +56,7 @@ class FacilityList extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('${Labels.delete}?'),
-        content: Text(Confirmations.delete(facility)),
+        content: Text(ConfirmationMessages.delete(facility)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
           TextButton(
@@ -69,14 +66,4 @@ class FacilityList extends ConsumerWidget {
     );
     return res ?? false;
   }
-
-  void _notifyDeleted(
-    ScaffoldMessengerState sm,
-    FacilityItem item,
-  ) =>
-      sm.showSnackBar(
-        SnackBar(
-          content: Text(Notifications.deleted(item)),
-        ),
-      );
 }

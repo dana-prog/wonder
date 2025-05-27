@@ -97,30 +97,30 @@ class WixClient extends Client {
   }
 
   @override
-  Future<T> updateItem<T extends Item>(T updatedItem) async {
-    logger.d('[WixClient.updateItem] item: $updatedItem');
+  Future<T> updateItem<T extends Item>(T newItem) async {
+    logger.d('[WixClient.updateItem] item: $newItem');
 
     await _ensureMemberLogin();
 
-    final dataCollectionId = metadata.getByName(updatedItem.itemType).dataCollectionId;
+    final dataCollectionId = metadata.getByName(newItem.itemType).dataCollectionId;
     final response = await http.put(
-      Uri.parse('$_itemsApiBaseUrl/${updatedItem.id}'),
+      Uri.parse('$_itemsApiBaseUrl/${newItem.id}'),
       headers: _getHeaders(),
       body: jsonEncode({
         'dataCollectionId': dataCollectionId,
-        'dataItem': {'data': updatedItem.fields},
+        'dataItem': {'data': newItem.fields},
       }),
     );
 
     if (response.statusCode != 200) {
-      throw Exception(
-          '[WixClient.updateItem] Failed to update item $updatedItem: ${response.body}');
+      throw Exception('[WixClient.updateItem] Failed to update item $newItem: ${response.body}');
     }
 
     logger.d('[WixClient.updateItem] response.body: ${response.body}');
 
     final dataItem = jsonDecode(response.body)['dataItem'];
-    return getItemObject(dataItem) as T;
+    final item = getItemObject(dataItem) as T;
+    return super.updateItem(item);
   }
 
   @override
@@ -140,8 +140,8 @@ class WixClient extends Client {
       throw Exception('[WixClient.deleteItem] Failed to delete item $item: ${response.body}');
     }
 
-    cache.delete(item);
-    return getItemObject<T>(jsonDecode(response.body)['dataItem']);
+    T i = getItemObject<T>(jsonDecode(response.body)['dataItem']);
+    return super.deleteItem(i);
   }
 
   Map<String, String> _getHeaders({_HeaderContentType contentType = _HeaderContentType.json}) => {

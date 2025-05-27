@@ -3,6 +3,7 @@ class Item extends Fields {
 
   String get id => this['id'];
 
+  // TODO: pass as a separate prop
   String get itemType => this['itemType'];
 
   @override

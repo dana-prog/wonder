@@ -7,26 +7,62 @@ import '../../logger.dart';
 typedef ItemCallback = void Function(Item);
 
 abstract class Client {
+  final List<ItemCallback> _itemCreatedCallbacks = [];
+  final List<ItemCallback> _itemUpdatedCallbacks = [];
+  final List<ItemCallback> _itemDeletedCallbacks = [];
+
   @protected
   final cache = _Cache();
 
   @protected
   final metadata = Metadata();
 
+  void addItemCreatedCallback(ItemCallback callback) => _itemCreatedCallbacks.add(callback);
+
+  void addItemUpdatedCallback(ItemCallback callback) => _itemUpdatedCallbacks.add(callback);
+
+  void addItemDeletedCallback(ItemCallback callback) => _itemDeletedCallbacks.add(callback);
+
+  void notifyItemCreated(Item item) {
+    for (var callback in _itemCreatedCallbacks) {
+      callback(item);
+    }
+  }
+
+  void notifyItemUpdated(Item item) {
+    for (var callback in _itemUpdatedCallbacks) {
+      callback(item);
+    }
+  }
+
+  void notifyItemDeleted(Item item) {
+    for (var callback in _itemDeletedCallbacks) {
+      callback(item);
+    }
+  }
+
   Future<T> fetchItem<T extends Item>({required String itemType, required String id});
 
   Future<List<T>> fetchItems<T extends Item>({required String itemType});
 
-  Future<T> updateItem<T extends Item>(T updatedItem) async {
-    logger.d('[LocalDevClient.updateItem] item: $updatedItem');
-    if (!cache.exists(updatedItem.id)) {
-      return cache.add(updatedItem);
+  Future<T> updateItem<T extends Item>(T newItem) async {
+    logger.d('[LocalDevClient.updateItem] item: $newItem');
+    T updatedItem;
+    if (!cache.exists(newItem.id)) {
+      updatedItem = cache.add(newItem);
     } else {
-      return cache.update(updatedItem);
+      updatedItem = cache.update(newItem);
     }
+
+    notifyItemUpdated(updatedItem);
+    return updatedItem;
   }
 
-  Future<T> deleteItem<T extends Item>(T item) async => cache.delete(item);
+  Future<T> deleteItem<T extends Item>(T item) async {
+    T deletedItem = cache.delete(item);
+    notifyItemDeleted(deletedItem);
+    return deletedItem;
+  }
 
   @protected
   T getItemObject<T extends Item>(Map<String, dynamic> dataItem) {
