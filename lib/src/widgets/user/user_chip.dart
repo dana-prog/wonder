@@ -7,6 +7,8 @@ import '../fields/value_chip.dart';
 const _defaultPadding = EdgeInsets.all(0);
 const _defaultTitleFontSize = 14.0;
 const _defaultInitialsColor = Colors.white;
+// TODO: remove hard coded value
+const _minRadius = 12.0;
 
 class UserChip extends StatelessWidget {
   final UserItem? user;
@@ -16,7 +18,7 @@ class UserChip extends StatelessWidget {
   final double? width;
   final EdgeInsetsGeometry? padding;
   final BorderRadius? borderRadius;
-  final TextStyle? textStyle;
+  final TextStyle? labelStyle;
 
   UserChip({
     required this.user,
@@ -24,32 +26,31 @@ class UserChip extends StatelessWidget {
     this.pictureUrl,
     this.padding,
     this.borderRadius,
-    this.textStyle,
+    this.labelStyle,
     this.height,
     this.width,
   }) : super(key: ValueKey(user?.id));
 
   @override
   Widget build(BuildContext context) {
-    final effectiveTextStyle = TextStyle(fontSize: _defaultTitleFontSize).merge(textStyle);
     return ValueChip(
       label: title,
       leadingBuilder: (BuildContext context) {
         if (user != null && user!.picture != null) {
-          return CircleAvatar(backgroundImage: NetworkImage(user!.picture!));
+          return CircleAvatar(backgroundImage: NetworkImage(user!.picture!), minRadius: _minRadius);
         }
         return CircleAvatar(
           backgroundColor: getInitialsColor(),
-          minRadius: 12,
+          minRadius: _minRadius,
           child: Text(
             getInitialsChars(),
-            style: getInitialsEffectiveTextStyle(effectiveTextStyle),
+            style: getInitialsEffectiveTextStyle(context),
           ),
         );
       },
       padding: padding ?? _defaultPadding,
       backgroundColor: backgroundColor,
-      textStyle: effectiveTextStyle,
+      labelStyle: getEffectiveLabelStyle(context),
       borderRadius: borderRadius,
       height: height,
       width: width,
@@ -67,16 +68,21 @@ class UserChip extends StatelessWidget {
   String get title => user?.title ?? Labels.noUser;
 
   Color getInitialsColor() {
-    final hash = title.hashCode;
-    final color = Colors.primaries[hash % Colors.primaries.length];
-    return color.shade700;
+    // final hash = title.hashCode;
+    // final color = Colors.primaries[hash % Colors.primaries.length];
+    // return color.shade700;
+    return Colors.primaries[5].shade700;
   }
 
-  TextStyle getInitialsEffectiveTextStyle(TextStyle textStyle) {
-    final defaultStyle = TextStyle(color: _defaultInitialsColor);
-    // initials font should be a bit smaller than the text size
-    final fontSize = (textStyle.fontSize ?? _defaultTitleFontSize) - 2.0;
+  TextStyle getEffectiveLabelStyle(BuildContext context) =>
+      TextStyle(fontSize: _defaultTitleFontSize).merge(labelStyle);
 
-    return defaultStyle.merge(textStyle).copyWith(fontSize: fontSize);
+  TextStyle getInitialsEffectiveTextStyle(BuildContext context) {
+    final labelStyle = getEffectiveLabelStyle(context);
+
+    // initials font should be a bit smaller than the text size
+    final fontSize = labelStyle.fontSize! - 3.0;
+
+    return labelStyle.copyWith(color: _defaultInitialsColor, fontSize: fontSize);
   }
 }

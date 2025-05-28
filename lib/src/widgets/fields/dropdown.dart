@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/data/list_value_item.dart';
+import 'package:wonder/src/widgets/fields/value_chip.dart';
 
-import '../../providers/lists_of_values_provider.dart';
+import '../../data/item.dart';
+
+typedef OptionBuilder = Widget Function(OptionProps<dynamic> option, BuildContext context);
+
+const _itemHeight = kMinInteractiveDimension;
 
 class Dropdown<T> extends StatelessWidget {
   final List<OptionProps<T>> optionsProps;
   final T? value;
+  final Widget Function(OptionProps<T> option, BuildContext context)? optionBuilder;
   final String? labelText;
   final ValueChanged<T?>? onChanged;
   final FormFieldValidator<T>? validator;
@@ -14,6 +18,7 @@ class Dropdown<T> extends StatelessWidget {
   const Dropdown({
     required this.optionsProps,
     this.value,
+    this.optionBuilder,
     this.labelText,
     this.onChanged,
     this.validator,
@@ -51,69 +56,35 @@ class Dropdown<T> extends StatelessWidget {
       icon: const SizedBox.shrink(),
       items: optionsProps.map((optionProps) => getMenuItem(optionProps, context)).toList(),
       selectedItemBuilder: (BuildContext context) =>
-          optionsProps.map((optionProps) => getOptionWidget(optionProps, context)).toList(),
+          optionsProps.map((option) => Center(child: buildOption(option, context))).toList(),
       onChanged: onChanged,
+      itemHeight: _itemHeight,
       // validator: validator,
       isExpanded: true,
     );
   }
 
-  DropdownMenuItem<T> getMenuItem(OptionProps<T> optionProps, BuildContext context) {
+  DropdownMenuItem<T> getMenuItem(OptionProps<T> option, BuildContext context) {
     return DropdownMenuItem<T>(
-      value: optionProps.value,
-      child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 6), child: getOptionWidget(optionProps, context)),
-    );
-  }
-
-  Widget getOptionWidget(OptionProps<T> option, BuildContext context) {
-    return Container(
-      // TODO: [P2] replace the hard-coded kMinInteractiveDimension with an option to expand to fill the container
-      height: kMinInteractiveDimension,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: option.color,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      // color: dropdownItem.color,
-      child: Center(
-        child: Text(option.title,
-            textAlign: TextAlign.center,
-            style: DefaultTextStyle.of(context).style.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                )),
+      value: option.value,
+      child: Container(
+        height: _itemHeight,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: buildOption(option, context),
       ),
     );
   }
-}
 
-class ListValuesDropdownConsumer extends ConsumerWidget {
-  final String listType;
-  final String? label;
-  final String? value;
-  final ValueChanged<String?>? onChanged;
-  final FormFieldValidator<String>? validator;
-
-  const ListValuesDropdownConsumer({
-    super.key,
-    required this.listType,
-    this.label,
-    this.value,
-    this.onChanged,
-    this.validator,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final listValues = ref.watch(listValuesProvider(listType));
-    return Dropdown(
-      optionsProps: listValues.map(OptionProps.fromListValueItem).toList(),
-      labelText: label,
-      value: value,
-      onChanged: onChanged,
-      validator: validator,
-    );
+  Widget buildOption(OptionProps<T> option, BuildContext context) {
+    if (optionBuilder != null) {
+      return optionBuilder!(option, context);
+    } else {
+      return OptionChip(option);
+    }
   }
 }
 
@@ -127,14 +98,17 @@ class OptionProps<T> {
     required this.title,
     this.color,
   });
+}
 
-  static OptionProps<String> fromListValueItem(ListValueItem item) {
-    return OptionProps<String>(
-      value: item.id,
-      title: item.title,
-      color: item.color,
-    );
-  }
+class ItemOptionProps<T extends Item> extends OptionProps<String> {
+  final T item;
+
+  ItemOptionProps(this.item)
+      : super(
+          value: item.id,
+          title: item.title,
+          color: item.color,
+        );
 }
 
 class OptionChip extends StatelessWidget {
@@ -144,11 +118,11 @@ class OptionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Chip(
-      label: Text(option.title),
+    return ValueChip(
+      label: option.title,
       backgroundColor: option.color,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
 }

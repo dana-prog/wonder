@@ -79,8 +79,6 @@ class ListValueItem extends Item {
 
   String get name => this['name'];
 
-  String get title => this['title'];
-
   String get description => this['description'];
 
   int get order => this['order'] ?? -1;
@@ -92,6 +90,7 @@ class ListValueItem extends Item {
     return _icons[valueItemType]![name] ?? Icons.question_mark_outlined;
   }
 
+  @override
   Color get color {
     assert(_colors.containsKey(valueItemType), 'No color defined for $valueItemType');
     assert(_colors[valueItemType]!.containsKey(name), 'No color defined for $valueItemType:$name');

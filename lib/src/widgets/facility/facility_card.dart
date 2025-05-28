@@ -84,19 +84,19 @@ class FacilityCard extends ConsumerWidget {
 
   Widget _typeBuilder(BuildContext context, WidgetRef ref) {
     final type = ref.watch(listValueProvider(facility.type));
-    return ListValueField(listValueItem: type, textStyle: _smallChipTextStyle);
+    return ListValueField(listValueItem: type, labelStyle: _smallChipTextStyle);
   }
 
   Widget _subtypeBuilder(BuildContext context, WidgetRef ref) {
     final subtype = ref.watch(listValueProvider(facility.subtype));
-    return ListValueField(listValueItem: subtype, textStyle: _smallChipTextStyle);
+    return ListValueField(listValueItem: subtype, labelStyle: _smallChipTextStyle);
   }
 
   Widget _roomCountBuilder(BuildContext context, WidgetRef ref) {
     final roomCount = facility.roomCount;
     return ValueChip(
       label: Labels.facilityRoomCount(roomCount),
-      textStyle: _smallChipTextStyle,
+      labelStyle: _smallChipTextStyle,
       backgroundColor: roomCountColors[roomCount]!,
     );
   }

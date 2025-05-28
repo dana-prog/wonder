@@ -2,30 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:wonder/src/data/list_value_item.dart';
 
 const _defaultPadding = EdgeInsets.symmetric(horizontal: 8, vertical: 2);
+const _defaultTextAlign = TextAlign.center;
 const _defaultBorderRadius = BorderRadius.all(Radius.circular(6));
 const _defaultFontSize = 14.0;
 const _defaultFontWeight = FontWeight.w600;
 
 class ListValueField extends StatelessWidget {
   final ListValueItem listValueItem;
-  final double? height;
-  final double? width;
+  final TextStyle? labelStyle;
+  final TextAlign? labelAlign;
   final EdgeInsetsGeometry? padding;
   final BorderRadius? borderRadius;
-  final TextStyle? textStyle;
+  final double? height;
+  final double? width;
 
   const ListValueField({
     required this.listValueItem,
+    this.labelStyle,
+    this.labelAlign = _defaultTextAlign,
     this.height,
     this.width,
     this.padding,
     this.borderRadius,
-    this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) => ValueChip(
-        textStyle: textStyle,
+        labelStyle: labelStyle,
         label: listValueItem.title,
         backgroundColor: listValueItem.color,
         height: height,
@@ -33,23 +36,24 @@ class ListValueField extends StatelessWidget {
       );
 }
 
+// not using material Chip since it has fixed minimum chip height (const double _kChipHeight = 32.0)
 class ValueChip extends StatelessWidget {
   final String label;
   final WidgetBuilder? leadingBuilder;
+  final TextStyle? labelStyle;
   final Color? backgroundColor;
   final double? height;
   final double? width;
   final EdgeInsetsGeometry? padding;
   final BorderRadius? borderRadius;
-  final TextStyle? textStyle;
 
   const ValueChip({
     required this.label,
     this.leadingBuilder,
+    this.labelStyle,
     this.backgroundColor,
     this.padding,
     this.borderRadius,
-    this.textStyle,
     this.height,
     this.width,
   });
@@ -68,21 +72,22 @@ class ValueChip extends StatelessWidget {
           padding: padding ?? _defaultPadding,
           child: leadingBuilder != null
               ? Row(
+                  mainAxisSize: MainAxisSize.min,
                   spacing: 8,
                   children: [
                     leadingBuilder!(context),
-                    titleBuilder(context),
+                    labelBuilder(context),
                   ],
                 )
-              : titleBuilder(context),
+              : labelBuilder(context),
         ),
       ),
     );
   }
 
-  Widget titleBuilder(BuildContext context) => Text(
+  Widget labelBuilder(BuildContext context) => Text(
         label,
-        textAlign: TextAlign.center,
+        textAlign: _defaultTextAlign,
         style: getEffectiveTextStyle(context),
       );
 
@@ -92,8 +97,8 @@ class ValueChip extends StatelessWidget {
       fontWeight: _defaultFontWeight,
       color: backgroundColor == null ? Colors.black : Colors.white,
     );
-    return (textStyle != null && textStyle!.inherit)
-        ? defaultTextStyle.merge(textStyle)
+    return (labelStyle != null && labelStyle!.inherit)
+        ? defaultTextStyle.merge(labelStyle)
         : defaultTextStyle;
   }
 }
