@@ -24,7 +24,7 @@ class ListValuesDropdownConsumer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final listValues = ref.watch(listValuesProvider(listType));
     return Dropdown(
-      labelText: label,
+      label: label,
       value: value,
       optionsProps: listValues.map(ItemOptionProps.new).toList(),
       onChanged: onChanged,

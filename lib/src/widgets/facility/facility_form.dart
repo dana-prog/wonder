@@ -90,29 +90,12 @@ class _FacilityFormState extends State<FacilityForm> {
         onChanged: (value) => onChanged(context, () => _status = value),
       );
 
-  Widget get _ownerFormField => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(fields['owner']!, style: Theme.of(context).inputDecorationTheme.labelStyle),
-          UsersDropdownConsumer(
-            value: _owner,
-            onChanged: (value) => onChanged(context, () => _owner = value),
-            validator: (value) => value == null ? 'Required' : null,
-          )
-        ],
+  Widget get _ownerFormField => UsersDropdownConsumer(
+        value: _owner,
+        label: fields['owner'],
+        onChanged: (value) => onChanged(context, () => _owner = value),
+        validator: (value) => value == null ? 'Required' : null,
       );
-
-  // Widget get _ownerFormField => Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Text(fields['owner']!, style: Theme.of(context).inputDecorationTheme.labelStyle),
-  //         UserItemsDropdownConsumer(
-  //           value: _owner,
-  //           onChanged: (value) => onChanged(context, () => _owner = value),
-  //           validator: (value) => value == null ? 'Required' : null,
-  //         )
-  //       ],
-  //     );
 
   Widget get _roomCountFormField => RoomCountDropdown(
         value: _roomCount,

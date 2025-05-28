@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:wonder/src/providers/lists_of_values_provider.dart';
 import 'package:wonder/src/resources/labels.dart';
+import 'package:wonder/src/widgets/facility/facility_form.dart';
 import 'package:wonder/src/widgets/fields/value_chip.dart';
 import 'package:wonder/src/widgets/user/user_chip.dart';
 
@@ -11,6 +11,7 @@ import '../../data/facility_item.dart';
 import '../../logger.dart';
 import '../../providers/users_provider.dart';
 import '../media/app_image.dart';
+import '../overlay/blurred_overlay.dart';
 import 'constants.dart';
 
 typedef Builder = Widget Function(BuildContext context, WidgetRef ref);
@@ -125,7 +126,12 @@ class FacilityCard extends ConsumerWidget {
   void _onEdit(BuildContext context) {
     final route = '/facility/${facility.id}';
     logger.t('[FacilityCard.onEdit] navigate to $route');
-    context.push(route);
+    Navigator.of(context).push(
+      PageRouteBuilder(
+          opaque: false,
+          barrierColor: Colors.black38, // dim background
+          pageBuilder: (_, __, ___) => BlurredOverlay(child: FacilityFormConsumer(facility.id))),
+    );
   }
 }
 

@@ -39,20 +39,14 @@ final router = GoRouter(
           return const Text('Invalid item type');
         }
 
-        return SingleViewScaffold(
-          // TODO: [P0] remove hard coded
-          viewBuilder: (BuildContext context) => FacilityFormConsumer(id),
-        );
+        return SingleViewScaffold(child: FacilityFormConsumer(id));
       },
     ),
     // debug
     GoRoute(
       path: Locations.debug,
       builder: (context, state) {
-        return SingleViewScaffold(
-          // TODO: [P0] remove hard coded
-          viewBuilder: (BuildContext context) => DebugView(),
-        );
+        return SingleViewScaffold(child: DebugView());
       },
     ),
     // more

@@ -23,7 +23,7 @@ class RoomCountDropdown extends StatelessWidget {
     // return _innerBuild(items, context);
     return Dropdown<int>(
       value: value,
-      labelText: ItemsLabels.getFieldLabels('facility')['roomCount'],
+      label: ItemsLabels.getFieldLabels('facility')['roomCount'],
       optionsProps: menuItemsProps,
       onChanged: onChanged,
     );

@@ -6,6 +6,7 @@ class UserItem extends Item {
       : assert(fields['itemType'] == 'user',
             'UserItem must be of type user and not ${fields['itemType']}');
 
+  @override
   String get title => [
         firstName,
         middleName,

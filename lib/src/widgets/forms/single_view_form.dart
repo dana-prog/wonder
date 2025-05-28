@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class SingleViewScaffold extends StatelessWidget {
-  final Widget Function(BuildContext context) viewBuilder;
+  final Widget child;
   final String? title;
+  final bool blurredOverlay;
 
   const SingleViewScaffold({
-    required this.viewBuilder,
+    required this.child,
     this.title,
+    this.blurredOverlay = false,
   });
 
   @override
@@ -18,7 +20,7 @@ class SingleViewScaffold extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-        child: viewBuilder(context),
+        child: child,
       ),
     );
   }

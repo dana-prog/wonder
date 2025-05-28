@@ -4,7 +4,6 @@ import 'package:wonder/src/widgets/fields/dropdown.dart';
 import 'package:wonder/src/widgets/user/user_chip.dart';
 
 import '../../data/user_item.dart';
-import '../../logger.dart';
 import '../../providers/users_provider.dart';
 
 class UsersDropdownConsumer extends ConsumerWidget {
@@ -24,16 +23,16 @@ class UsersDropdownConsumer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final users = ref.watch(userListProvider);
     return Dropdown<String>(
+      value: value,
+      label: label,
       optionsProps: users.map(ItemOptionProps.new).toList(),
       optionBuilder: buildOption,
-      value: value,
       onChanged: onChanged,
       validator: validator,
     );
   }
 
   Widget buildOption(OptionProps<String> option, BuildContext _) {
-    logger.d('[UsersDropdownConsumer] buildOption: $option');
     assert(option is ItemOptionProps<UserItem>, 'Expected ItemOptionProps');
     return UserChip(user: (option as ItemOptionProps<UserItem>).item);
   }
