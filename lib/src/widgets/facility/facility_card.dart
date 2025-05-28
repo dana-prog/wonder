@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:wonder/src/providers/lists_of_values_provider.dart';
 import 'package:wonder/src/resources/labels.dart';
 import 'package:wonder/src/widgets/fields/value_chip.dart';
+import 'package:wonder/src/widgets/user/user_chip.dart';
 
 import '../../data/facility_item.dart';
 import '../../logger.dart';
@@ -15,6 +16,7 @@ import 'constants.dart';
 typedef Builder = Widget Function(BuildContext context, WidgetRef ref);
 
 const _cardHeight = 48.0;
+const _smallChipTextStyle = TextStyle(fontSize: 11);
 
 class FacilityCard extends ConsumerWidget {
   final FacilityItem facility;
@@ -69,42 +71,34 @@ class FacilityCard extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final owner = facility.owner != null ? ref.watch(userProvider(facility.owner!)) : null;
-    final theme = Theme.of(context);
-    return owner != null
-        ? Text(
-            owner.title,
-            style: theme.textTheme.titleSmall,
-          )
-        : Text(
-            Labels.noOwner,
-            style: (theme.textTheme.titleSmall ?? const TextStyle())
-                .copyWith(fontStyle: FontStyle.italic, color: Colors.grey.shade600),
-          );
+    return UserChip(user: owner);
   }
 
   Widget _statusBuilder(BuildContext context, WidgetRef ref) {
     final status = ref.watch(listValueProvider(facility.status));
     return ListValueField(
       listValueItem: status,
-      size: ValueChipSize.large,
       width: 120,
     );
   }
 
   Widget _typeBuilder(BuildContext context, WidgetRef ref) {
     final type = ref.watch(listValueProvider(facility.type));
-    return ListValueField(listValueItem: type, textStyle: TextStyle(fontSize: 11));
+    return ListValueField(listValueItem: type, textStyle: _smallChipTextStyle);
   }
 
   Widget _subtypeBuilder(BuildContext context, WidgetRef ref) {
     final subtype = ref.watch(listValueProvider(facility.subtype));
-    return ListValueField(listValueItem: subtype);
+    return ListValueField(listValueItem: subtype, textStyle: _smallChipTextStyle);
   }
 
   Widget _roomCountBuilder(BuildContext context, WidgetRef ref) {
     final roomCount = facility.roomCount;
     return ValueChip(
-        title: Labels.facilityRoomCount(roomCount), color: roomCountColors[roomCount]!);
+      label: Labels.facilityRoomCount(roomCount),
+      textStyle: _smallChipTextStyle,
+      backgroundColor: roomCountColors[roomCount]!,
+    );
   }
 
   Widget _buttonBuilder({required IconData icon, GestureTapCallback? onTap}) {
@@ -206,25 +200,22 @@ Widget _cardContentBuilder({
           // owner / type, subtype, room count
           Expanded(
             flex: 2,
-            child: DefaultTextStyle(
-              style: const TextStyle(fontSize: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ownerBuilder(context, ref),
-                  Spacer(),
-                  Row(
-                    children: [
-                      typeBuilder(context, ref),
-                      SizedBox(width: 8),
-                      subtypeBuilder(context, ref),
-                      SizedBox(width: 8),
-                      roomCountBuilder(context, ref),
-                    ],
-                  ),
-                ],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ownerBuilder(context, ref),
+                Spacer(),
+                Row(
+                  children: [
+                    typeBuilder(context, ref),
+                    SizedBox(width: 8),
+                    subtypeBuilder(context, ref),
+                    SizedBox(width: 8),
+                    roomCountBuilder(context, ref),
+                  ],
+                ),
+              ],
             ),
           ),
           // status

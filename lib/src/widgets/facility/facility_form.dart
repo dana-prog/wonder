@@ -77,17 +77,17 @@ class _FacilityFormState extends State<FacilityForm> {
               ];
       });
 
-  Widget get _subtypeFormField => ValueItemsDropdownConsumer(
-        labelText: fields['subtype'],
-        type: 'facilitySubtype',
+  Widget get _subtypeFormField => ListValuesDropdownConsumer(
+        label: fields['subtype'],
+        listType: 'facilitySubtype',
         value: _subtype,
         onChanged: (value) => onChanged(context, () => _subtype = value),
         // validator: (value) => value == null ? 'Required' : null,
       );
 
-  Widget get _statusFormField => ValueItemsDropdownConsumer(
-        labelText: fields['status'],
-        type: 'facilityStatus',
+  Widget get _statusFormField => ListValuesDropdownConsumer(
+        label: fields['status'],
+        listType: 'facilityStatus',
         value: _status,
         onChanged: (value) => onChanged(context, () => _status = value),
       );

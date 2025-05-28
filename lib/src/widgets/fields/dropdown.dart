@@ -88,17 +88,17 @@ class Dropdown<T> extends StatelessWidget {
   }
 }
 
-class ValueItemsDropdownConsumer extends ConsumerWidget {
-  final String type;
-  final String? labelText;
+class ListValuesDropdownConsumer extends ConsumerWidget {
+  final String listType;
+  final String? label;
   final String? value;
   final ValueChanged<String?>? onChanged;
   final FormFieldValidator<String>? validator;
 
-  const ValueItemsDropdownConsumer({
+  const ListValuesDropdownConsumer({
     super.key,
-    this.labelText,
-    required this.type,
+    required this.listType,
+    this.label,
     this.value,
     this.onChanged,
     this.validator,
@@ -106,10 +106,10 @@ class ValueItemsDropdownConsumer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final values = ref.watch(listValuesProvider(type));
+    final listValues = ref.watch(listValuesProvider(listType));
     return Dropdown(
-      optionsProps: values.map(OptionProps.fromListValueItem).toList(),
-      labelText: labelText,
+      optionsProps: listValues.map(OptionProps.fromListValueItem).toList(),
+      labelText: label,
       value: value,
       onChanged: onChanged,
       validator: validator,
@@ -133,6 +133,22 @@ class OptionProps<T> {
       value: item.id,
       title: item.title,
       color: item.color,
+    );
+  }
+}
+
+class OptionChip extends StatelessWidget {
+  final OptionProps option;
+
+  const OptionChip(this.option);
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: Text(option.title),
+      backgroundColor: option.color,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
 }

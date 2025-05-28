@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/user_item.dart';
 import '../../providers/users_provider.dart';
-import '../media/app_image.dart';
 
 class UserItemsDropdown extends StatelessWidget {
   final String? value;
@@ -32,19 +31,20 @@ class UserItemsDropdown extends StatelessWidget {
 
   DropdownMenuItem<String> getMenuItem(UserItem item) {
     // TODO: move radius to a constant
-    final radius = 12.0;
+    // final radius = 12.0;
 
     return DropdownMenuItem<String>(
       value: item.id,
       child: SizedBox(
           child: Row(
         children: [
-          SizedBox(
-              width: radius * 2,
-              child: ClipOval(
-                child: AppImage(item.picture, height: radius * 2, width: radius * 2),
-              )),
-          const SizedBox(width: 8),
+          // TODO: use user chip
+          // SizedBox(
+          //     width: radius * 2,
+          //     child: ClipOval(
+          //       child: AppImage(item.picture, height: radius * 2, width: radius * 2),
+          //     )),
+          // const SizedBox(width: 8),
           Flexible(
               child: Text(
             item.title,

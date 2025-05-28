@@ -15,7 +15,7 @@ class Titles {
 
 class Labels {
   static const String noDataFound = 'No Data Found';
-  static const String noOwner = '<No Owner>';
+  static const String noUser = '<No Owner>';
   static const String save = 'Save';
   static const String edit = 'Edit';
   static const String delete = 'Delete';
@@ -46,14 +46,11 @@ class NotificationMessages {
     }
   }
 
-  static String created(Item item) =>
-      '${ItemsLabels.getShortTitle(item)} created successfully.'.capitalize();
+  static String created(Item item) => '${ItemsLabels.getShortTitle(item)} created.'.capitalize();
 
-  static String deleted(Item item) =>
-      '${ItemsLabels.getShortTitle(item)} deleted successfully.'.capitalize();
+  static String deleted(Item item) => '${ItemsLabels.getShortTitle(item)} deleted.'.capitalize();
 
-  static String updated(Item item) =>
-      '${ItemsLabels.getShortTitle(item)} updated successfully.'.capitalize();
+  static String updated(Item item) => '${ItemsLabels.getShortTitle(item)} updated.'.capitalize();
 }
 
 class ItemsLabels {

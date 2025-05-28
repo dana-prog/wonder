@@ -2,9 +2,6 @@ import 'item.dart';
 import 'item_helpers.dart';
 
 class UserItem extends Item {
-  static final _defaultPicture =
-      '$mediaPublicUrlPrefix/1246fe_7609a78c62784e4788f3fb2c6a65fb95~mv2.png';
-
   UserItem.fromFields(super.fields)
       : assert(fields['itemType'] == 'user',
             'UserItem must be of type user and not ${fields['itemType']}');
@@ -26,7 +23,7 @@ class UserItem extends Item {
 
   String get email => this['email'];
 
-  String get picture => getFieldValue('picture') ?? _defaultPicture;
+  String? get picture => getFieldValue('picture');
 
   @override
   void operator []=(String fieldName, dynamic fieldValue) {
