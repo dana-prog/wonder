@@ -4,27 +4,28 @@ import 'package:wonder/src/data/facility_item.dart';
 import 'package:wonder/src/providers/lists_of_values_provider.dart';
 import 'package:wonder/src/resources/labels.dart';
 
-import '../../providers/facilities_provider.dart';
+import '../../data/item.dart';
+import '../../providers/items_provider.dart';
 import '../async/async_value_widget.dart';
 import '../fields/list_values_dropdown.dart';
 import '../fields/users_dropdown.dart';
 import 'room_count_dropdown.dart';
 
-class FacilityForm extends StatefulWidget {
+class ItemDetailsForm extends StatefulWidget {
   final FacilityItem? initialItem;
-  final void Function(FacilityItem item) save;
+  final void Function(Item item) save;
 
-  const FacilityForm({
+  const ItemDetailsForm({
     this.initialItem,
     required this.save,
     super.key,
   });
 
   @override
-  State<FacilityForm> createState() => _FacilityFormState();
+  State<ItemDetailsForm> createState() => _FacilityDetailsFormState();
 }
 
-class _FacilityFormState extends State<FacilityForm> {
+class _FacilityDetailsFormState extends State<ItemDetailsForm> {
   final _formKey = GlobalKey<FormState>();
   final fields = ItemsLabels.getFieldLabels('facility');
   int? _number;
@@ -57,7 +58,7 @@ class _FacilityFormState extends State<FacilityForm> {
   }
 
   List<Widget> get fieldsLayout => spaceWidgets([
-        Align(alignment: Alignment.centerLeft, child: _FormTitle(_number!, _type!)),
+        Align(alignment: Alignment.centerLeft, child: _FacilityFormTitle(_number!, _type!)),
         _ownerFormField,
         _statusFormField,
         _subtypeFormField,
@@ -115,37 +116,39 @@ class _FacilityFormState extends State<FacilityForm> {
   }
 }
 
-class FacilityFormConsumer extends ConsumerWidget {
+const _itemType = 'facility';
+
+class FacilityDetailsFormConsumer extends ConsumerWidget {
   final String id;
 
-  const FacilityFormConsumer(this.id, {super.key});
+  const FacilityDetailsFormConsumer(this.id, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncFacility = ref.watch(facilityProvider(id));
+    final asyncFacility = ref.watch(itemProvider((_itemType, id)));
 
-    return AsyncValueWidget<FacilityItem>(
+    return AsyncValueWidget<Item>(
       asyncValue: asyncFacility,
       dataBuilder: (item, _) {
-        return FacilityForm(
-          initialItem: item,
+        return ItemDetailsForm(
+          initialItem: item as FacilityItem,
           save: (item) => save(item, ref),
         );
       },
     );
   }
 
-  void save(FacilityItem item, WidgetRef ref) async {
-    final notifier = ref.read(facilityListProvider.notifier);
+  void save(Item item, WidgetRef ref) async {
+    final notifier = ref.read(itemListProvider(item.itemType).notifier);
     await notifier.update(item);
   }
 }
 
-class _FormTitle extends ConsumerWidget {
+class _FacilityFormTitle extends ConsumerWidget {
   final int number;
   final String typeName;
 
-  const _FormTitle(this.number, this.typeName);
+  const _FacilityFormTitle(this.number, this.typeName);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

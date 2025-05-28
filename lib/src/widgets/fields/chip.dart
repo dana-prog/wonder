@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wonder/src/data/list_value_item.dart';
 
 const _defaultPadding = EdgeInsets.symmetric(horizontal: 8, vertical: 2);
 const _defaultTextAlign = TextAlign.center;
@@ -7,37 +6,8 @@ const _defaultBorderRadius = BorderRadius.all(Radius.circular(6));
 const _defaultFontSize = 14.0;
 const _defaultFontWeight = FontWeight.w600;
 
-class ListValueField extends StatelessWidget {
-  final ListValueItem listValueItem;
-  final TextStyle? labelStyle;
-  final TextAlign? labelAlign;
-  final EdgeInsetsGeometry? padding;
-  final BorderRadius? borderRadius;
-  final double? height;
-  final double? width;
-
-  const ListValueField({
-    required this.listValueItem,
-    this.labelStyle,
-    this.labelAlign = _defaultTextAlign,
-    this.height,
-    this.width,
-    this.padding,
-    this.borderRadius,
-  });
-
-  @override
-  Widget build(BuildContext context) => ValueChip(
-        labelStyle: labelStyle,
-        label: listValueItem.title,
-        backgroundColor: listValueItem.color,
-        height: height,
-        width: width,
-      );
-}
-
 // not using material Chip since it has fixed minimum chip height (const double _kChipHeight = 32.0)
-class ValueChip extends StatelessWidget {
+class Chip extends StatelessWidget {
   final String label;
   final WidgetBuilder? leadingBuilder;
   final TextStyle? labelStyle;
@@ -47,7 +17,7 @@ class ValueChip extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final BorderRadius? borderRadius;
 
-  const ValueChip({
+  const Chip({
     required this.label,
     this.leadingBuilder,
     this.labelStyle,

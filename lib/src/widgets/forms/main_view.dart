@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wonder/src/logger.dart';
 import 'package:wonder/src/widgets/forms/more_view.dart';
+import 'package:wonder/src/widgets/item/item_list.dart';
 
+import '../../data/facility_item.dart';
 import '../../resources/labels.dart';
-import '../facility/facility_list.dart';
-import '../item/ticket_list.dart';
+import '../facility/facility_card.dart';
 import '../notifications/event_messenger.dart';
+import '../ticket/ticket_list.dart';
 
 class _Page {
   final String name;
@@ -39,7 +41,11 @@ class MainView extends StatelessWidget {
       name: facilitiesPageName,
       label: Titles.facilities,
       icon: Icons.house,
-      widget: FacilityList(),
+      widget: ItemList(
+          itemType: 'facility',
+          itemBuilder: (context, item) => FacilityCard(
+                item: item as FacilityItem,
+              )),
     ),
     _Page(
       name: morePageName,

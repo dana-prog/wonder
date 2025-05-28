@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/data/list_value_item.dart';
 
+// TODO: create a cache for all types of items (unify with the client cache)
 final listsValuesProvider =
     Provider<ListsValuesCache>((ref) => throw Exception('listsValuesProvider state was not set'));
 

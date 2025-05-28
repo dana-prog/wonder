@@ -92,7 +92,7 @@ class WixClient extends Client {
 
     return (jsonDecode(response.body)['dataItems'] as List)
         .cast<Map<String, dynamic>>()
-        .map((dataItem) => getItemObject(dataItem) as T)
+        .map((dataItem) => getItemObject<T>(dataItem))
         .toList();
   }
 
@@ -197,4 +197,8 @@ class WixClient extends Client {
 
   @override
   Future<void> logout() async => await _authentication.logout();
+
+  @override
+  T getItemObject<T extends Item>(Map<String, dynamic> dataItem) =>
+      super.getItemObject<T>({...dataItem, 'id': dataItem['id']});
 }

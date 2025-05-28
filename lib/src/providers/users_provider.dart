@@ -10,6 +10,7 @@ final userListProvider = Provider<List<UserItem>>((ref) {
   return userList.users;
 });
 
+// TODO: check caching
 final userProvider = Provider.family<UserItem, String>((ref, id) {
   final userList = ref.watch(usersProvider);
   return userList.getUserById(id);

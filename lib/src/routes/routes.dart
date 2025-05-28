@@ -39,7 +39,7 @@ final router = GoRouter(
           return const Text('Invalid item type');
         }
 
-        return SingleViewScaffold(child: FacilityFormConsumer(id));
+        return SingleViewScaffold(child: FacilityDetailsFormConsumer(id));
       },
     ),
     // debug

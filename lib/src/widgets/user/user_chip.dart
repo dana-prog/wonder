@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Chip;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/data/user_item.dart';
 
+import '../../providers/users_provider.dart';
 import '../../resources/labels.dart';
-import '../fields/value_chip.dart';
+import '../fields/chip.dart';
 
 const _defaultPadding = EdgeInsets.all(0);
 const _defaultTitleFontSize = 14.0;
@@ -33,7 +35,7 @@ class UserChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueChip(
+    return Chip(
       label: title,
       leadingBuilder: (BuildContext context) {
         if (user != null && user!.picture != null) {
@@ -68,10 +70,11 @@ class UserChip extends StatelessWidget {
   String get title => user?.title ?? Labels.noUser;
 
   Color getInitialsColor() {
-    // final hash = title.hashCode;
-    // final color = Colors.primaries[hash % Colors.primaries.length];
-    // return color.shade700;
-    return Colors.primaries[5].shade700;
+    // TODO: check performance
+    final hash = title.hashCode;
+    final color = Colors.primaries[hash % Colors.primaries.length];
+    return color.shade700;
+    // return Colors.primaries[5].shade700;
   }
 
   TextStyle getEffectiveLabelStyle(BuildContext context) =>
@@ -84,5 +87,43 @@ class UserChip extends StatelessWidget {
     final fontSize = labelStyle.fontSize! - 3.0;
 
     return labelStyle.copyWith(color: _defaultInitialsColor, fontSize: fontSize);
+  }
+}
+
+class UserChipConsumer extends ConsumerWidget {
+  final String? id;
+  final Color? backgroundColor;
+  final String? pictureUrl;
+  final double? height;
+  final double? width;
+  final EdgeInsetsGeometry? padding;
+  final BorderRadius? borderRadius;
+  final TextStyle? labelStyle;
+
+  const UserChipConsumer({
+    this.id,
+    this.backgroundColor,
+    this.pictureUrl,
+    this.height,
+    this.width,
+    this.padding,
+    this.borderRadius,
+    this.labelStyle,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = id != null ? ref.watch(userProvider(id!)) : null;
+
+    return UserChip(
+      user: user,
+      backgroundColor: backgroundColor,
+      pictureUrl: pictureUrl,
+      height: height,
+      width: width,
+      padding: padding,
+      borderRadius: borderRadius,
+      labelStyle: labelStyle,
+    );
   }
 }

@@ -15,7 +15,7 @@ class Titles {
 
 class Labels {
   static const String noDataFound = 'No Data Found';
-  static const String noUser = '<No Owner>';
+  static const String noUser = 'No Owner';
   static const String save = 'Save';
   static const String edit = 'Edit';
   static const String delete = 'Delete';

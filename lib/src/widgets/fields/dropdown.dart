@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:wonder/src/widgets/fields/value_chip.dart';
+import 'package:flutter/material.dart' hide Chip;
+import 'package:wonder/src/widgets/fields/chip.dart';
 
 import '../../data/item.dart';
 
@@ -118,7 +118,7 @@ class OptionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueChip(
+    return Chip(
       label: option.title,
       backgroundColor: option.color,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
