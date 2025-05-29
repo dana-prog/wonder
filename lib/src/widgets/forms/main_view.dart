@@ -59,7 +59,7 @@ class MainView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.d('[MainView.build] selectedPageName: ${_selectedPage.name}');
+    logger.t('[MainView.build] selectedPageName: ${_selectedPage.name}');
 
     return Scaffold(
       appBar: AppBar(title: Text(_selectedPage.label)),
@@ -73,7 +73,7 @@ class MainView extends StatelessWidget {
         currentIndex: _selectedPageIndex,
         onTap: (index) {
           final pageName = _pages[index].name;
-          logger.d('[MainForm.onTap] tabIndex: $index, tabName: $pageName');
+          logger.t('[MainForm.onTap] tabIndex: $index, tabName: $pageName');
           context.go('/$pageName');
         },
         items: _pages

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wonder/src/widgets/item/item_form.dart';
 
 import '../logger.dart';
-import '../widgets/facility/facility_form.dart';
 import '../widgets/forms/debug_view.dart';
 import '../widgets/forms/main_view.dart';
 import '../widgets/forms/single_view_form.dart';
@@ -30,16 +30,20 @@ final router = GoRouter(
       path: Locations.item,
       builder: (context, state) {
         logger.d('[router.item]');
-        final type = state.pathParameters['itemType']!;
+        final itemType = state.pathParameters['itemType']!;
         final id = state.pathParameters['itemId']!;
 
-        if (type != 'facility') {
-          final error = 'invalid item type: $type';
+        if (itemType != 'facility') {
+          final error = 'invalid item type: $itemType';
           logger.e('[router.item] $error');
           return const Text('Invalid item type');
         }
 
-        return SingleViewScaffold(child: FacilityDetailsFormConsumer(id));
+        // TODO: check this as the initial route
+        // TODO: try replacing the SingleViewScaffold with Material
+        return SingleViewScaffold(
+          child: ItemFormConsumer(itemType: itemType, id: id),
+        );
       },
     ),
     // debug

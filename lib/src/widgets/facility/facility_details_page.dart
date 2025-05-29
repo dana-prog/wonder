@@ -1,34 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/data/facility_item.dart';
-import 'package:wonder/src/providers/lists_of_values_provider.dart';
-import 'package:wonder/src/resources/labels.dart';
+import 'package:wonder/src/widgets/async/async_value_widget.dart';
 
+import '../../data/facility_item.dart';
 import '../../data/item.dart';
 import '../../providers/items_provider.dart';
-import '../async/async_value_widget.dart';
+import '../../resources/labels.dart';
 import '../fields/list_values_dropdown.dart';
 import '../fields/users_dropdown.dart';
 import 'room_count_dropdown.dart';
 
-class ItemDetailsForm extends StatefulWidget {
-  final FacilityItem? initialItem;
+class FacilityDetailsPage extends StatefulWidget {
+  final Item? initialItem;
   final void Function(Item item) save;
 
-  const ItemDetailsForm({
+  const FacilityDetailsPage({
     this.initialItem,
     required this.save,
     super.key,
   });
 
   @override
-  State<ItemDetailsForm> createState() => _FacilityDetailsFormState();
+  State<StatefulWidget> createState() => _FacilityDetailsPageState();
 }
 
-class _FacilityDetailsFormState extends State<ItemDetailsForm> {
-  final _formKey = GlobalKey<FormState>();
+class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   final fields = ItemsLabels.getFieldLabels('facility');
-  int? _number;
+  // int? _number;
   String? _type;
   String? _subtype;
   String? _status;
@@ -38,9 +36,10 @@ class _FacilityDetailsFormState extends State<ItemDetailsForm> {
   @override
   void initState() {
     super.initState();
-    final item = widget.initialItem;
+    assert(widget.initialItem is FacilityItem?, 'Initial item must be of type FacilityItem');
+    final item = widget.initialItem as FacilityItem?;
     if (item != null) {
-      _number = item.number;
+      // _number = item.number;
       _type = item.type;
       _subtype = item.subtype;
       _status = item.status;
@@ -51,14 +50,22 @@ class _FacilityDetailsFormState extends State<ItemDetailsForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: SingleChildScrollView(child: Column(children: spaceWidgets(fieldsLayout))),
+    return SingleChildScrollView(
+      child: Column(
+        children: spaceWidgets(
+          [
+            _ownerFormField,
+            _statusFormField,
+            _subtypeFormField,
+            _roomCountFormField,
+          ],
+        ),
+      ),
     );
   }
 
-  List<Widget> get fieldsLayout => spaceWidgets([
-        Align(alignment: Alignment.centerLeft, child: _FacilityFormTitle(_number!, _type!)),
+  List<Widget> buildFieldsLayout() => spaceWidgets([
+        // Align(alignment: Alignment.centerLeft, child: _FacilityFormTitle(_number!, _type!)),
         _ownerFormField,
         _statusFormField,
         _subtypeFormField,
@@ -116,47 +123,23 @@ class _FacilityDetailsFormState extends State<ItemDetailsForm> {
   }
 }
 
-const _itemType = 'facility';
+class FacilityDetailsPageConsumer extends ConsumerWidget {
+  final dynamic itemType;
+  final dynamic id;
 
-class FacilityDetailsFormConsumer extends ConsumerWidget {
-  final String id;
-
-  const FacilityDetailsFormConsumer(this.id, {super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncFacility = ref.watch(itemProvider((_itemType, id)));
-
-    return AsyncValueWidget<Item>(
-      asyncValue: asyncFacility,
-      dataBuilder: (item, _) {
-        return ItemDetailsForm(
-          initialItem: item as FacilityItem,
-          save: (item) => save(item, ref),
-        );
-      },
-    );
-  }
-
-  void save(Item item, WidgetRef ref) async {
-    final notifier = ref.read(itemListProvider(item.itemType).notifier);
-    await notifier.update(item);
-  }
-}
-
-class _FacilityFormTitle extends ConsumerWidget {
-  final int number;
-  final String typeName;
-
-  const _FacilityFormTitle(this.number, this.typeName);
+  const FacilityDetailsPageConsumer(this.itemType, this.id);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final type = ref.watch(listValueProvider(typeName));
-    return Text(
-      textAlign: TextAlign.left,
-      '${type.title} #$number',
-      style: Theme.of(context).textTheme.headlineMedium,
+    final asyncItem = ref.watch(itemProvider((itemType, id)));
+    final notifier = ref.watch(itemListProvider(itemType).notifier);
+
+    return AsyncValueWidget(
+      asyncValue: asyncItem,
+      dataBuilder: (item, _) => FacilityDetailsPage(
+        initialItem: item,
+        save: (item) => notifier.update(item),
+      ),
     );
   }
 }

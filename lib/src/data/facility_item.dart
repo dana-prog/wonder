@@ -43,6 +43,10 @@ class FacilityItem extends Item {
 
   String get mainPicture => pictures[0];
 
+  // TODO: remove hard codes villa or separate to a itemType
+  @override
+  String get title => 'Villa #$number';
+
   @override
   void operator []=(String fieldName, dynamic fieldValue) {
     if (fieldName != 'pictures') {

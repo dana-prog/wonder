@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wonder/src/widgets/item/item_form.dart';
 
 import '../../data/item.dart';
 import '../../logger.dart';
 import '../../providers/items_provider.dart';
 import '../../resources/labels.dart';
-import '../facility/facility_form.dart';
 import '../overlay/blurred_overlay.dart';
 
 typedef ItemCardLayoutBuilder = Widget Function(BuildContext context, WidgetRef ref, Item item);
@@ -35,10 +35,13 @@ class ItemCard extends ConsumerWidget {
       buttons.add(_editButtonBuilder(context, ref));
     }
 
-    return Card(
-      child: Padding(
-        padding: EdgeInsetsGeometry.all(8.0),
-        child: Row(children: [...layout, Spacer(), ...buttons]),
+    return GestureDetector(
+      onTap: () => _onEdit(context),
+      child: Card(
+        child: Padding(
+          padding: EdgeInsetsGeometry.all(8.0),
+          child: Row(children: [...layout, Spacer(), ...buttons]),
+        ),
       ),
     );
   }
@@ -53,12 +56,15 @@ class ItemCard extends ConsumerWidget {
 
   void _onEdit(BuildContext context) {
     final route = '/${item.itemType}/${item.id}';
-    logger.t('[ItemCard.onEdit] navigate to $route');
+    logger.d('[ItemCard.onEdit] navigate to $route');
     Navigator.of(context).push(
       PageRouteBuilder(
-          opaque: false,
-          barrierColor: Colors.black38, // dim background
-          pageBuilder: (_, __, ___) => BlurredOverlay(child: FacilityDetailsFormConsumer(item.id))),
+        opaque: false,
+        barrierColor: Colors.black38, // dim background
+        pageBuilder: (_, __, ___) => BlurredOverlay(
+          child: ItemFormConsumer(itemType: item.itemType, id: item.id),
+        ),
+      ),
     );
   }
 
