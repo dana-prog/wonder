@@ -26,7 +26,7 @@ class ListValuesDropdownConsumer extends ConsumerWidget {
     return Dropdown(
       label: label,
       value: value,
-      optionsProps: listValues.map(ItemOptionProps.new).toList(),
+      optionsProps: listValues.map(OptionProps.fromItem).toList(),
       onChanged: onChanged,
       validator: validator,
     );

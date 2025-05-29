@@ -15,12 +15,12 @@ class Titles {
 
 class Labels {
   static const String noDataFound = 'No Data Found';
-  static const String noUser = 'No Owner';
   static const String save = 'Save';
   static const String edit = 'Edit';
   static const String delete = 'Delete';
   static const String loading = 'Loading';
   static String facilityRoomCount(int count) => count == 1 ? '$count Bedroom' : '$count Bedrooms';
+  static String noItem(String typeName) => '${typeName.capitalize()} Not Set';
 }
 
 class ConfirmationMessages {
@@ -65,7 +65,7 @@ class ItemsLabels {
 
         return '${ItemsLabels.getTypeLabel(item.itemType)} #${item.number}';
       },
-      fieldTitles: {
+      fieldLabels: {
         'number': 'Number',
         'type': 'Type',
         'subtype': 'Subtype',
@@ -81,7 +81,7 @@ class ItemsLabels {
     if (labels == null) {
       throw Exception('No labels found for item type: $itemType');
     }
-    return labels.fieldTitles;
+    return labels.fieldLabels;
   }
 
   static String getTypeLabel(String itemType) {
@@ -102,13 +102,13 @@ class ItemsLabels {
 }
 
 class ItemLabels {
-  final Map<String, String> fieldTitles;
+  final Map<String, String> fieldLabels;
   final String itemType;
   final String Function(Item item) shortTitle;
 
   ItemLabels({
     required this.itemType,
     required this.shortTitle,
-    required this.fieldTitles,
+    required this.fieldLabels,
   });
 }

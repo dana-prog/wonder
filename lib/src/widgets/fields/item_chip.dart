@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Chip;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wonder/src/resources/labels.dart';
 import 'package:wonder/src/widgets/async/async_value_widget.dart';
 
 import '../../data/item.dart';
@@ -7,7 +8,8 @@ import '../../providers/items_provider.dart';
 import '../fields/chip.dart';
 
 class ItemChip extends StatelessWidget {
-  final Item item;
+  final Item? item;
+  final String? itemType;
   final WidgetBuilder? leadingBuilder;
   final TextStyle? labelStyle;
   final EdgeInsetsGeometry? padding;
@@ -17,19 +19,21 @@ class ItemChip extends StatelessWidget {
 
   const ItemChip({
     required this.item,
+    this.itemType,
     this.leadingBuilder,
     this.labelStyle,
     this.padding,
     this.borderRadius,
     this.height,
     this.width,
-  });
+  }) : assert(item != null || itemType != null,
+            'Either item or itemType must be provided. If item is null, itemType must be provided to fetch the item.');
 
   @override
   Widget build(BuildContext context) {
     return Chip(
-      label: item.title,
-      backgroundColor: item.color,
+      label: item?.title ?? Labels.noItem(itemType!),
+      backgroundColor: item?.color ?? Colors.grey[200],
       leadingBuilder: leadingBuilder,
       labelStyle: labelStyle,
       padding: padding,

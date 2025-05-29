@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Chip;
 import 'package:wonder/src/widgets/fields/chip.dart';
 
 import '../../data/item.dart';
+import '../../resources/labels.dart';
 
 typedef OptionBuilder = Widget Function(OptionProps<dynamic> option, BuildContext context);
 
@@ -89,26 +90,21 @@ class Dropdown<T> extends StatelessWidget {
 }
 
 class OptionProps<T> {
-  final T value;
+  final T? value;
   final String title;
   final Color? color;
+  final dynamic data;
 
-  const OptionProps({
-    required this.value,
-    required this.title,
-    this.color,
-  });
-}
+  const OptionProps({required this.value, required this.title, this.color, this.data});
 
-class ItemOptionProps<T extends Item> extends OptionProps<String> {
-  final T item;
-
-  ItemOptionProps(this.item)
-      : super(
-          value: item.id,
-          title: item.title,
-          color: item.color,
-        );
+  static OptionProps<String> fromItem(Item item) {
+    return OptionProps<String>(
+      value: item.id,
+      title: item.title,
+      color: item.color,
+      data: item,
+    );
+  }
 }
 
 class OptionChip extends StatelessWidget {
@@ -125,4 +121,13 @@ class OptionChip extends StatelessWidget {
       // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
+}
+
+class EmptyOptionProps extends OptionProps<String> {
+  EmptyOptionProps(String typeName)
+      : super(
+          value: null,
+          title: Labels.noItem(typeName),
+          color: Colors.transparent,
+        );
 }

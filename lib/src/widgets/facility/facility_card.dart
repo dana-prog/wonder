@@ -41,7 +41,7 @@ class FacilityCard extends ConsumerWidget {
             ),
           ),
         ),
-        ownerWidget: UserChipConsumer(id: item.owner),
+        ownerWidget: item.owner != null ? UserChipConsumer(id: item.owner!) : UserChip(user: null),
         typeWidget: ListValueChipConsumer(id: item.type, labelStyle: _smallChipTextStyle),
         subtypeWidget: ListValueChipConsumer(id: item.subtype, labelStyle: _smallChipTextStyle),
         roomCountWidget: Chip(

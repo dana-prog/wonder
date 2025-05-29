@@ -25,15 +25,24 @@ class UsersDropdownConsumer extends ConsumerWidget {
     return Dropdown<String>(
       value: value,
       label: label,
-      optionsProps: users.map(ItemOptionProps.new).toList(),
-      optionBuilder: buildOption,
+      optionsProps: getOptionsProps(users),
+      optionBuilder: optionBuilder,
       onChanged: onChanged,
       validator: validator,
     );
   }
 
-  Widget buildOption(OptionProps<String> option, BuildContext _) {
-    assert(option is ItemOptionProps<UserItem>, 'Expected ItemOptionProps');
-    return UserChip(user: (option as ItemOptionProps<UserItem>).item);
+  List<OptionProps<String>> getOptionsProps(List<UserItem> users) {
+    final options = <OptionProps<String>>[];
+    options.add(EmptyOptionProps('user'));
+    for (final user in users) {
+      options.add(OptionProps.fromItem(user));
+    }
+
+    return options;
+  }
+
+  Widget optionBuilder(OptionProps<String> option, BuildContext _) {
+    return UserChip(user: option.data);
   }
 }
