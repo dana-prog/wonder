@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const _defaultPadding = EdgeInsets.symmetric(horizontal: 8, vertical: 2);
 const _defaultTextAlign = TextAlign.center;
-const _defaultBorderRadius = BorderRadius.all(Radius.circular(6));
+const _defaultBorderRadius = BorderRadius.all(Radius.circular(10.0));
 const _defaultFontSize = 14.0;
 const _defaultFontWeight = FontWeight.w600;
 
@@ -39,10 +39,12 @@ class Chip extends StatelessWidget {
           borderRadius: borderRadius ?? _defaultBorderRadius,
         ),
         child: Padding(
+          // TODO: resolve padding
           padding: padding ?? _defaultPadding,
           child: leadingBuilder != null
               ? Row(
                   mainAxisSize: MainAxisSize.min,
+                  // mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 8,
                   children: [
                     leadingBuilder!(context),

@@ -26,6 +26,7 @@ enum _HeaderContentType {
   }
 }
 
+// TODO: separate the authentication and db apis
 class WixClient extends Client {
   final _authentication = WixAuthentication();
 
@@ -109,6 +110,11 @@ class WixClient extends Client {
       body: jsonEncode({
         'dataCollectionId': dataCollectionId,
         'dataItem': {'data': newItem.fields},
+        //{
+        // 'data': newItem.fields.removeWhere(
+        //   (fieldName, _) => ['id', 'itemType'].contains(fieldName),
+        // )
+        // },
       }),
     );
 

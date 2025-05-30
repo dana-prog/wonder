@@ -7,7 +7,6 @@ import 'package:wonder/src/widgets/item/item_list.dart';
 import '../../data/facility_item.dart';
 import '../../resources/labels.dart';
 import '../facility/facility_card.dart';
-import '../notifications/event_messenger.dart';
 import '../ticket/ticket_list.dart';
 
 class _Page {
@@ -63,11 +62,9 @@ class MainView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(_selectedPage.label)),
-      body: EventMessenger(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 16),
-          child: _selectedPage.widget,
-        ),
+      body: Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: _selectedPage.widget,
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedPageIndex,

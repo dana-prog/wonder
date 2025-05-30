@@ -8,6 +8,7 @@ import '../../providers/items_provider.dart';
 import '../../resources/labels.dart';
 import '../fields/list_values_dropdown.dart';
 import '../fields/users_dropdown.dart';
+import '../media/image_manager.dart';
 import 'room_count_dropdown.dart';
 
 class FacilityDetailsPage extends StatefulWidget {
@@ -32,6 +33,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   String? _status;
   String? _owner;
   int? _roomCount;
+  List<String>? _pictures;
 
   @override
   void initState() {
@@ -45,6 +47,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
       _status = item.status;
       _owner = item.owner;
       _roomCount = item.roomCount;
+      _pictures = item.pictures;
     }
   }
 
@@ -53,37 +56,36 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
     return SingleChildScrollView(
       child: Column(
         children: spaceWidgets(
-          [
-            _ownerFormField,
-            _statusFormField,
-            _subtypeFormField,
-            _roomCountFormField,
+          widgets: [
+            _ownerFormFieldBuilder(),
+            _statusFormFieldBuilder(),
+            _subtypeFormFieldBuilder(),
+            _roomCountFormFieldBuilder(),
+            _picturesBuilder(),
           ],
+          verticalSpace: 16.0,
         ),
       ),
     );
   }
 
-  List<Widget> buildFieldsLayout() => spaceWidgets([
-        // Align(alignment: Alignment.centerLeft, child: _FacilityFormTitle(_number!, _type!)),
-        _ownerFormField,
-        _statusFormField,
-        _subtypeFormField,
-        _roomCountFormField,
-      ]);
-
   // TODO: replace with padding instead of SizedBox
-  List<Widget> spaceWidgets(List<Widget> widgets) => widgets.fold(<Widget>[], (previous, element) {
+  List<Widget> spaceWidgets({
+    required List<Widget> widgets,
+    double? verticalSpace,
+    double? horizontalSpace,
+  }) =>
+      widgets.fold(<Widget>[], (previous, element) {
         return previous.isEmpty
             ? [element]
             : [
                 ...previous,
-                const SizedBox(height: 8, width: 10),
+                SizedBox(height: verticalSpace, width: horizontalSpace),
                 element,
               ];
       });
 
-  Widget get _subtypeFormField => ListValuesDropdownConsumer(
+  Widget _subtypeFormFieldBuilder() => ListValuesDropdownConsumer(
         label: fields['subtype'],
         listType: 'facilitySubtype',
         value: _subtype,
@@ -91,24 +93,45 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         // validator: (value) => value == null ? 'Required' : null,
       );
 
-  Widget get _statusFormField => ListValuesDropdownConsumer(
+  Widget _statusFormFieldBuilder() => ListValuesDropdownConsumer(
         label: fields['status'],
         listType: 'facilityStatus',
         value: _status,
         onChanged: (value) => onChanged(context, () => _status = value),
       );
 
-  Widget get _ownerFormField => UsersDropdownConsumer(
+  Widget _ownerFormFieldBuilder() => UsersDropdownConsumer(
         value: _owner,
         label: fields['owner'],
         onChanged: (value) => onChanged(context, () => _owner = value),
         validator: (value) => value == null ? 'Required' : null,
       );
 
-  Widget get _roomCountFormField => RoomCountDropdown(
+  Widget _roomCountFormFieldBuilder() => RoomCountDropdown(
         value: _roomCount,
         onChanged: (value) => onChanged(context, () => _roomCount = value),
       );
+
+  Widget _picturesBuilder() {
+    return ImageManager(
+      ids: _pictures ?? [],
+      onAdd: (String id) async {
+        onChanged(context, () {
+          _pictures = _pictures ?? [];
+          _pictures!.add(id);
+        });
+      },
+      onRemove: (String id) async {
+        onChanged(context, () {
+          final exists = _pictures?.contains(id) ?? false;
+          assert(exists, 'Picture with id $id does not exist in the list');
+          if (exists) return;
+
+          _pictures = _pictures?.where((pic) => pic != id).toList();
+        });
+      },
+    );
+  }
 
   void onChanged(BuildContext context, VoidCallback fn) async {
     setState(fn);

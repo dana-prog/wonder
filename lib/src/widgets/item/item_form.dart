@@ -26,7 +26,7 @@ class ItemForm extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         formTitleBuilder(context),
-        SizedBox(height: 16),
+        SizedBox(height: 20),
         formBodyBuilder(item.itemType, item.id),
       ],
     );

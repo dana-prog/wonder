@@ -3,10 +3,6 @@ import 'package:wonder/src/data/item.dart';
 import 'package:wonder/src/data/item_helpers.dart';
 
 class FacilityItem extends Item {
-  static final _defaultPictures = [
-    '$mediaPublicUrlPrefix/1246fe_888314eeeb9a4468ab2ba15e283ecbfa~mv2.png'
-  ];
-
   FacilityItem.fromFields(Map<String, dynamic> fields) : super({'itemType': 'facility', ...fields});
 
   FacilityItem({
@@ -38,10 +34,9 @@ class FacilityItem extends Item {
 
   int get roomCount => (this['roomCount']).toInt();
 
-  List<String> get pictures =>
-      getFieldValue<List<String>>('pictures', defaultValue: _defaultPictures)!;
+  List<String>? get pictures => getFieldValue<List<String>>('pictures');
 
-  String get mainPicture => pictures[0];
+  String? get mainPicture => pictures?[0];
 
   // TODO: remove hard codes villa or separate to a itemType
   @override

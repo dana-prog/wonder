@@ -16,6 +16,8 @@ typedef Builder = Widget Function(BuildContext context, WidgetRef ref);
 const _cardHeight = 48.0;
 const _smallChipTextStyle = TextStyle(fontSize: 11);
 
+const _defaultPicture = 'default_facility_picture.png';
+
 class FacilityCard extends ConsumerWidget {
   final FacilityItem item;
 
@@ -29,7 +31,7 @@ class FacilityCard extends ConsumerWidget {
         imageWidget: SizedBox(
             width: _cardHeight,
             height: _cardHeight,
-            child: ClipOval(child: AppImage(item.mainPicture))),
+            child: ClipOval(child: AppImage(id: item.mainPicture ?? _defaultPicture))),
         numberWidget: SizedBox(
           height: _cardHeight,
           width: 65,

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Chip;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/widgets/fields/dropdown.dart';
 import 'package:wonder/src/widgets/user/user_chip.dart';
@@ -25,14 +25,15 @@ class UsersDropdownConsumer extends ConsumerWidget {
     return Dropdown<String>(
       value: value,
       label: label,
-      optionsProps: getOptionsProps(users),
-      optionBuilder: optionBuilder,
+      optionsProps: _getOptionsProps(users),
+      optionBuilder: _optionBuilder,
+      selectedBuilder: _selectedBuilder,
       onChanged: onChanged,
       validator: validator,
     );
   }
 
-  List<OptionProps<String>> getOptionsProps(List<UserItem> users) {
+  List<OptionProps<String>> _getOptionsProps(List<UserItem> users) {
     final options = <OptionProps<String>>[];
     options.add(EmptyOptionProps('user'));
     for (final user in users) {
@@ -42,7 +43,27 @@ class UsersDropdownConsumer extends ConsumerWidget {
     return options;
   }
 
-  Widget optionBuilder(OptionProps<String> option, BuildContext _) {
+  Widget _optionBuilder(OptionProps<String> option, BuildContext _) {
     return UserChip(user: option.data);
+  }
+
+  Widget _selectedBuilder(OptionProps<String> option, BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+          width: 1,
+        ),
+      ),
+      child: UserChip(
+        user: option.data,
+        // backgroundColor: Colors.grey.shade400,
+        padding: defaultOptionChipPadding.copyWith(left: 8, right: 8),
+        labelStyle: TextStyle(
+            color: Theme.of(context).textTheme.labelSmall?.color, fontWeight: FontWeight.normal),
+      ),
+    );
   }
 }

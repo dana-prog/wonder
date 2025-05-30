@@ -8,7 +8,6 @@ import '../../resources/labels.dart';
 import '../fields/chip.dart';
 
 const _userPicture = '$mediaPublicUrlPrefix/1246fe_7609a78c62784e4788f3fb2c6a65fb95~mv2.png';
-const _defaultPadding = EdgeInsets.all(0);
 const _defaultTitleFontSize = 14.0;
 const _defaultInitialsColor = Colors.white;
 // TODO: remove hard coded value
@@ -17,11 +16,11 @@ const _minRadius = 12.0;
 class UserChip extends StatelessWidget {
   final UserItem? user;
   final Color? backgroundColor;
-  final double? height;
-  final double? width;
   final EdgeInsetsGeometry? padding;
   final BorderRadius? borderRadius;
   final TextStyle? labelStyle;
+  final double? height;
+  final double? width;
 
   const UserChip({
     required this.user,
@@ -38,7 +37,8 @@ class UserChip extends StatelessWidget {
     return Chip(
       label: user?.title ?? Labels.noItem('user'),
       leadingBuilder: leadingBuilder,
-      padding: padding ?? _defaultPadding,
+      padding: padding,
+      // padding: padding ?? _defaultPadding,
       backgroundColor: backgroundColor,
       labelStyle: getEffectiveLabelStyle(context),
       borderRadius: borderRadius,
@@ -68,7 +68,7 @@ class UserChip extends StatelessWidget {
 
     return CircleAvatar(
       radius: _minRadius,
-      backgroundImage: NetworkImage(user!.picture!),
+      backgroundImage: AssetImage(user!.picture!),
     );
   }
 

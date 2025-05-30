@@ -18,9 +18,9 @@ class UserItem extends Item {
 
   String get lastName => this['lastName'];
 
-  String get middleName => containsField('middleName') ? this['middleName'] : '';
+  String get middleName => getFieldValue('middleName', defaultValue: '')!;
 
-  String get nickname => containsField('nickname') ? this['nickname'] : '';
+  String get nickname => getFieldValue('nickname', defaultValue: '')!;
 
   String get email => this['email'];
 
