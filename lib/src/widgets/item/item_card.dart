@@ -65,6 +65,7 @@ class ItemCard extends ConsumerWidget {
     final route = '/${item.itemType}/${item.id}';
     logger.d('[ItemCard.onEdit] navigate to $route');
     Navigator.of(context).push(
+      // TODO: check this solution again: it might be a problem when we want to share the route (to send a ticket link for example)
       PageRouteBuilder(
         opaque: false,
         barrierColor: Colors.black38, // dim background

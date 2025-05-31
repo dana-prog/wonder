@@ -2,11 +2,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../app_theme.dart';
 import '../../logger.dart';
 import '../../providers/file_provider.dart';
+import '../../routes/locations.dart';
 import '../platform/dotted_border.dart';
 import 'app_image.dart';
 
@@ -129,14 +131,19 @@ class _ImageThumbnail extends StatelessWidget {
     return Stack(
       alignment: Alignment.topRight,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(defaultBorderRadius),
-          child: AppFileImage(path: path, width: width, height: height),
+        GestureDetector(
+          onTap: () {
+            context.push(Locations.image.replaceFirst(':path', path));
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(defaultBorderRadius),
+            child: AppFileImage(path: path, width: width, height: height),
+          ),
         ),
         onRemove != null
             ? Padding(
                 padding: EdgeInsets.all(_removeBtnPadding),
-                child: _RemoveButton(id: path, onRemove: onRemove!),
+                child: _RemoveButton(path: path, onRemove: onRemove!),
               )
             : SizedBox.shrink(),
       ],
@@ -149,37 +156,6 @@ const _removeBtnPadding = 3.0;
 const _removeBtnIconSize = 12.0;
 final _removeBtnBackgroundColor = WidgetStateProperty.all<Color>(Colors.white);
 final _removeBtnForegroundColor = WidgetStateProperty.all(Colors.grey.shade700);
-
-class _RemoveButton extends StatelessWidget {
-  final String id;
-  final void Function(String id) onRemove;
-
-  const _RemoveButton({
-    required this.id,
-    required this.onRemove,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: _removeBtnSize,
-      height: _removeBtnSize,
-      child: FilledButton(
-        style: ButtonStyle(
-          shape: WidgetStateProperty.all(const CircleBorder()),
-          padding: WidgetStateProperty.all(EdgeInsets.all(0)),
-          backgroundColor: _removeBtnBackgroundColor,
-          foregroundColor: _removeBtnForegroundColor,
-        ),
-        onPressed: () {
-          logger.d('[ImageManager] Removing image with id: $id');
-          onRemove(id);
-        },
-        child: const Icon(Icons.close, size: _removeBtnIconSize),
-      ),
-    );
-  }
-}
 
 class _AddImagePlaceholder extends ConsumerWidget {
   final AddImageCallback onAdd;
@@ -216,6 +192,37 @@ class _AddImagePlaceholder extends ConsumerWidget {
           borderRadius: BorderRadius.circular(defaultBorderRadius),
         ),
         child: const Icon(Icons.add_a_photo),
+      ),
+    );
+  }
+}
+
+class _RemoveButton extends StatelessWidget {
+  final String path;
+  final void Function(String id) onRemove;
+
+  const _RemoveButton({
+    required this.path,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: _removeBtnSize,
+      height: _removeBtnSize,
+      child: FilledButton(
+        style: ButtonStyle(
+          shape: WidgetStateProperty.all(const CircleBorder()),
+          padding: WidgetStateProperty.all(EdgeInsets.all(0)),
+          backgroundColor: _removeBtnBackgroundColor,
+          foregroundColor: _removeBtnForegroundColor,
+        ),
+        onPressed: () {
+          logger.d('[ImageManager] Removing image with path: $path');
+          onRemove(path);
+        },
+        child: const Icon(Icons.close, size: _removeBtnIconSize),
       ),
     );
   }
