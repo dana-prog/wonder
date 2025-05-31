@@ -12,13 +12,13 @@ typedef ItemCardLayoutBuilder = Widget Function(BuildContext context, WidgetRef 
 
 class ItemCard extends ConsumerWidget {
   final Item item;
-  final Iterable<Widget> layout;
+  final Widget body;
   final bool canEdit;
   final bool canDelete;
 
   const ItemCard({
     required this.item,
-    required this.layout,
+    required this.body,
     this.canEdit = true,
     this.canDelete = true,
     super.key,
@@ -26,23 +26,30 @@ class ItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final buttons = [];
-    if (canDelete) {
-      buttons.add(_deleteButtonBuilder(context, ref));
-    }
-
-    if (canEdit) {
-      buttons.add(_editButtonBuilder(context, ref));
-    }
-
     return GestureDetector(
       onTap: () => _onEdit(context),
       child: Card(
         child: Padding(
           padding: EdgeInsetsGeometry.all(8.0),
-          child: Row(children: [...layout, Spacer(), ...buttons]),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(child: body),
+              buildButtons(context, ref),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget buildButtons(BuildContext context, WidgetRef ref) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        if (canDelete) _deleteButtonBuilder(context, ref),
+        if (canEdit) _editButtonBuilder(context, ref),
+      ],
     );
   }
 

@@ -44,7 +44,6 @@ class Chip extends StatelessWidget {
           child: leadingBuilder != null
               ? Row(
                   mainAxisSize: MainAxisSize.min,
-                  // mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 8,
                   children: [
                     leadingBuilder!(context),

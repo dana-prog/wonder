@@ -103,18 +103,15 @@ class WixClient extends Client {
 
     await _ensureMemberLogin();
 
+    final fields = newItem.fields;
+    fields.removeWhere((fieldName, _) => ['id', 'itemType'].contains(fieldName));
     final dataCollectionId = metadata.getByName(newItem.itemType).dataCollectionId;
     final response = await http.put(
       Uri.parse('$_itemsApiBaseUrl/${newItem.id}'),
       headers: _getHeaders(),
       body: jsonEncode({
         'dataCollectionId': dataCollectionId,
-        'dataItem': {'data': newItem.fields},
-        //{
-        // 'data': newItem.fields.removeWhere(
-        //   (fieldName, _) => ['id', 'itemType'].contains(fieldName),
-        // )
-        // },
+        'dataItem': {'data': fields},
       }),
     );
 

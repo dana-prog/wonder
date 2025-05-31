@@ -12,6 +12,7 @@ class FacilityItem extends Item {
     required String subtype,
     required String owner,
     int? roomCount,
+    List<String>? pictures,
   }) : this.fromFields({
           'dataCollectionId': ItemType.facility.pluralName,
           'number': number,
@@ -20,6 +21,7 @@ class FacilityItem extends Item {
           'subtype': subtype,
           'owner': owner,
           'roomCount': roomCount,
+          'pictures': pictures ?? [],
         });
 
   int get number => (this['number']).toInt();

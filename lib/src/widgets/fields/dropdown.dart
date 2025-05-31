@@ -57,6 +57,7 @@ class Dropdown<T> extends StatelessWidget {
         border: OutlineInputBorder(
           borderSide: BorderSide.none,
         ),
+        // the following prop enables setting a small height to the item
         isCollapsed: true,
       ),
       icon: const SizedBox.shrink(),

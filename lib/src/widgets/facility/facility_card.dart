@@ -6,6 +6,7 @@ import 'package:wonder/src/widgets/list_value/list_value_chip.dart';
 import 'package:wonder/src/widgets/user/user_chip.dart';
 
 import '../../data/facility_item.dart';
+import '../../globals.dart';
 import '../fields/item_chip.dart';
 import '../item/item_card.dart';
 import '../media/app_image.dart';
@@ -16,7 +17,7 @@ typedef Builder = Widget Function(BuildContext context, WidgetRef ref);
 const _cardHeight = 48.0;
 const _smallChipTextStyle = TextStyle(fontSize: 11);
 
-const _defaultPicture = 'default_facility_picture.png';
+final _defaultPicture = '$imagesPath/default_facility_picture.png';
 
 class FacilityCard extends ConsumerWidget {
   final FacilityItem item;
@@ -27,11 +28,14 @@ class FacilityCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ItemCard(
       item: item,
-      layout: buildCardLayout(
+      body: buildCardBody(
         imageWidget: SizedBox(
             width: _cardHeight,
             height: _cardHeight,
-            child: ClipOval(child: AppImage(id: item.mainPicture ?? _defaultPicture))),
+            child: ClipOval(
+                child: item.mainPicture != null
+                    ? AppFileImage(path: item.mainPicture!)
+                    : AppAssetImage(assetPath: _defaultPicture))),
         numberWidget: SizedBox(
           height: _cardHeight,
           width: 65,
@@ -60,7 +64,7 @@ class FacilityCard extends ConsumerWidget {
     );
   }
 
-  Iterable<Widget> buildCardLayout({
+  Widget buildCardBody({
     required Widget imageWidget,
     required Widget numberWidget,
     required Widget ownerWidget,
@@ -69,36 +73,34 @@ class FacilityCard extends ConsumerWidget {
     required Widget roomCountWidget,
     required Widget statusWidget,
   }) {
-    return [
-      // image
-      imageWidget,
-      SizedBox(width: 10),
-      // number
-      numberWidget,
-      SizedBox(width: 10),
-      // owner / type, subtype, room count
-      Expanded(
-        flex: 2,
-        child: Column(
-          spacing: 6,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ownerWidget,
-            // Spacer(),
-            Row(
-              children: [
-                typeWidget,
-                SizedBox(width: 8),
-                subtypeWidget,
-                SizedBox(width: 8),
-                roomCountWidget,
-              ],
-            ),
-          ],
-        ),
-      ),
-      // // status
-      // statusWidget,
-    ];
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(children: [
+          imageWidget,
+          SizedBox(width: 10),
+          numberWidget,
+          SizedBox(width: 10),
+          Column(
+            spacing: 6,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ownerWidget,
+              Row(
+                children: [
+                  typeWidget,
+                  SizedBox(width: 8),
+                  subtypeWidget,
+                  SizedBox(width: 8),
+                  roomCountWidget,
+                ],
+              ),
+            ],
+          ),
+        ]),
+        statusWidget,
+      ],
+    );
   }
 }

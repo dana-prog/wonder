@@ -20,7 +20,6 @@ class RoomCountDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return _innerBuild(items, context);
     return Dropdown<int>(
       value: value,
       label: ItemsLabels.getFieldLabels('facility')['roomCount'],
@@ -28,27 +27,4 @@ class RoomCountDropdown extends StatelessWidget {
       onChanged: onChanged,
     );
   }
-
-// Widget _innerBuild(List<MenuItemProps<int>> items, BuildContext context) {
-//   final selectedListValue = roomCount != null
-//       ? items.firstWhere(
-//           (item) => item.value == roomCount,
-//         )
-//       : null;
-//   return DropdownButtonFormField<T>(
-//     value: roomCount,
-//     decoration: InputDecoration(
-//         filled: true,
-//         fillColor: selectedListValue != null ? selectedListValue.color : Colors.transparent,
-//         border: OutlineInputBorder(
-//           borderRadius: BorderRadius.circular(10),
-//           borderSide: BorderSide.none,
-//         )),
-//     icon: const SizedBox.shrink(),
-//     items: items.map((item) => getMenuItem(item, context)).toList(),
-//     onChanged: onChanged,
-//     // validator: validator,
-//     isExpanded: true,
-//   );
-// }
 }

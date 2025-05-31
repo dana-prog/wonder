@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wonder/src/widgets/async/async_value_widget.dart';
 
 import '../../logger.dart';
-import '../../storage/file_storage.dart';
+import '../../providers/file_provider.dart';
 
-class AppImage extends ConsumerWidget {
-  final String id;
+class AppFileImage extends ConsumerWidget {
+  final String path;
   final double? width;
   final double? height;
 
-  const AppImage({
-    required this.id,
+  const AppFileImage({
+    required this.path,
     this.width,
     this.height,
     super.key,
@@ -18,36 +19,52 @@ class AppImage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    logger.t('[AppImage:build]: id: $id');
-    final fileStorage = ref.watch(fileStorageProvider);
+    logger.t('[AppFileImage:build]: path: $path');
+    final asyncFile = ref.watch(fileProvider(path));
+
+    return AsyncValueWidget(
+      asyncValue: asyncFile,
+      loadingBuilder: (context) => const Center(child: CircularProgressIndicator()),
+      dataBuilder: (file, _) => Image.file(
+        file,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          logger.e('[AppFileImage:build]: Error loading file: ${file.path}: $error',
+              stackTrace: stackTrace);
+          return Text(error.toString());
+        },
+      ),
+    );
+  }
+}
+
+class AppAssetImage extends StatelessWidget {
+  final String assetPath;
+  final double? width;
+  final double? height;
+
+  const AppAssetImage({
+    required this.assetPath,
+    this.width,
+    this.height,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    logger.t('[AppAssetImage:build]: assetPath: $assetPath');
     return Image.asset(
-      fileStorage.getFilePath(id),
+      assetPath,
       width: width,
       height: height,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        logger.e(
-          '[AppImage:build]: Error loading image: $id: $error',
-          stackTrace: stackTrace,
-        );
+        logger.e('[AppAssetImage:build]: Error loading asset image: $assetPath: $error',
+            stackTrace: stackTrace);
         return Text(error.toString());
       },
-      // loadingBuilder: (context, child, loadingProgress) {
-      //   if (loadingProgress == null) {
-      //     return child;
-      //   }
-      //
-      //   return Shimmer.fromColors(
-      //     baseColor: Colors.grey.shade300,
-      //     highlightColor: Colors.grey.shade100,
-      //     enabled: true,
-      //     child: Container(
-      //       width: width,
-      //       height: height,
-      //       color: Colors.grey.shade300,
-      //     ),
-      //   );
-      // },
     );
   }
 }

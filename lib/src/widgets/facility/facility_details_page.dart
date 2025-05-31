@@ -4,6 +4,7 @@ import 'package:wonder/src/widgets/async/async_value_widget.dart';
 
 import '../../data/facility_item.dart';
 import '../../data/item.dart';
+import '../../logger.dart';
 import '../../providers/items_provider.dart';
 import '../../resources/labels.dart';
 import '../fields/list_values_dropdown.dart';
@@ -122,18 +123,21 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         });
       },
       onRemove: (String id) async {
+        logger.d('[FacilityDetailsPage.onRemove] Removing picture with id: $id from $_pictures');
         onChanged(context, () {
           final exists = _pictures?.contains(id) ?? false;
           assert(exists, 'Picture with id $id does not exist in the list');
-          if (exists) return;
+          if (!exists) return;
 
-          _pictures = _pictures?.where((pic) => pic != id).toList();
+          logger.d('[FacilityDetailsPage.onRemove] Removing picture with id: $id from $_pictures');
+          _pictures!.removeWhere((pic) => pic == id);
+          logger.d('[FacilityDetailsPage.onRemove] Removed picture with id: $id from $_pictures');
         });
       },
     );
   }
 
-  void onChanged(BuildContext context, VoidCallback fn) async {
+  void onChanged(BuildContext context, VoidCallback fn) {
     setState(fn);
     widget.save(FacilityItem.fromFields({
       // TODO: remove !
@@ -142,6 +146,8 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
       'type': _type,
       'subtype': _subtype,
       'owner': _owner,
+      'roomCount': _roomCount,
+      'pictures': _pictures ?? [],
     }));
   }
 }
