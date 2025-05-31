@@ -67,7 +67,6 @@ final router = GoRouter(
       path: Locations.image,
       builder: (context, state) {
         final path = state.pathParameters['path']!;
-        logger.d('[router.image] path: $path');
         return ImagePage(path: path);
       },
     ),
