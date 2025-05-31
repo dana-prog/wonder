@@ -6,7 +6,6 @@ import 'dropdown.dart';
 
 class ListValuesDropdownConsumer extends ConsumerWidget {
   final String listType;
-  final String? label;
   final String? value;
   final ValueChanged<String?>? onChanged;
   final FormFieldValidator<String>? validator;
@@ -14,7 +13,6 @@ class ListValuesDropdownConsumer extends ConsumerWidget {
   const ListValuesDropdownConsumer({
     super.key,
     required this.listType,
-    this.label,
     this.value,
     this.onChanged,
     this.validator,
@@ -24,7 +22,6 @@ class ListValuesDropdownConsumer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final listValues = ref.watch(listValuesProvider(listType));
     return Dropdown(
-      label: label,
       value: value,
       optionsProps: listValues.map(OptionProps.fromItem).toList(),
       onChanged: onChanged,

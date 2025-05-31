@@ -14,7 +14,6 @@ class Dropdown<T> extends StatelessWidget {
   final List<OptionProps<T>> optionsProps;
   final T? value;
   final Widget Function(OptionProps<T> option, BuildContext context)? optionBuilder;
-  final String? label;
   final ValueChanged<T?>? onChanged;
   final FormFieldValidator<T>? validator;
   final Widget Function(OptionProps<T> option, BuildContext context)? selectedBuilder;
@@ -24,7 +23,6 @@ class Dropdown<T> extends StatelessWidget {
     this.value,
     this.optionBuilder,
     this.selectedBuilder,
-    this.label,
     this.onChanged,
     this.validator,
     super.key,
@@ -32,21 +30,6 @@ class Dropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (label != null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 6,
-        children: [
-          Text(label!, style: Theme.of(context).inputDecorationTheme.labelStyle),
-          buildDropdown(context)
-        ],
-      );
-    } else {
-      return buildDropdown(context);
-    }
-  }
-
-  Widget buildDropdown(BuildContext context) {
     return DropdownButtonFormField<T>(
       alignment: Alignment.topCenter,
       isDense: false,

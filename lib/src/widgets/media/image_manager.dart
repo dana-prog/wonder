@@ -74,7 +74,6 @@ class ImageManager extends StatelessWidget {
   Widget buildImage({required String id, double? width, double? height}) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        logger.d('[ImageManager.buildImage] id: $id, constraints: $constraints');
         final size = (constraints.maxWidth - _imagesHorizontalSpace) / 2;
         return _ImageThumbnail(
           path: id,

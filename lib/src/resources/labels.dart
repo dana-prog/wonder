@@ -72,6 +72,7 @@ class ItemsLabels {
         'status': 'Status',
         'owner': 'Owner',
         'roomCount': '# Rooms',
+        'pictures': 'Pictures',
       },
     ),
   };

@@ -99,8 +99,6 @@ class WixClient extends Client {
 
   @override
   Future<T> updateItem<T extends Item>(T newItem) async {
-    logger.d('[WixClient.updateItem] item: $newItem');
-
     await _ensureMemberLogin();
 
     final fields = newItem.fields;
@@ -118,8 +116,6 @@ class WixClient extends Client {
     if (response.statusCode != 200) {
       throw Exception('[WixClient.updateItem] Failed to update item $newItem: ${response.body}');
     }
-
-    logger.d('[WixClient.updateItem] response.body: ${response.body}');
 
     final dataItem = jsonDecode(response.body)['dataItem'];
     final item = getItemObject(dataItem) as T;

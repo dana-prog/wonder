@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wonder/src/resources/labels.dart';
 import 'package:wonder/src/widgets/facility/constants.dart';
+import 'package:wonder/src/widgets/platform/field_label.dart';
 
 import '../fields/dropdown.dart';
 
@@ -20,11 +21,13 @@ class RoomCountDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dropdown<int>(
-      value: value,
-      label: ItemsLabels.getFieldLabels('facility')['roomCount'],
-      optionsProps: menuItemsProps,
-      onChanged: onChanged,
+    return FieldLabel(
+      label: ItemsLabels.getFieldLabels('facility')['roomCount']!,
+      child: Dropdown<int>(
+        value: value,
+        optionsProps: menuItemsProps,
+        onChanged: onChanged,
+      ),
     );
   }
 }

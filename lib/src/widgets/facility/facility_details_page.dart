@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/widgets/async/async_value_widget.dart';
+import 'package:wonder/src/widgets/platform/field_label.dart';
 
 import '../../data/facility_item.dart';
 import '../../data/item.dart';
@@ -86,26 +87,31 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
               ];
       });
 
-  Widget _subtypeFormFieldBuilder() => ListValuesDropdownConsumer(
-        label: fields['subtype'],
-        listType: 'facilitySubtype',
-        value: _subtype,
-        onChanged: (value) => onChanged(context, () => _subtype = value),
-        // validator: (value) => value == null ? 'Required' : null,
+  Widget _subtypeFormFieldBuilder() => FieldLabel(
+        label: fields['subtype']!,
+        child: ListValuesDropdownConsumer(
+          listType: 'facilitySubtype',
+          value: _subtype,
+          onChanged: (value) => onChanged(context, () => _subtype = value),
+        ),
       );
 
-  Widget _statusFormFieldBuilder() => ListValuesDropdownConsumer(
-        label: fields['status'],
-        listType: 'facilityStatus',
-        value: _status,
-        onChanged: (value) => onChanged(context, () => _status = value),
+  Widget _statusFormFieldBuilder() => FieldLabel(
+        label: fields['status']!,
+        child: ListValuesDropdownConsumer(
+          listType: 'facilityStatus',
+          value: _status,
+          onChanged: (value) => onChanged(context, () => _status = value),
+        ),
       );
 
-  Widget _ownerFormFieldBuilder() => UsersDropdownConsumer(
-        value: _owner,
-        label: fields['owner'],
-        onChanged: (value) => onChanged(context, () => _owner = value),
-        validator: (value) => value == null ? 'Required' : null,
+  Widget _ownerFormFieldBuilder() => FieldLabel(
+        label: fields['owner']!,
+        child: UsersDropdownConsumer(
+          value: _owner,
+          onChanged: (value) => onChanged(context, () => _owner = value),
+          validator: (value) => value == null ? 'Required' : null,
+        ),
       );
 
   Widget _roomCountFormFieldBuilder() => RoomCountDropdown(
@@ -114,7 +120,9 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
       );
 
   Widget _picturesBuilder() {
-    return ImageManager(
+    return FieldLabel(
+        label: fields['pictures']!,
+        child: ImageManager(
       ids: _pictures ?? [],
       onAdd: (String id) async {
         onChanged(context, () {
@@ -134,7 +142,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
           logger.d('[FacilityDetailsPage.onRemove] Removed picture with id: $id from $_pictures');
         });
       },
-    );
+    ),);
   }
 
   void onChanged(BuildContext context, VoidCallback fn) {

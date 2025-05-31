@@ -10,30 +10,28 @@ import 'file_storage.dart';
 class LocalFileStorage extends FileStorage {
   @override
   Future<String> saveFile(Stream<Uint8List> stream, String name) async {
+    logger.t('[LocalFileStorage:saveFile]: name: $name');
     final id = '${Uuid().v4()}_$name';
     final file = await getFile(id);
     // 💡 Ensure parent directories exist
     await file.parent.create(recursive: true);
-    logger.d('[LocalFileStorage:saveFile]: name: $name, path: ${file.path}');
     final sink = file.openWrite(mode: FileMode.writeOnly);
     await sink.addStream(stream);
     // await sink.flush();
     await sink.close();
-    logger.d('[LocalFileStorage:saveFile]: saved file with id: $id, to path: ${file.path}');
     return id;
   }
 
   @override
   Future<File> getFile(String id) async {
-    logger.d('[LocalFileStorage:getFile]: id: $id');
     final dir = await getApplicationDocumentsDirectory();
     final path = getFilePath(id);
-    logger.d('[LocalFileStorage:getFile]: path: $path');
     return File('${dir.path}/$path');
   }
 
   @override
   Future<Uint8List> loadFile(String id) async {
+    logger.t('[LocalFileStorage:loadFile]: id: $id');
     final file = await getFile(id);
     if (!await file.exists()) {
       throw FileSystemException('File not found', file.path);
@@ -44,7 +42,7 @@ class LocalFileStorage extends FileStorage {
 
   @override
   Future<void> deleteFile(String id) async {
-    logger.d('[LocalFileStorage:deleteFile]: id: $id');
+    logger.t('[LocalFileStorage:deleteFile]: id: $id');
     final file = await getFile(id);
     final exists = await file.exists();
     if (!exists) {

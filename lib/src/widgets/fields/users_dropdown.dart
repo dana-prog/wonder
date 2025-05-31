@@ -8,13 +8,11 @@ import '../../providers/users_provider.dart';
 
 class UsersDropdownConsumer extends ConsumerWidget {
   final String? value;
-  final String? label;
   final ValueChanged<String?>? onChanged;
   final FormFieldValidator<String>? validator;
 
   const UsersDropdownConsumer({
     this.value,
-    this.label,
     this.onChanged,
     this.validator,
   });
@@ -24,7 +22,6 @@ class UsersDropdownConsumer extends ConsumerWidget {
     final users = ref.watch(userListProvider);
     return Dropdown<String>(
       value: value,
-      label: label,
       optionsProps: _getOptionsProps(users),
       optionBuilder: _optionBuilder,
       selectedBuilder: _selectedBuilder,
