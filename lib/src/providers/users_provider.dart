@@ -24,7 +24,10 @@ class UsersCache {
     _users = users;
     _usersById = {};
     for (var item in users) {
-      _usersById[item.id] = item;
+      assert(item.id != null,
+          'UserItem id must not be null (cannot add new items without id to the cache)');
+
+      _usersById[item.id!] = item;
     }
   }
 

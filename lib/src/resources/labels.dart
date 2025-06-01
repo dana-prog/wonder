@@ -6,7 +6,6 @@ import '../data/item.dart';
 class Titles {
   static const String app = 'Facility Management';
   static const String tickets = 'Tickets';
-  static const String facilities = 'Facilities';
   static const String more = 'More';
   static const String theme = 'Theme';
   static const String debug = 'Debug';
@@ -19,8 +18,10 @@ class Labels {
   static const String edit = 'Edit';
   static const String delete = 'Delete';
   static const String loading = 'Loading';
+  static const String selectOption = 'Select Option';
   static String facilityRoomCount(int count) => count == 1 ? '$count Bedroom' : '$count Bedrooms';
   static String noItem(String typeName) => '${typeName.capitalize()} Not Set';
+  static String newItem(String itemType) => 'New ${ItemsLabels.getSingularLabel(itemType)}';
 }
 
 class ConfirmationMessages {
@@ -58,12 +59,11 @@ class ItemsLabels {
     'facility': ItemLabels(
       // TODO: currently we have only 'villa' facilities. in the future either separate to different item types or change the itemType here to 'facility'
       itemType: 'villa',
+      singleLabel: 'Villa',
+      pluralLabel: 'Villas',
       shortTitle: (Item item) {
-        if (item is! FacilityItem) {
-          throw Exception('Expected FacilityItem, got ${item.runtimeType}');
-        }
-
-        return '${ItemsLabels.getTypeLabel(item.itemType)} #${item.number}';
+        assert(item is FacilityItem, 'Expected FacilityItem, got ${item.runtimeType}');
+        return '${ItemsLabels.getSingularLabel(item.itemType)} #${item['number']}';
       },
       fieldLabels: {
         'number': 'Number',
@@ -75,41 +75,45 @@ class ItemsLabels {
         'pictures': 'Pictures',
       },
     ),
+    'ticket': ItemLabels(
+      itemType: 'ticket',
+      singleLabel: 'Ticket',
+      pluralLabel: 'Tickets',
+      shortTitle: (Item item) => item.title,
+      fieldLabels: {},
+    ),
   };
 
-  static Map<String, String> getFieldLabels(String itemType) {
+  static Map<String, String> getFieldLabels(String itemType) =>
+      _getItemLabels(itemType).fieldLabels;
+
+  static String getShortTitle(Item item) => _getItemLabels(item.itemType).shortTitle(item);
+
+  static String getSingularLabel(String itemType) => _getItemLabels(itemType).singleLabel;
+
+  static String getPluralLabel(String itemType) => _getItemLabels(itemType).pluralLabel;
+
+  static ItemLabels _getItemLabels(String itemType) {
     final labels = itemsLabels[itemType];
     if (labels == null) {
       throw Exception('No labels found for item type: $itemType');
     }
-    return labels.fieldLabels;
-  }
-
-  static String getTypeLabel(String itemType) {
-    final labels = itemsLabels[itemType];
-    if (labels == null) {
-      throw Exception('No labels found for item type: $itemType');
-    }
-    return labels.itemType;
-  }
-
-  static String getShortTitle(Item item) {
-    final ItemLabels? labels = itemsLabels[item.itemType];
-    if (labels == null) {
-      throw Exception('No labels found for item type: ${item.itemType}');
-    }
-    return labels.shortTitle(item);
+    return labels;
   }
 }
 
 class ItemLabels {
   final Map<String, String> fieldLabels;
   final String itemType;
+  final String singleLabel;
+  final String pluralLabel;
   final String Function(Item item) shortTitle;
 
   ItemLabels({
     required this.itemType,
     required this.shortTitle,
+    this.singleLabel = 'Item',
+    this.pluralLabel = 'Items',
     required this.fieldLabels,
   });
 }

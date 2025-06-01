@@ -29,7 +29,7 @@ final router = GoRouter(
         }),
     // item
     GoRoute(
-      path: Locations.item,
+      path: Locations.editItem,
       builder: (context, state) {
         logger.d('[router.item]: ${state.path}');
         final itemType = state.pathParameters['itemType']!;
@@ -70,6 +70,17 @@ final router = GoRouter(
         return ImagePage(path: path);
       },
     ),
+    // new item
+    GoRoute(
+        path: Locations.newItem,
+        builder: (context, state) {
+          final itemType = state.pathParameters['itemType']!;
+          assert(itemType == 'facility', 'only facility is supported for new items');
+
+          return SingleViewScaffold(
+            child: ItemFormConsumer(itemType: itemType, id: null),
+          );
+        }),
   ],
   observers: [LoggingObserver()],
   onException: (exception, state, router) {

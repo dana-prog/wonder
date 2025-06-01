@@ -1150,7 +1150,7 @@ class LocalDevClient extends Client {
     super.resetCache();
     for (final itemFields in _itemsFields) {
       final item = getItemObject(itemFields);
-      cache.add(item);
+      cache.set(item);
     }
   }
 }

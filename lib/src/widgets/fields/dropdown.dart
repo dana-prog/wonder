@@ -13,6 +13,7 @@ Widget _defaultOptionBuilder(OptionProps option, BuildContext context) =>
 class Dropdown<T> extends StatelessWidget {
   final List<OptionProps<T>> optionsProps;
   final T? value;
+  final OptionProps<T>? emptyOptionProps;
   final Widget Function(OptionProps<T> option, BuildContext context)? optionBuilder;
   final ValueChanged<T?>? onChanged;
   final FormFieldValidator<T>? validator;
@@ -21,6 +22,7 @@ class Dropdown<T> extends StatelessWidget {
   const Dropdown({
     required this.optionsProps,
     this.value,
+    this.emptyOptionProps,
     this.optionBuilder,
     this.selectedBuilder,
     this.onChanged,
@@ -44,15 +46,15 @@ class Dropdown<T> extends StatelessWidget {
         isCollapsed: true,
       ),
       icon: const SizedBox.shrink(),
-      items: buildMenuItems(optionsProps, context),
-      selectedItemBuilder: (BuildContext context) => buildSelectedItems(optionsProps, context),
+      items: buildMenuItems(context),
+      selectedItemBuilder: buildSelectedItems,
       onChanged: onChanged,
       isExpanded: true,
     );
   }
 
-  List<DropdownMenuItem<T>> buildMenuItems(List<OptionProps<T>> optionProps, BuildContext context) {
-    return optionsProps
+  List<DropdownMenuItem<T>> buildMenuItems(BuildContext context) {
+    return _actualOptionsProps
         .map(
           (optionProps) => DropdownMenuItem<T>(
             value: optionProps.value,
@@ -72,9 +74,10 @@ class Dropdown<T> extends StatelessWidget {
   Widget buildOption(OptionProps<T> option, BuildContext context) =>
       (optionBuilder ?? _defaultOptionBuilder)(option, context);
 
-  List<Widget> buildSelectedItems(List<OptionProps<T>> option, BuildContext context) {
-    return optionsProps
+  List<Widget> buildSelectedItems(BuildContext context) {
+    return _actualOptionsProps
         .map((option) => Center(
+              // TODO: remove column?
               child: Column(
                 children: [
                   SizedBox(
@@ -86,6 +89,11 @@ class Dropdown<T> extends StatelessWidget {
             ))
         .toList();
   }
+
+  List<OptionProps<T>> get _actualOptionsProps => [
+        emptyOptionProps ?? OptionProps<T>(value: null, title: Labels.selectOption),
+        ...optionsProps,
+      ];
 }
 
 // data for displaying a dropdown option
@@ -107,6 +115,8 @@ class OptionProps<T> {
   }
 }
 
+final _defaultOptionChipColor = Colors.grey.shade100;
+
 // a chip for displaying an option in a dropdown
 class OptionChip extends StatelessWidget {
   final OptionProps option;
@@ -118,18 +128,17 @@ class OptionChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Chip(
       label: option.title,
-      backgroundColor: option.color,
+      backgroundColor: option.color ?? _defaultOptionChipColor,
       padding: padding,
     );
   }
 }
 
 // an empty option for displaying when there are no items in the dropdown
-class EmptyOptionProps extends OptionProps<String> {
-  EmptyOptionProps(String typeName)
+class EmptyOptionProps<T> extends OptionProps<T> {
+  EmptyOptionProps({String? title, Color? color})
       : super(
           value: null,
-          title: Labels.noItem(typeName),
-          color: Colors.transparent,
+          title: title ?? Labels.selectOption,
         );
 }

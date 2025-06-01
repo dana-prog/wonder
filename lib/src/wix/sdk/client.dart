@@ -45,11 +45,21 @@ abstract class Client {
 
   Future<List<T>> fetchItems<T extends Item>({required String itemType});
 
+  Future<T> createItem<T extends Item>(T newItem) async {
+    logger.d('[LocalDevClient.createItem] item: $newItem');
+    T createdItem;
+    createdItem = cache.set(newItem);
+
+    notifyItemCreated(createdItem);
+    return createdItem;
+  }
+
   Future<T> updateItem<T extends Item>(T newItem) async {
+    assert(newItem.id != null, 'Item id must not be null for update');
     logger.d('[LocalDevClient.updateItem] item: $newItem');
     T updatedItem;
-    if (!cache.exists(newItem.id)) {
-      updatedItem = cache.add(newItem);
+    if (!cache.exists(newItem.id!)) {
+      updatedItem = cache.set(newItem);
     } else {
       updatedItem = cache.update(newItem);
     }
@@ -59,7 +69,7 @@ abstract class Client {
   }
 
   Future<T> deleteItem<T extends Item>(T item) async {
-    T deletedItem = cache.delete(item);
+    T deletedItem = cache.remove(item);
     notifyItemDeleted(deletedItem);
     return deletedItem;
   }
@@ -70,7 +80,7 @@ abstract class Client {
     final dataCollectionId = dataItem['dataCollectionId'];
     final itemMetadata = metadata.getByCollectionId(dataCollectionId);
     if (!cache.exists(id)) {
-      cache.add(itemMetadata.deserializer({
+      cache.set(itemMetadata.deserializer({
         'id': dataItem['id'],
         'itemType': itemMetadata.name,
       }));
@@ -138,17 +148,21 @@ class _Cache {
     return result;
   }
 
-  T add<T extends Item>(T item) {
-    itemsById[item.id] = item;
+  T set<T extends Item>(T item) {
+    assert(
+        item.id != null, 'Item id must not be null (cannot add new items without id to the cache)');
+    itemsById[item.id!] = item;
     return item;
   }
 
   T update<T extends Item>(T updatedItem) {
-    if (!exists(updatedItem.id)) {
+    assert(updatedItem.id != null, 'Item id must not be null for update');
+
+    if (!exists(updatedItem.id!)) {
       throw Exception('[_Cache.updateItem] Item with id ${updatedItem.id} not found in cache');
     }
 
-    final oldItem = this[updatedItem.id] as T;
+    final oldItem = this[updatedItem.id!] as T;
 
     for (MapEntry<String, dynamic> field in updatedItem.fields.entries) {
       oldItem[field.key] = field.value;
@@ -157,8 +171,9 @@ class _Cache {
     return oldItem;
   }
 
-  T delete<T extends Item>(T deletedItem) {
-    if (!exists(deletedItem.id)) {
+  T remove<T extends Item>(T deletedItem) {
+    assert(deletedItem.id != null, 'Item id must not be null for delete');
+    if (!exists(deletedItem.id!)) {
       throw Exception('[_Cache.deleteItem] Item with id ${deletedItem.id} not found in cache');
     }
 

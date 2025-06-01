@@ -3,7 +3,8 @@ class Locations {
   static const initial = facilities;
   static const tickets = '/tickets';
   static const facilities = '/facilities';
-  static const item = 'item/:itemType/:itemId';
+  static const editItem = '/item/:itemType/:itemId';
+  static const newItem = '/new_item/:itemType';
   static const debug = '/debug';
   static const themeSettings = '/theme_settings';
   static const more = '/more';

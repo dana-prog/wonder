@@ -66,8 +66,10 @@ class Chip extends StatelessWidget {
     final defaultTextStyle = TextStyle(
       fontSize: _defaultFontSize,
       fontWeight: _defaultFontWeight,
+      // TODO: remove hardcoded colors
       color: backgroundColor == null ? Colors.black : Colors.white,
     );
+
     return (labelStyle != null && labelStyle!.inherit)
         ? defaultTextStyle.merge(labelStyle)
         : defaultTextStyle;

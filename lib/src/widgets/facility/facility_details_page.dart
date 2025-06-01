@@ -121,35 +121,36 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
 
   Widget _picturesBuilder() {
     return FieldLabel(
-        label: fields['pictures']!,
-        child: ImageManager(
-      ids: _pictures ?? [],
-      onAdd: (String id) async {
-        onChanged(context, () {
-          _pictures = _pictures ?? [];
-          _pictures!.add(id);
-        });
-      },
-      onRemove: (String id) async {
-        logger.d('[FacilityDetailsPage.onRemove] Removing picture with id: $id from $_pictures');
-        onChanged(context, () {
-          final exists = _pictures?.contains(id) ?? false;
-          assert(exists, 'Picture with id $id does not exist in the list');
-          if (!exists) return;
-
+      label: fields['pictures']!,
+      child: ImageManager(
+        ids: _pictures ?? [],
+        onAdd: (String id) async {
+          onChanged(context, () {
+            _pictures = _pictures ?? [];
+            _pictures!.add(id);
+          });
+        },
+        onRemove: (String id) async {
           logger.d('[FacilityDetailsPage.onRemove] Removing picture with id: $id from $_pictures');
-          _pictures!.removeWhere((pic) => pic == id);
-          logger.d('[FacilityDetailsPage.onRemove] Removed picture with id: $id from $_pictures');
-        });
-      },
-    ),);
+          onChanged(context, () {
+            final exists = _pictures?.contains(id) ?? false;
+            assert(exists, 'Picture with id $id does not exist in the list');
+            if (!exists) return;
+
+            logger
+                .d('[FacilityDetailsPage.onRemove] Removing picture with id: $id from $_pictures');
+            _pictures!.removeWhere((pic) => pic == id);
+            logger.d('[FacilityDetailsPage.onRemove] Removed picture with id: $id from $_pictures');
+          });
+        },
+      ),
+    );
   }
 
   void onChanged(BuildContext context, VoidCallback fn) {
     setState(fn);
     widget.save(FacilityItem.fromFields({
-      // TODO: remove !
-      ...widget.initialItem!.fields,
+      ...(widget.initialItem?.fields ?? {}),
       'status': _status,
       'type': _type,
       'subtype': _subtype,
@@ -161,14 +162,17 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
 }
 
 class FacilityDetailsPageConsumer extends ConsumerWidget {
-  final dynamic itemType;
-  final dynamic id;
+  final String itemType;
+  final String? id;
 
-  const FacilityDetailsPageConsumer(this.itemType, this.id);
+  const FacilityDetailsPageConsumer({
+    required this.itemType,
+    this.id,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncItem = ref.watch(itemProvider((itemType, id)));
+    final asyncItem = id != null ? ref.watch(itemProvider((itemType, id!))) : AsyncValue.data(null);
     final notifier = ref.watch(itemListProvider(itemType).notifier);
 
     return AsyncValueWidget(

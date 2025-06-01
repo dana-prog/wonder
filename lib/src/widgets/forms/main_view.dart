@@ -2,24 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wonder/src/logger.dart';
 import 'package:wonder/src/widgets/forms/more_view.dart';
-import 'package:wonder/src/widgets/item/item_list.dart';
 
-import '../../data/facility_item.dart';
 import '../../resources/labels.dart';
-import '../facility/facility_card.dart';
+import '../../routes/locations.dart';
+import '../facility/facilities_main_view.dart';
 import '../ticket/ticket_list.dart';
 
 class _Page {
   final String name;
-  final String label;
+  final String navigationItemLabel;
   final IconData icon;
-  final Widget widget;
+  final WidgetBuilder bodyBuilder;
+  final PreferredSizeWidget? titleWidget;
+  final FloatingActionButton Function(BuildContext)? floatingActionButtonBuilder;
 
   const _Page({
     required this.name,
-    required this.label,
+    required this.navigationItemLabel,
     required this.icon,
-    required this.widget,
+    required this.bodyBuilder,
+    this.titleWidget,
+    this.floatingActionButtonBuilder,
   });
 }
 
@@ -27,44 +30,50 @@ const String ticketsPageName = 'tickets';
 const String facilitiesPageName = 'facilities';
 const String morePageName = 'more';
 
+final _pages = [
+  _Page(
+    name: ticketsPageName,
+    navigationItemLabel: ItemsLabels.getPluralLabel('ticket'),
+    icon: Icons.confirmation_num,
+    bodyBuilder: (BuildContext _) => TicketList(),
+  ),
+  _Page(
+    name: facilitiesPageName,
+    navigationItemLabel: ItemsLabels.getPluralLabel('facility'),
+    icon: Icons.house,
+    bodyBuilder: (BuildContext context) => FacilitiesMainView(),
+    floatingActionButtonBuilder: (BuildContext context) => FloatingActionButton(
+      onPressed: () => context.push(Locations.newItem.replaceFirst(':itemType', 'facility')),
+      child: const Icon(Icons.add),
+    ),
+  ),
+  _Page(
+    name: morePageName,
+    navigationItemLabel: Titles.more,
+    titleWidget: AppBar(title: Text(Titles.more), automaticallyImplyLeading: false),
+    icon: Icons.more,
+    bodyBuilder: (BuildContext _) => MoreView(),
+  ),
+];
+
 class MainView extends StatelessWidget {
   final String selectedPageName;
-  final _pages = [
-    _Page(
-      name: ticketsPageName,
-      label: Titles.tickets,
-      icon: Icons.confirmation_num,
-      widget: TicketList(),
-    ),
-    _Page(
-      name: facilitiesPageName,
-      label: Titles.facilities,
-      icon: Icons.house,
-      widget: ItemList(
-          itemType: 'facility',
-          itemBuilder: (context, item) => FacilityCard(
-                item: item as FacilityItem,
-              )),
-    ),
-    _Page(
-      name: morePageName,
-      label: Titles.more,
-      icon: Icons.more,
-      widget: MoreView(),
-    ),
-  ];
 
-  MainView(this.selectedPageName, {super.key});
+  const MainView(this.selectedPageName, {super.key});
 
   @override
   Widget build(BuildContext context) {
     logger.t('[MainView.build] selectedPageName: ${_selectedPage.name}');
 
     return Scaffold(
-      appBar: AppBar(title: Text(_selectedPage.label)),
+      appBar: _selectedPage.titleWidget ??
+          AppBar(
+            title: Text(_selectedPage.navigationItemLabel),
+            automaticallyImplyLeading: false,
+          ),
       body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: _selectedPage.widget,
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: _selectedPage.bodyBuilder(context),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedPageIndex,
@@ -77,11 +86,12 @@ class MainView extends StatelessWidget {
             .map(
               (page) => BottomNavigationBarItem(
                 icon: Icon(page.icon),
-                label: page.label,
+                label: page.navigationItemLabel,
               ),
             )
             .toList(),
       ),
+      floatingActionButton: _selectedPage.floatingActionButtonBuilder?.call(context),
     );
   }
 

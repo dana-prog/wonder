@@ -30,15 +30,8 @@ class UsersDropdownConsumer extends ConsumerWidget {
     );
   }
 
-  List<OptionProps<String>> _getOptionsProps(List<UserItem> users) {
-    final options = <OptionProps<String>>[];
-    options.add(EmptyOptionProps('user'));
-    for (final user in users) {
-      options.add(OptionProps.fromItem(user));
-    }
-
-    return options;
-  }
+  List<OptionProps<String>> _getOptionsProps(List<UserItem> users) =>
+      users.map(OptionProps.fromItem).toList();
 
   Widget _optionBuilder(OptionProps<String> option, BuildContext _) {
     return UserChip(user: option.data);
@@ -56,10 +49,29 @@ class UsersDropdownConsumer extends ConsumerWidget {
       ),
       child: UserChip(
         user: option.data,
-        // backgroundColor: Colors.grey.shade400,
         padding: defaultOptionChipPadding.copyWith(left: 8, right: 8),
-        labelStyle: TextStyle(
-            color: Theme.of(context).textTheme.labelSmall?.color, fontWeight: FontWeight.normal),
+      ),
+    );
+  }
+
+  Widget emptySelectedBuilder(BuildContext context, OptionProps option) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: defaultOptionChipPadding.copyWith(left: 8, right: 8),
+        child: UserChip(
+          user: option.data,
+          padding: defaultOptionChipPadding.copyWith(left: 8, right: 8),
+          labelStyle: TextStyle(
+              color: Theme.of(context).textTheme.labelSmall?.color, fontWeight: FontWeight.normal),
+        ),
       ),
     );
   }

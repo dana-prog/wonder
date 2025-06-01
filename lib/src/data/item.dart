@@ -5,7 +5,7 @@ import '../logger.dart';
 class Item extends Fields {
   Item(super.fields);
 
-  String get id => this['id'];
+  String? get id => getFieldValue<String>('id');
 
   // TODO: pass as a separate prop or consider removing since each type is created with its own class
   String get itemType => this['itemType'];

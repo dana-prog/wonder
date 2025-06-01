@@ -31,6 +31,11 @@ class ItemListNotifier extends StateNotifier<AsyncValue<List<Item>>> {
     return _load();
   }
 
+  Future<Item> create(Item item) async {
+    logger.d('[FacilityListNotifier.create] $item');
+    return await client.createItem(item);
+  }
+
   Future<Item> update(Item item) async {
     logger.d('[FacilityListNotifier.update] $item');
     return await client.updateItem(item);
