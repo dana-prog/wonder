@@ -2,38 +2,19 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// @docImport 'action_chip.dart';
-/// @docImport 'app.dart';
-/// @docImport 'choice_chip.dart';
-/// @docImport 'circle_avatar.dart';
-/// @docImport 'filter_chip.dart';
-/// @docImport 'input_chip.dart';
-/// @docImport 'scaffold.dart';
+//////////////////////////////////////////////////////////////////
+// this is a copy of flutter's chip.dart file
+// it is used to remove the constraint on the minimal chip height
+//////////////////////////////////////////////////////////////////
+
 library;
 
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart' show clampDouble;
+import 'package:flutter/material.dart' hide Chip;
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 
-import 'chip_theme.dart';
-import 'color_scheme.dart';
-import 'colors.dart';
-import 'constants.dart';
-import 'debug.dart';
-import 'icons.dart';
-import 'ink_decoration.dart';
-import 'ink_well.dart';
-import 'material.dart';
-import 'material_localizations.dart';
-import 'material_state.dart';
-import 'text_theme.dart';
-import 'theme.dart';
-import 'theme_data.dart';
-import 'tooltip.dart';
-
-// Some design constants
 const double _kChipHeight = 32.0;
 
 const int _kCheckmarkAlpha = 0xde; // 87%
