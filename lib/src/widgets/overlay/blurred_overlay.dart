@@ -22,6 +22,7 @@ class BlurredOverlay extends StatelessWidget {
             onTap: () => _close(context),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              // TODO: [THEME] check if we need to move this hard coded value
               child: Container(color: const Color.fromRGBO(0, 0, 0, 0.5)),
             ),
           ),
@@ -29,6 +30,7 @@ class BlurredOverlay extends StatelessWidget {
             child: Stack(children: [
               Container(
                 padding: const EdgeInsets.all(24),
+                // TODO: [THEME]
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),

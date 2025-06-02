@@ -5,10 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../app_theme.dart';
 import '../../logger.dart';
 import '../../providers/file_provider.dart';
 import '../../routes/locations.dart';
+import '../../theme/app_theme.dart';
 import '../platform/dotted_border.dart';
 import 'app_image.dart';
 
@@ -151,9 +151,12 @@ class _ImageThumbnail extends StatelessWidget {
   }
 }
 
+// TODO: [THEME]
 const _removeBtnSize = 16.0;
 const _removeBtnPadding = 3.0;
 const _removeBtnIconSize = 12.0;
+
+// TODO: [THEME]
 final _removeBtnBackgroundColor = WidgetStateProperty.all<Color>(Colors.white);
 final _removeBtnForegroundColor = WidgetStateProperty.all(Colors.grey.shade700);
 

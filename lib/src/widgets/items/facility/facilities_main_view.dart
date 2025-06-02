@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../data/facility_item.dart';
-import '../item/item_list.dart';
+import '../../../data/facility_item.dart';
+import '../item_list.dart';
 import 'facility_card.dart';
 
 class FacilitiesMainView extends StatelessWidget {

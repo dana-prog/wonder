@@ -20,7 +20,7 @@ class Labels {
   static const String loading = 'Loading';
   static const String selectOption = 'Select Option';
   static String facilityRoomCount(int count) => count == 1 ? '$count Bedroom' : '$count Bedrooms';
-  static String noItem(String typeName) => '${typeName.capitalize()} Not Set';
+  static String noItem(String? typeName) => '${typeName?.capitalize() ?? 'Item'} Not Set';
   static String newItem(String itemType) => 'New ${ItemsLabels.getSingularLabel(itemType)}';
 }
 

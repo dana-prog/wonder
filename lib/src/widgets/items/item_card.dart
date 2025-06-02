@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/widgets/item/item_form.dart';
 
 import '../../data/item.dart';
 import '../../logger.dart';
 import '../../providers/items_provider.dart';
 import '../../resources/labels.dart';
 import '../overlay/blurred_overlay.dart';
+import 'item_form.dart';
 
 typedef ItemCardLayoutBuilder = Widget Function(BuildContext context, WidgetRef ref, Item item);
 
@@ -68,6 +68,7 @@ class ItemCard extends ConsumerWidget {
       // TODO: check this solution again: it might be a problem when we want to share the route (to send a ticket link for example)
       PageRouteBuilder(
         opaque: false,
+        // TODO: [THEME]
         barrierColor: Colors.black38, // dim background
         pageBuilder: (_, __, ___) => BlurredOverlay(
           child: ItemFormConsumer(itemType: item.itemType, id: item.id),

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import '../logger.dart';
 
 class Item extends Fields {
@@ -19,7 +17,7 @@ class Item extends Fields {
     return this['title']!;
   }
 
-  Color? get color => null;
+  String? get avatar => null;
 
   @override
   String toString() {
@@ -49,7 +47,7 @@ abstract class Fields {
     return _fields.containsKey(fieldName)
         ? _fields[fieldName]
         : throw Exception(
-            "Field $fieldName not found for Fields = ${toFullString()}",
+            'Field $fieldName not found for Fields = ${toFullString()}',
           );
   }
 

@@ -38,7 +38,8 @@ class FacilityItem extends Item {
 
   List<String>? get pictures => getFieldValue<List<String>>('pictures');
 
-  String? get mainPicture => pictures?[0];
+  @override
+  String? get avatar => (pictures ?? []).isNotEmpty ? pictures![0] : null;
 
   // TODO: remove hard codes villa or separate to a itemType
   @override

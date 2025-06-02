@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:wonder/src/wix/sdk/token.dart';
-import 'package:wonder/src/wix/sdk/wix_authentication.dart';
 
-import '../../data/item.dart';
-import '../../logger.dart';
+import '../data/item.dart';
+import '../logger.dart';
 import 'client.dart';
+import 'token.dart';
+import 'wix_authentication.dart';
 
 const _itemsApiBaseUrl = 'https://www.wixapis.com/wix-data/v2/items';
 

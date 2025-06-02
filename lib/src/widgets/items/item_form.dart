@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/resources/labels.dart';
-import 'package:wonder/src/widgets/facility/facility_details_page.dart';
 
 import '../../data/item.dart';
 import '../../providers/items_provider.dart';
+import '../../resources/labels.dart';
 import '../async/async_value_widget.dart';
+import 'facility/facility_details_page.dart';
 
 class ItemForm extends StatelessWidget {
   final Item? item;

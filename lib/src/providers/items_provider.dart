@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/providers/client_provider.dart';
-import 'package:wonder/src/wix/sdk/client.dart';
 
+import '../client/client.dart';
 import '../data/item.dart';
 import '../logger.dart';
+import 'client_provider.dart';
 
 class ItemListNotifier extends StateNotifier<AsyncValue<List<Item>>> {
   final Client client;

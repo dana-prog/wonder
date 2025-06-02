@@ -6,7 +6,7 @@ import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
 import 'package:pkce/pkce.dart';
 
-import '../../logger.dart';
+import '../logger.dart';
 import 'token.dart';
 
 enum LoginState {

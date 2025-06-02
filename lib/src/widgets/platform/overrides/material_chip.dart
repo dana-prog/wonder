@@ -15,7 +15,7 @@ import 'package:flutter/foundation.dart' show clampDouble;
 import 'package:flutter/material.dart' hide Chip;
 import 'package:flutter/rendering.dart';
 
-const double _kChipHeight = 32.0;
+const double _kChipHeight = 16.0;
 
 const int _kCheckmarkAlpha = 0xde; // 87%
 const int _kDisabledAlpha = 0x61; // 38%
@@ -666,11 +666,11 @@ class ChipAnimationStyle {
 ///  * [Wrap], A widget that displays its children in multiple horizontal or
 ///    vertical runs.
 ///  * <https://material.io/design/components/chips.html>
-class Chip extends StatelessWidget implements ChipAttributes, DeletableChipAttributes {
+class MaterialChip extends StatelessWidget implements ChipAttributes, DeletableChipAttributes {
   /// Creates a Material Design chip.
   ///
   /// The [elevation] must be null or non-negative.
-  const Chip({
+  const MaterialChip({
     super.key,
     this.avatar,
     required this.label,
@@ -2157,6 +2157,7 @@ class _RenderChip extends RenderBox with SlottedContainerRenderObjectMixin<_Chip
       return;
     }
     final Color disabledColor = _disabledColor;
+    // ignore: deprecated_member_use
     final int disabledColorAlpha = disabledColor.alpha;
     if (needsCompositing) {
       _avatarOpacityLayerHandler.layer = context.pushOpacity(
@@ -2194,6 +2195,7 @@ class _RenderChip extends RenderBox with SlottedContainerRenderObjectMixin<_Chip
       _deleteIconOpacityLayerHandler.layer = null;
       return;
     }
+    // ignore: deprecated_member_use
     final int disabledColorAlpha = _disabledColor.alpha;
     if (!enableAnimation.isCompleted) {
       if (needsCompositing) {
@@ -2412,6 +2414,7 @@ class _ChipDefaultsM3 extends ChipThemeData {
       );
 
   @override
+  // ignore: deprecated_member_use
   MaterialStateProperty<Color?>? get color => null; // Subclasses override this getter
 
   @override
@@ -2429,6 +2432,7 @@ class _ChipDefaultsM3 extends ChipThemeData {
   @override
   BorderSide? get side => isEnabled
       ? BorderSide(color: _colors.outlineVariant)
+      // ignore: deprecated_member_use
       : BorderSide(color: _colors.onSurface.withOpacity(0.12));
 
   @override

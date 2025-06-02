@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../wix/sdk/client.dart';
-import '../wix/sdk/wix_client.dart';
+import '../client/client.dart';
+import '../client/wix_client.dart';
 
 final clientProvider = Provider<Client>((ref) {
   return _client;

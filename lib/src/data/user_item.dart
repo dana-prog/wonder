@@ -24,7 +24,8 @@ class UserItem extends Item {
 
   String get email => this['email'];
 
-  String? get picture => getFieldValue('picture');
+  @override
+  String? get avatar => getFieldValue('picture');
 
   @override
   void operator []=(String fieldName, dynamic fieldValue) {

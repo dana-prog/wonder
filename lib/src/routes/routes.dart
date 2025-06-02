@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wonder/src/routes/logging_observer.dart';
-import 'package:wonder/src/widgets/item/item_form.dart';
-import 'package:wonder/src/widgets/media/image_page.dart';
 
 import '../logger.dart';
 import '../widgets/forms/debug_view.dart';
 import '../widgets/forms/main_view.dart';
 import '../widgets/forms/single_view_form.dart';
+import '../widgets/items/item_form.dart';
+import '../widgets/media/image_page.dart';
 import 'locations.dart';
+import 'logging_observer.dart';
 
 final router = GoRouter(
   initialLocation: Locations.initial,
@@ -17,21 +17,18 @@ final router = GoRouter(
     GoRoute(
         path: Locations.tickets,
         builder: (context, state) {
-          logger.d('[router.tickets]');
           return MainView(ticketsPageName);
         }),
     // facilities
     GoRoute(
         path: Locations.facilities,
         builder: (context, state) {
-          logger.d('[router.facilities]');
           return MainView(facilitiesPageName);
         }),
     // item
     GoRoute(
       path: Locations.editItem,
       builder: (context, state) {
-        logger.d('[router.item]: ${state.path}');
         final itemType = state.pathParameters['itemType']!;
         final id = state.pathParameters['itemId']!;
 

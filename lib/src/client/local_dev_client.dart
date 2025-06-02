@@ -1,5 +1,5 @@
-import '../../data/item.dart';
-import '../../logger.dart';
+import '../data/item.dart';
+import '../logger.dart';
 import 'client.dart';
 
 const _itemsFields = <Map<String, dynamic>>[

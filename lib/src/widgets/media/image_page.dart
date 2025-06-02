@@ -15,6 +15,7 @@ class ImagePage extends StatelessWidget {
           top: 16,
           right: 16,
           child: IconButton(
+            // TODO: [THEME]
             icon: const Icon(Icons.close, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),

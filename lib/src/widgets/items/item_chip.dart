@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart' hide Chip;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wonder/src/resources/colors.dart';
 import 'package:wonder/src/resources/labels.dart';
 import 'package:wonder/src/widgets/async/async_value_widget.dart';
 
 import '../../data/item.dart';
 import '../../providers/items_provider.dart';
-import '../fields/chip.dart';
+import '../platform/chip.dart';
 
 class ItemChip extends StatelessWidget {
   final Item? item;
   final String? itemType;
-  final WidgetBuilder? leadingBuilder;
+  final Widget? avatar;
   final TextStyle? labelStyle;
   final EdgeInsetsGeometry? padding;
-  final BorderRadius? borderRadius;
   final double? height;
   final double? width;
 
   const ItemChip({
     required this.item,
     this.itemType,
-    this.leadingBuilder,
+    this.avatar,
     this.labelStyle,
     this.padding,
-    this.borderRadius,
     this.height,
     this.width,
   }) : assert(item != null || itemType != null,
@@ -33,11 +32,10 @@ class ItemChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Chip(
       label: item?.title ?? Labels.noItem(itemType!),
-      backgroundColor: item?.color ?? Colors.grey[200],
-      leadingBuilder: leadingBuilder,
+      avatar: avatar,
+      backgroundColor: getItemColor(item),
       labelStyle: labelStyle,
       padding: padding,
-      borderRadius: borderRadius,
       height: height,
       width: width,
     );
@@ -47,20 +45,18 @@ class ItemChip extends StatelessWidget {
 class ItemChipConsumer extends ConsumerWidget {
   final String itemType;
   final String id;
-  final WidgetBuilder? leadingBuilder;
+  final Widget? avatar;
   final TextStyle? labelStyle;
   final double? height;
-  final double? width;
   final EdgeInsetsGeometry? padding;
-  final BorderRadius? borderRadius;
+  final double? width;
 
   const ItemChipConsumer({
     required this.itemType,
     required this.id,
-    this.leadingBuilder,
+    this.avatar,
     this.labelStyle,
     this.padding,
-    this.borderRadius,
     this.height,
     this.width,
   });
@@ -71,7 +67,14 @@ class ItemChipConsumer extends ConsumerWidget {
     return AsyncValueWidget(
         asyncValue: asyncItem,
         dataBuilder: (item, _) {
-          return ItemChip(item: item);
+          return ItemChip(
+              item: item,
+              itemType: itemType,
+              avatar: avatar,
+              labelStyle: labelStyle,
+              padding: padding,
+              height: height,
+              width: width);
         });
   }
 }

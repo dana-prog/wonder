@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../app_theme.dart';
 import '../routes/routes.dart';
+import '../theme/app_theme.dart';
 
 const _locale = Locale('en');
 
@@ -11,15 +11,10 @@ class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      theme: getLightTheme(),
+      theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       routerConfig: router,
       locale: _locale,
-      // localizationsDelegates: const [
-      //   GlobalMaterialLocalizations.delegate,
-      //   GlobalWidgetsLocalizations.delegate,
-      //   GlobalCupertinoLocalizations.delegate,
-      // ],
       supportedLocales: [_locale],
     );
   }

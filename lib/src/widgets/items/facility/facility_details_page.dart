@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/widgets/async/async_value_widget.dart';
-import 'package:wonder/src/widgets/platform/field_label.dart';
 
-import '../../data/facility_item.dart';
-import '../../data/item.dart';
-import '../../logger.dart';
-import '../../providers/items_provider.dart';
-import '../../resources/labels.dart';
-import '../fields/list_values_dropdown.dart';
-import '../fields/users_dropdown.dart';
-import '../media/image_manager.dart';
+import '../../../data/facility_item.dart';
+import '../../../data/item.dart';
+import '../../../logger.dart';
+import '../../../providers/items_provider.dart';
+import '../../../resources/labels.dart';
+import '../../async/async_value_widget.dart';
+import '../../media/image_manager.dart';
+import '../../platform/field_label.dart';
+import '../list_value/list_values_dropdown.dart';
+import '../user/users_dropdown.dart';
 import 'room_count_dropdown.dart';
 
 class FacilityDetailsPage extends StatefulWidget {
@@ -91,6 +91,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         label: fields['subtype']!,
         child: ListValuesDropdownConsumer(
           listType: 'facilitySubtype',
+          style: TextStyle(fontWeight: FontWeight.bold),
           value: _subtype,
           onChanged: (value) => onChanged(context, () => _subtype = value),
         ),
@@ -101,6 +102,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         child: ListValuesDropdownConsumer(
           listType: 'facilityStatus',
           value: _status,
+          style: TextStyle(fontWeight: FontWeight.bold),
           onChanged: (value) => onChanged(context, () => _status = value),
         ),
       );
@@ -117,6 +119,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   Widget _roomCountFormFieldBuilder() => RoomCountDropdown(
         value: _roomCount,
         onChanged: (value) => onChanged(context, () => _roomCount = value),
+        style: TextStyle(fontWeight: FontWeight.bold),
       );
 
   Widget _picturesBuilder() {

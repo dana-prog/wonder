@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart' hide Chip;
-import 'package:wonder/src/widgets/fields/chip.dart';
+import 'package:wonder/src/resources/colors.dart';
+import 'package:wonder/src/widgets/platform/chip.dart';
 
 import '../../data/item.dart';
 import '../../resources/labels.dart';
 
-const defaultOptionChipPadding = EdgeInsets.symmetric(vertical: 6);
+typedef OptionBuilder = Widget Function(
+    OptionProps<dynamic> option, TextStyle? style, BuildContext context);
 
-typedef OptionBuilder = Widget Function(OptionProps<dynamic> option, BuildContext context);
-Widget _defaultOptionBuilder(OptionProps option, BuildContext context) =>
-    OptionChip(option, padding: defaultOptionChipPadding);
+Widget _defaultOptionBuilder(OptionProps option, TextStyle? style, BuildContext context) =>
+    OptionChip(option: option, style: style);
 
 class Dropdown<T> extends StatelessWidget {
   final List<OptionProps<T>> optionsProps;
   final T? value;
+  final TextStyle? style;
   final OptionProps<T>? emptyOptionProps;
-  final Widget Function(OptionProps<T> option, BuildContext context)? optionBuilder;
+  final OptionBuilder? optionBuilder;
   final ValueChanged<T?>? onChanged;
   final FormFieldValidator<T>? validator;
-  final Widget Function(OptionProps<T> option, BuildContext context)? selectedBuilder;
+  final OptionBuilder? selectedBuilder;
 
   const Dropdown({
     required this.optionsProps,
     this.value,
+    this.style,
     this.emptyOptionProps,
     this.optionBuilder,
     this.selectedBuilder,
@@ -36,6 +39,7 @@ class Dropdown<T> extends StatelessWidget {
       alignment: Alignment.topCenter,
       isDense: false,
       value: value,
+      style: style,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.all(0),
         fillColor: Colors.transparent,
@@ -58,35 +62,18 @@ class Dropdown<T> extends StatelessWidget {
         .map(
           (optionProps) => DropdownMenuItem<T>(
             value: optionProps.value,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: buildOption(optionProps, context),
-            ),
+            child: buildOption(optionProps, context),
           ),
         )
         .toList();
   }
 
   Widget buildOption(OptionProps<T> option, BuildContext context) =>
-      (optionBuilder ?? _defaultOptionBuilder)(option, context);
+      (optionBuilder ?? _defaultOptionBuilder)(option, style, context);
 
   List<Widget> buildSelectedItems(BuildContext context) {
     return _actualOptionsProps
-        .map((option) => Center(
-              // TODO: remove column?
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: (selectedBuilder ?? _defaultOptionBuilder)(option, context),
-                  ),
-                ],
-              ),
-            ))
+        .map((option) => Center(child: buildOption(option, context)))
         .toList();
   }
 
@@ -109,27 +96,31 @@ class OptionProps<T> {
     return OptionProps<String>(
       value: item.id,
       title: item.title,
-      color: item.color,
+      color: getItemColor(item),
       data: item,
     );
   }
 }
 
-final _defaultOptionChipColor = Colors.grey.shade100;
-
 // a chip for displaying an option in a dropdown
 class OptionChip extends StatelessWidget {
   final OptionProps option;
   final EdgeInsetsGeometry? padding;
+  final TextStyle? style;
 
-  const OptionChip(this.option, {this.padding});
+  const OptionChip({
+    required this.option,
+    this.padding,
+    this.style,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Chip(
       label: option.title,
-      backgroundColor: option.color ?? _defaultOptionChipColor,
+      backgroundColor: option.color,
       padding: padding,
+      labelStyle: style,
     );
   }
 }

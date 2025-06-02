@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:wonder/src/widgets/fields/dropdown.dart';
+import '../platform/dropdown.dart';
 
 import '../../logger.dart';
-import '../facility/room_count_dropdown.dart';
+import '../items/facility/room_count_dropdown.dart';
 
 final _options = [
-  OptionProps(value: 'dropdowns', title: 'Dropdowns', color: Color(0xFFa86e3c)),
-  OptionProps(value: 'test', title: 'Test', color: Color(0xFF8465c6)),
+  OptionProps(value: 'dropdowns', title: 'Dropdowns', color: Colors.pink.shade200),
+  OptionProps(value: 'test', title: 'Test', color: Colors.brown.shade400),
 ];
 
 class DebugView extends StatefulWidget {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wonder/src/resources/labels.dart';
-import 'package:wonder/src/widgets/facility/constants.dart';
-import 'package:wonder/src/widgets/platform/field_label.dart';
 
-import '../fields/dropdown.dart';
+import '../../../resources/colors.dart';
+import '../../../resources/labels.dart';
+import '../../platform/dropdown.dart';
+import '../../platform/field_label.dart';
 
 final List<OptionProps<int>> menuItemsProps = roomCountColors.entries
     .map((entry) => OptionProps<int>(
@@ -15,9 +15,14 @@ final List<OptionProps<int>> menuItemsProps = roomCountColors.entries
 
 class RoomCountDropdown extends StatelessWidget {
   final int? value;
+  final TextStyle? style;
   final ValueChanged<int?>? onChanged;
 
-  const RoomCountDropdown({this.value, this.onChanged});
+  const RoomCountDropdown({
+    this.value,
+    this.style,
+    this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +32,7 @@ class RoomCountDropdown extends StatelessWidget {
         value: value,
         optionsProps: menuItemsProps,
         onChanged: onChanged,
+        style: style,
       ),
     );
   }

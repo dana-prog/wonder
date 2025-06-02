@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../providers/lists_of_values_provider.dart';
-import '../fields/item_chip.dart';
+import '../../../providers/lists_of_values_provider.dart';
+import '../item_chip.dart';
 
 class ListValueChipConsumer extends ConsumerWidget {
   final String id;
   final Color? backgroundColor;
-  final String? pictureUrl;
+  final TextStyle? labelStyle;
+  final EdgeInsetsGeometry? padding;
   final double? height;
   final double? width;
-  final EdgeInsetsGeometry? padding;
-  final BorderRadius? borderRadius;
-  final TextStyle? labelStyle;
 
   const ListValueChipConsumer({
     required this.id,
     this.backgroundColor,
-    this.pictureUrl,
+    this.labelStyle,
+    this.padding,
     this.height,
     this.width,
-    this.padding,
-    this.borderRadius,
-    this.labelStyle,
   });
 
   @override
@@ -31,11 +27,10 @@ class ListValueChipConsumer extends ConsumerWidget {
 
     return ItemChip(
       item: item,
+      labelStyle: labelStyle,
+      padding: padding,
       height: height,
       width: width,
-      padding: padding,
-      borderRadius: borderRadius,
-      labelStyle: labelStyle,
     );
   }
 }

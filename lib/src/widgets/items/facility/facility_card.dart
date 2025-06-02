@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart' hide Chip;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wonder/src/resources/labels.dart';
-import 'package:wonder/src/widgets/fields/chip.dart';
-import 'package:wonder/src/widgets/list_value/list_value_chip.dart';
-import 'package:wonder/src/widgets/user/user_chip.dart';
 
-import '../../data/facility_item.dart';
-import '../../globals.dart';
-import '../fields/item_chip.dart';
-import '../item/item_card.dart';
-import '../media/app_image.dart';
-import 'constants.dart';
+import '../../../data/facility_item.dart';
+import '../../../globals.dart';
+import '../../items/item_card.dart';
+import '../../media/app_image.dart';
+import '../list_value/list_value_chip.dart';
+import '../user/user_chip.dart';
+import 'room_count_chip.dart';
 
 typedef Builder = Widget Function(BuildContext context, WidgetRef ref);
 
 const _cardHeight = 48.0;
-const _smallChipTextStyle = TextStyle(fontSize: 11);
 
 final _defaultPicture = '$imagesPath/default_facility_picture.png';
 
@@ -26,6 +22,11 @@ class FacilityCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final smallChipStyle = TextStyle(
+      fontSize: Theme.of(context).textTheme.labelSmall?.fontSize,
+      fontWeight: FontWeight.bold,
+    );
+
     return ItemCard(
       item: item,
       body: buildCardBody(
@@ -33,8 +34,8 @@ class FacilityCard extends ConsumerWidget {
             width: _cardHeight,
             height: _cardHeight,
             child: ClipOval(
-                child: item.mainPicture != null
-                    ? AppFileImage(path: item.mainPicture!)
+                child: item.avatar != null
+                    ? AppFileImage(path: item.avatar!)
                     : AppAssetImage(assetPath: _defaultPicture))),
         numberWidget: SizedBox(
           height: _cardHeight,
@@ -47,18 +48,15 @@ class FacilityCard extends ConsumerWidget {
             ),
           ),
         ),
-        ownerWidget: item.owner != null ? UserChipConsumer(id: item.owner!) : UserChip(user: null),
-        typeWidget: ListValueChipConsumer(id: item.type, labelStyle: _smallChipTextStyle),
-        subtypeWidget: ListValueChipConsumer(id: item.subtype, labelStyle: _smallChipTextStyle),
-        roomCountWidget: Chip(
-          label: Labels.facilityRoomCount(item.roomCount),
-          labelStyle: _smallChipTextStyle,
-          backgroundColor: roomCountColors[item.roomCount]!,
-        ),
-        statusWidget: ItemChipConsumer(
-          itemType: 'listValue',
+        ownerWidget: UserChipConsumer(id: item.owner),
+        typeWidget: ListValueChipConsumer(id: item.type, labelStyle: smallChipStyle),
+        subtypeWidget: ListValueChipConsumer(id: item.subtype, labelStyle: smallChipStyle),
+        roomCountWidget: RoomCountChip(roomCount: item.roomCount, labelStyle: smallChipStyle),
+        statusWidget: ListValueChipConsumer(
           id: item.status,
-          width: 120,
+          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+          // TODO: remove hard coded value
+          width: 85,
         ),
       ),
     );
@@ -83,8 +81,9 @@ class FacilityCard extends ConsumerWidget {
           numberWidget,
           SizedBox(width: 10),
           Column(
-            spacing: 6,
+            spacing: 8,
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               ownerWidget,
               Row(

@@ -34,7 +34,6 @@ class ItemList extends ConsumerWidget {
           child: ListView.builder(
             physics: AlwaysScrollableScrollPhysics(),
             itemCount: items.length,
-            // itemBuilder: (context, itemIndex) => Text(items[itemIndex].toString()),
             itemBuilder: (context, itemIndex) => itemBuilder(context, items[itemIndex]),
           ),
         );

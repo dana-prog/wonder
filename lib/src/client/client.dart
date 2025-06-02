@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
-import '../../data/item.dart';
-import '../../data/metadata.dart';
-import '../../logger.dart';
+import '../data/item.dart';
+import '../data/metadata.dart';
+import '../logger.dart';
 
 typedef ItemCallback = void Function(Item);
 
