@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart' hide Chip, DropdownMenuItem;
+import 'package:flutter/material.dart' hide Chip;
 import 'package:wonder/src/utils/color_utils.dart';
 
 import '../../resources/labels.dart';
-import 'overrides/material_dropdown.dart';
 
 typedef OptionBuilder = Widget Function(
     DropdownOptionProps<dynamic> option, TextStyle? style, BuildContext context);
@@ -31,13 +30,11 @@ class Dropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialDropdownButtonFormField<T>(
+    return DropdownButtonFormField<T>(
       alignment: Alignment.topCenter,
       isDense: false,
       value: value,
       style: style,
-      // TODO: remove hard coded value
-      // itemHeight: itemHeight,
       decoration: InputDecoration(
         // contentPadding: const EdgeInsets.all(0),
         border: OutlineInputBorder(borderSide: BorderSide.none),
