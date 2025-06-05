@@ -6,7 +6,7 @@ import '../data/list_value_item.dart';
 // ListValueItem
 final listsValuesColors = <String, Map<String, Color>>{
   'facilityStatus': {
-    'notStarted': Colors.brown.shade300,
+    'notStarted': Colors.blueGrey.shade300,
     'planning': Colors.purple.shade300,
     'construction': Colors.amber.shade300,
     'ready': Colors.blue.shade300,
@@ -40,9 +40,9 @@ final roomCountColors = <int, Color>{
 Color? getItemColor(Item? item) {
   final listsValuesColors = <String, Map<String, Color>>{
     'facilityStatus': {
-      'notStarted': Colors.brown.shade300,
+      'notStarted': Colors.blueGrey.shade300,
       'planning': Colors.purple.shade300,
-      'construction': Colors.deepOrange.shade300,
+      'construction': Colors.amber.shade300,
       'ready': Colors.blue.shade300,
       'operational': Colors.green.shade300,
     },

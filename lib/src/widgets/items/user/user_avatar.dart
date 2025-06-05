@@ -4,6 +4,7 @@ import '../../../data/item_helpers.dart';
 import '../../../data/user_item.dart';
 import 'initials_avatar.dart';
 
+// TODO: move to assets folder
 const _defaultUserPicture = '$mediaPublicUrlPrefix/1246fe_7609a78c62784e4788f3fb2c6a65fb95~mv2.png';
 
 class UserAvatar extends StatelessWidget {

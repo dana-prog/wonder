@@ -13,10 +13,19 @@ class InitialsAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = getInitialsColor();
     return CircleAvatar(
+      // specify minRadius to prevent CircleAvatar from applying minimum width to the widget (see CircleAvatar._minDiameter and _defaultMinRadius)
+      minRadius: 0,
       backgroundColor: color,
-      child: AutoSizeText(
-        getInitialsChars(),
-        style: TextStyle(color: AppTheme.dark.colorScheme.onSurface),
+      child: Padding(
+        // TODO: remove hard coded value
+        padding: EdgeInsets.all(3),
+        // use AutoSizeText to allow the initials to shrink if needed
+        child: AutoSizeText(
+          getInitialsChars(),
+          // default minFontSize is 12, but we want to allow smaller sizes fo the initials avatar
+          minFontSize: 8,
+          style: TextStyle(color: AppTheme.dark.colorScheme.onSurface),
+        ),
       ),
     );
   }

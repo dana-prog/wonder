@@ -1,33 +1,29 @@
-import 'package:flutter/material.dart' hide Chip;
-import 'package:wonder/src/resources/colors.dart';
-import 'package:wonder/src/widgets/platform/chip.dart';
+import 'package:flutter/material.dart' hide Chip, DropdownMenuItem;
+import 'package:wonder/src/utils/color_utils.dart';
 
-import '../../data/item.dart';
 import '../../resources/labels.dart';
+import 'overrides/material_dropdown.dart';
 
 typedef OptionBuilder = Widget Function(
-    OptionProps<dynamic> option, TextStyle? style, BuildContext context);
-
-Widget _defaultOptionBuilder(OptionProps option, TextStyle? style, BuildContext context) =>
-    OptionChip(option: option, style: style);
+    DropdownOptionProps<dynamic> option, TextStyle? style, BuildContext context);
 
 class Dropdown<T> extends StatelessWidget {
-  final List<OptionProps<T>> optionsProps;
+  final List<DropdownOptionProps<T>> optionsProps;
   final T? value;
   final TextStyle? style;
-  final OptionProps<T>? emptyOptionProps;
+  final double? itemHeight;
+  final DropdownOptionProps<T>? emptyOptionProps;
   final OptionBuilder? optionBuilder;
   final ValueChanged<T?>? onChanged;
   final FormFieldValidator<T>? validator;
-  final OptionBuilder? selectedBuilder;
 
   const Dropdown({
     required this.optionsProps,
     this.value,
     this.style,
+    this.itemHeight,
     this.emptyOptionProps,
     this.optionBuilder,
-    this.selectedBuilder,
     this.onChanged,
     this.validator,
     super.key,
@@ -35,20 +31,20 @@ class Dropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<T>(
+    return MaterialDropdownButtonFormField<T>(
       alignment: Alignment.topCenter,
       isDense: false,
       value: value,
       style: style,
+      // TODO: remove hard coded value
+      // itemHeight: itemHeight,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.all(0),
-        fillColor: Colors.transparent,
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-        ),
-        // the following prop enables setting a small height to the item
+        // contentPadding: const EdgeInsets.all(0),
+        border: OutlineInputBorder(borderSide: BorderSide.none),
+        // prevent the dropdown from occupying extra space
         isCollapsed: true,
       ),
+      // hide the open dropdown arrow icon
       icon: const SizedBox.shrink(),
       items: buildMenuItems(context),
       selectedItemBuilder: buildSelectedItems,
@@ -62,74 +58,102 @@ class Dropdown<T> extends StatelessWidget {
         .map(
           (optionProps) => DropdownMenuItem<T>(
             value: optionProps.value,
-            child: buildOption(optionProps, context),
+            child: DropdownOption<T>(
+              option: optionProps,
+              style: style,
+              height: itemHeight,
+            ),
           ),
         )
         .toList();
   }
 
-  Widget buildOption(OptionProps<T> option, BuildContext context) =>
-      (optionBuilder ?? _defaultOptionBuilder)(option, style, context);
-
   List<Widget> buildSelectedItems(BuildContext context) {
     return _actualOptionsProps
-        .map((option) => Center(child: buildOption(option, context)))
+        .map((option) => Center(
+                child: DropdownOption<T>(
+              option: option,
+              style: style,
+              height: itemHeight,
+            )))
         .toList();
   }
 
-  List<OptionProps<T>> get _actualOptionsProps => [
-        emptyOptionProps ?? OptionProps<T>(value: null, title: Labels.selectOption),
+  List<DropdownOptionProps<T>> get _actualOptionsProps => [
+        emptyOptionProps ?? DropdownOptionProps<T>(value: null, title: Labels.selectOption),
         ...optionsProps,
       ];
+
+  DropdownOptionProps<T> get selectedOption {
+    return _actualOptionsProps.firstWhere(
+      (option) => option.value == value,
+      orElse: () =>
+          emptyOptionProps ?? DropdownOptionProps<T>(value: null, title: Labels.selectOption),
+    );
+  }
 }
 
 // data for displaying a dropdown option
-class OptionProps<T> {
+class DropdownOptionProps<T> {
   final T? value;
   final String title;
   final Color? color;
+  final Widget? avatar;
   final dynamic data;
 
-  const OptionProps({required this.value, required this.title, this.color, this.data});
-
-  static OptionProps<String> fromItem(Item item) {
-    return OptionProps<String>(
-      value: item.id,
-      title: item.title,
-      color: getItemColor(item),
-      data: item,
-    );
-  }
-}
-
-// a chip for displaying an option in a dropdown
-class OptionChip extends StatelessWidget {
-  final OptionProps option;
-  final EdgeInsetsGeometry? padding;
-  final TextStyle? style;
-
-  const OptionChip({
-    required this.option,
-    this.padding,
-    this.style,
+  const DropdownOptionProps({
+    required this.value,
+    required this.title,
+    this.color,
+    this.avatar,
+    this.data,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      label: option.title,
-      backgroundColor: option.color,
-      padding: padding,
-      labelStyle: style,
-    );
-  }
 }
 
 // an empty option for displaying when there are no items in the dropdown
-class EmptyOptionProps<T> extends OptionProps<T> {
+class EmptyOptionProps<T> extends DropdownOptionProps<T> {
   EmptyOptionProps({String? title, Color? color})
       : super(
           value: null,
           title: title ?? Labels.selectOption,
         );
+}
+
+class DropdownOption<T> extends StatelessWidget {
+  final DropdownOptionProps<T> option;
+  final TextStyle? style;
+  final double? height;
+
+  const DropdownOption({
+    required this.option,
+    this.style,
+    this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // occupy the full width of the dropdown
+      width: double.infinity,
+      height: height ?? kMinInteractiveDimension,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: option.color ?? Colors.transparent,
+        // TODO: remove hard coded value
+        borderRadius: BorderRadius.circular(6.0),
+      ),
+      child: option.avatar != null
+          ? Row(
+              children: [
+                Padding(
+                  // TODO: remove hard coded value
+                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                  child: option.avatar!,
+                ),
+                Align(child: Text(option.title, style: applyOnColor(style, option.color))),
+              ],
+            )
+          : Text(option.title, style: applyOnColor(style, option.color)),
+    );
+  }
 }

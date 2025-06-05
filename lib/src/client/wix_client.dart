@@ -98,6 +98,34 @@ class WixClient extends Client {
   }
 
   @override
+  Future<T> createItem<T extends Item>(T newItem) async {
+    logger.d('[WixClient.createItem] $newItem');
+
+    await _ensureMemberLogin();
+
+    final fields = newItem.fields;
+    final dataCollectionId = metadata.getByName(newItem.itemType).dataCollectionId;
+    final response = await http.post(
+      Uri.parse(_itemsApiBaseUrl),
+      headers: _getHeaders(),
+      body: jsonEncode({
+        'dataCollectionId': dataCollectionId,
+        'dataItem': {'data': fields},
+      }),
+    );
+
+    logger.d('[WixClient.createItem] ${response.statusCode}\n${response.body}');
+
+    if (response.statusCode != 200) {
+      throw Exception('[WixClient.updateItem] Failed to update item $newItem: ${response.body}');
+    }
+
+    final dataItem = jsonDecode(response.body)['dataItem'];
+    final item = getItemObject(dataItem) as T;
+    return super.createItem(item);
+  }
+
+  @override
   Future<T> updateItem<T extends Item>(T newItem) async {
     await _ensureMemberLogin();
 

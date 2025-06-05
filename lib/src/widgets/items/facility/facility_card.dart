@@ -11,9 +11,10 @@ import 'room_count_chip.dart';
 
 typedef Builder = Widget Function(BuildContext context, WidgetRef ref);
 
+// TODO: replace with k...
 const _cardHeight = 48.0;
 
-final _defaultPicture = '$imagesPath/default_facility_picture.png';
+final _defaultPicture = '$imagesPath/default_facility.png';
 
 class FacilityCard extends ConsumerWidget {
   final FacilityItem item;

@@ -4,15 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/user_item.dart';
 import '../../../providers/users_provider.dart';
 import '../../platform/dropdown.dart';
-import 'user_chip.dart';
+import '../dropdown_item_option_props.dart';
+import 'user_avatar.dart';
 
 class UsersDropdownConsumer extends ConsumerWidget {
   final String? value;
+  final TextStyle? style;
+  final double? itemHeight;
   final ValueChanged<String?>? onChanged;
   final FormFieldValidator<String>? validator;
 
   const UsersDropdownConsumer({
     this.value,
+    this.style,
+    this.itemHeight,
     this.onChanged,
     this.validator,
   });
@@ -22,49 +27,17 @@ class UsersDropdownConsumer extends ConsumerWidget {
     final users = ref.watch(userListProvider);
     return Dropdown<String>(
       value: value,
-      optionsProps: _getOptionsProps(users),
-      optionBuilder: _optionBuilder,
-      selectedBuilder: _selectedBuilder,
-      onChanged: onChanged,
-      validator: validator,
+      optionsProps: users.map(DropdownUserOptionProps.new).toList(),
+      style: style,
+      itemHeight: itemHeight,
     );
   }
+}
 
-  List<OptionProps<String>> _getOptionsProps(
-    List<UserItem> users,
-  ) =>
-      users.map(OptionProps.fromItem).toList();
-
-  Widget _optionBuilder(
-    OptionProps<dynamic> option,
-    TextStyle? style,
-    BuildContext _,
-  ) {
-    return UserChip(
-      item: option.data,
-      labelStyle: style,
-    );
-  }
-
-  Widget _selectedBuilder(
-    OptionProps<dynamic> option,
-    TextStyle? style,
-    BuildContext _,
-  ) {
-    return UserChip(
-      item: option.data,
-      labelStyle: style,
-    );
-  }
-
-  Widget emptySelectedBuilder(
-    OptionProps option,
-    TextStyle? style,
-    BuildContext _,
-  ) {
-    return UserChip(
-      item: option.data,
-      labelStyle: style,
-    );
-  }
+class DropdownUserOptionProps extends DropdownItemOptionProps {
+  DropdownUserOptionProps(UserItem super.item)
+      : super(
+          avatar: UserAvatar(item: item),
+          color: Colors.grey.shade200,
+        );
 }

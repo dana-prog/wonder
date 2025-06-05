@@ -1,17 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:wonder/src/widgets/platform/overrides/material_chip.dart';
+import 'package:flutter/material.dart' as m;
 
 import '../../utils/color_utils.dart';
 
-class Chip extends StatelessWidget {
+class Chip extends m.StatelessWidget {
   final String label;
-  final Widget? avatar;
-  final TextStyle? labelStyle;
-  final Color? backgroundColor;
+  final m.Widget? avatar;
+  final m.TextStyle? labelStyle;
+  final m.Color? backgroundColor;
   final double? height;
   final double? width;
-  final EdgeInsetsGeometry? padding;
-  final OutlinedBorder? shape;
+  final m.EdgeInsetsGeometry? padding;
+  final m.OutlinedBorder? shape;
 
   const Chip({
     required this.label,
@@ -25,34 +24,24 @@ class Chip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialChip(
+  m.Widget build(m.BuildContext context) {
+    return m.Chip(
       // adding a container to wrap the label in order to set width and height
-      label: Container(
+      label: m.Container(
         width: width,
         height: height,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-        ),
-        child: Center(child: Text(label)),
+        decoration: m.BoxDecoration(color: backgroundColor),
+        child: m.Center(child: m.Text(label)),
       ),
       avatar: avatar,
-      labelStyle: getLabelStyle(context),
+      labelStyle: applyOnColor(labelStyle, backgroundColor),
       backgroundColor: backgroundColor,
       padding: padding,
       // set to shrinkWrap to avoid extra padding around the chip
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      shape: const StadiumBorder(),
-      // shape: shape,
+      // materialTapTargetSize: m.MaterialTapTargetSize.shrinkWrap,
+      // shape: m.RoundedRectangleBorder(
+      //   borderRadius: m.BorderRadius.circular(10.0),
+      // ),
     );
-  }
-
-  TextStyle? getLabelStyle(BuildContext context) {
-    if (backgroundColor == null) {
-      return labelStyle;
-    }
-
-    final color = getOnColor(backgroundColor!);
-    return TextStyle(color: color).merge(labelStyle);
   }
 }

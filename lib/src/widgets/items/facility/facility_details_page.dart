@@ -13,6 +13,9 @@ import '../list_value/list_values_dropdown.dart';
 import '../user/users_dropdown.dart';
 import 'room_count_dropdown.dart';
 
+const _numberFieldWidth = 100.0;
+const _fieldHeight = 36.0;
+
 class FacilityDetailsPage extends StatefulWidget {
   final Item? initialItem;
   final void Function(Item item) save;
@@ -29,7 +32,7 @@ class FacilityDetailsPage extends StatefulWidget {
 
 class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   final fields = ItemsLabels.getFieldLabels('facility');
-  // int? _number;
+  int? _number;
   String? _type;
   String? _subtype;
   String? _status;
@@ -43,13 +46,22 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
     assert(widget.initialItem is FacilityItem?, 'Initial item must be of type FacilityItem');
     final item = widget.initialItem as FacilityItem?;
     if (item != null) {
-      // _number = item.number;
+      _number = item.number;
       _type = item.type;
       _subtype = item.subtype;
       _status = item.status;
       _owner = item.owner;
       _roomCount = item.roomCount;
       _pictures = item.pictures;
+    } else {
+      logger.d('[FacilityDetailsPage.initState] Initial item is null, setting default values');
+      _number = 2;
+      // TODO: remove hard coded value for villa
+      _type = 'd9c1d2a1-17fe-4f3f-b035-dcbe4905e444';
+      _subtype = '41af2d26-7a9d-49f4-91f7-34f7965410e4';
+      _status = '126cd917-9ee1-45a7-8bdf-190ed1f67e3c';
+      _owner = 'c8cbd709-bdb7-4fb7-8b83-49fa90d2ecfc';
+      _roomCount = 1;
     }
   }
 
@@ -58,14 +70,28 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
     return SingleChildScrollView(
       child: Column(
         children: spaceWidgets(
+          verticalSpace: 16.0,
           widgets: [
-            _ownerFormFieldBuilder(),
+            Row(
+              children: spaceWidgets(
+                horizontalSpace: 16.0,
+                widgets: [
+                  SizedBox(
+                    width: _numberFieldWidth,
+                    child: _numberFormFieldBuilder(),
+                  ),
+                  Expanded(
+                    child: _ownerFormFieldBuilder(),
+                  ),
+                ],
+              ),
+            ),
             _statusFormFieldBuilder(),
             _subtypeFormFieldBuilder(),
             _roomCountFormFieldBuilder(),
             _picturesBuilder(),
+            _saveButton(),
           ],
-          verticalSpace: 16.0,
         ),
       ),
     );
@@ -87,11 +113,33 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
               ];
       });
 
+  Widget _numberFormFieldBuilder() => FieldLabel(
+        label: fields['number']!,
+        child: SizedBox(
+          height: _fieldHeight,
+          child: TextFormField(
+            initialValue: _number?.toString(),
+            decoration: InputDecoration(
+              // set isDense to true to avoid extra top padding
+              isDense: true,
+              // set filled to true to add background color
+              filled: true,
+            ),
+            keyboardType: TextInputType.number,
+            // textAlignVertical: TextAlignVertical.center,
+            textAlign: TextAlign.center,
+            onChanged: (value) => onChanged(context, () => _number = int.tryParse(value)),
+            validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+          ),
+        ),
+      );
+
   Widget _subtypeFormFieldBuilder() => FieldLabel(
         label: fields['subtype']!,
         child: ListValuesDropdownConsumer(
           listType: 'facilitySubtype',
           style: TextStyle(fontWeight: FontWeight.bold),
+          itemHeight: _fieldHeight,
           value: _subtype,
           onChanged: (value) => onChanged(context, () => _subtype = value),
         ),
@@ -103,6 +151,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
           listType: 'facilityStatus',
           value: _status,
           style: TextStyle(fontWeight: FontWeight.bold),
+          itemHeight: _fieldHeight,
           onChanged: (value) => onChanged(context, () => _status = value),
         ),
       );
@@ -111,6 +160,8 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         label: fields['owner']!,
         child: UsersDropdownConsumer(
           value: _owner,
+          // style: TextStyle(fontWeight: FontWeight.bold),
+          itemHeight: _fieldHeight,
           onChanged: (value) => onChanged(context, () => _owner = value),
           validator: (value) => value == null ? 'Required' : null,
         ),
@@ -120,6 +171,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         value: _roomCount,
         onChanged: (value) => onChanged(context, () => _roomCount = value),
         style: TextStyle(fontWeight: FontWeight.bold),
+        itemHeight: _fieldHeight,
       );
 
   Widget _picturesBuilder() {
@@ -150,17 +202,36 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
     );
   }
 
+  Widget _saveButton() => ElevatedButton(
+        onPressed: () {
+          logger.d('[FacilityDetailsPage._saveButton.onPressed]');
+          widget.save(FacilityItem.fromFields({
+            ...(widget.initialItem?.fields ?? {}),
+            'number': _number,
+            'status': _status,
+            'type': _type,
+            'subtype': _subtype,
+            'owner': _owner,
+            'roomCount': _roomCount,
+            'pictures': _pictures ?? [],
+          }));
+        },
+        child: Text('Save'),
+      );
+
   void onChanged(BuildContext context, VoidCallback fn) {
     setState(fn);
-    widget.save(FacilityItem.fromFields({
-      ...(widget.initialItem?.fields ?? {}),
-      'status': _status,
-      'type': _type,
-      'subtype': _subtype,
-      'owner': _owner,
-      'roomCount': _roomCount,
-      'pictures': _pictures ?? [],
-    }));
+    if (widget.initialItem != null) {
+      widget.save(FacilityItem.fromFields({
+        ...(widget.initialItem?.fields ?? {}),
+        'status': _status,
+        'type': _type,
+        'subtype': _subtype,
+        'owner': _owner,
+        'roomCount': _roomCount,
+        'pictures': _pictures ?? [],
+      }));
+    }
   }
 }
 
@@ -180,9 +251,9 @@ class FacilityDetailsPageConsumer extends ConsumerWidget {
 
     return AsyncValueWidget(
       asyncValue: asyncItem,
-      dataBuilder: (item, _) => FacilityDetailsPage(
-        initialItem: item,
-        save: (item) => notifier.update(item),
+      dataBuilder: (initialItem, _) => FacilityDetailsPage(
+        initialItem: initialItem,
+        save: (item) => initialItem == null ? notifier.create(item) : notifier.update(item),
       ),
     );
   }

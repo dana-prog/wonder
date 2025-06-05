@@ -1,4 +1,7 @@
-library;
+//////////////////////////////////////////////////////////////////
+// this is a copy of flutter's dropdown.dart file
+// it is used to remove the constraint on the minimal item height
+//////////////////////////////////////////////////////////////////
 
 import 'dart:math' as math;
 import 'dart:ui';
@@ -918,7 +921,7 @@ class DropdownButtonHideUnderline extends InheritedWidget {
 ///
 /// See also:
 ///
-///  * [DropdownButtonFormField], which integrates with the [Form] widget.
+///  * [MaterialDropdownButtonFormField], which integrates with the [Form] widget.
 ///  * [DropdownMenuItem], the class used to represent the [items].
 ///  * [DropdownButtonHideUnderline], which prevents its descendant dropdown buttons
 ///    from displaying their underlines.
@@ -986,7 +989,7 @@ class DropdownButton<T> extends StatefulWidget {
           'Either zero or 2 or more [DropdownMenuItem]s were detected '
           'with the same value',
         ),
-        assert(itemHeight == null || itemHeight >= kMinInteractiveDimension),
+        // assert(itemHeight == null || itemHeight >= kMinInteractiveDimension),
         _inputDecoration = null,
         _isEmpty = false;
 
@@ -1034,7 +1037,7 @@ class DropdownButton<T> extends StatefulWidget {
           'Either zero or 2 or more [DropdownMenuItem]s were detected '
           'with the same value',
         ),
-        assert(itemHeight == null || itemHeight >= kMinInteractiveDimension),
+        // assert(itemHeight == null || itemHeight >= kMinInteractiveDimension),
         _inputDecoration = inputDecoration,
         _isEmpty = isEmpty;
 
@@ -1668,14 +1671,14 @@ class _DropdownButtonState<T> extends State<DropdownButton<T>> with WidgetsBindi
 ///
 ///  * [DropdownButton], which is the underlying text field without the [Form]
 ///    integration.
-class DropdownButtonFormField<T> extends FormField<T> {
+class MaterialDropdownButtonFormField<T> extends FormField<T> {
   /// Creates a [DropdownButton] widget that is a [FormField], wrapped in an
   /// [InputDecorator].
   ///
   /// For a description of the `onSaved`, `validator`, or `autovalidateMode`
   /// parameters, see [FormField]. For the rest (other than [decoration]), see
   /// [DropdownButton].
-  DropdownButtonFormField({
+  MaterialDropdownButtonFormField({
     super.key,
     required List<DropdownMenuItem<T>>? items,
     DropdownButtonBuilder? selectedItemBuilder,
@@ -1720,7 +1723,7 @@ class DropdownButtonFormField<T> extends FormField<T> {
           'Either zero or 2 or more [DropdownMenuItem]s were detected '
           'with the same value',
         ),
-        assert(itemHeight == null || itemHeight >= kMinInteractiveDimension),
+        // assert(itemHeight == null || itemHeight >= kMinInteractiveDimension),
         decoration = decoration ?? const InputDecoration(),
         super(
           initialValue: value,
@@ -1820,7 +1823,8 @@ class DropdownButtonFormField<T> extends FormField<T> {
 }
 
 class _DropdownButtonFormFieldState<T> extends FormFieldState<T> {
-  DropdownButtonFormField<T> get _dropdownButtonFormField => widget as DropdownButtonFormField<T>;
+  MaterialDropdownButtonFormField<T> get _dropdownButtonFormField =>
+      widget as MaterialDropdownButtonFormField<T>;
 
   @override
   void didChange(T? value) {
@@ -1829,7 +1833,7 @@ class _DropdownButtonFormFieldState<T> extends FormFieldState<T> {
   }
 
   @override
-  void didUpdateWidget(DropdownButtonFormField<T> oldWidget) {
+  void didUpdateWidget(MaterialDropdownButtonFormField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialValue != widget.initialValue) {
       setValue(widget.initialValue);

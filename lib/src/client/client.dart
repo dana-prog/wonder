@@ -46,7 +46,7 @@ abstract class Client {
   Future<List<T>> fetchItems<T extends Item>({required String itemType});
 
   Future<T> createItem<T extends Item>(T newItem) async {
-    logger.d('[LocalDevClient.createItem] item: $newItem');
+    logger.d('[Client.createItem] item: $newItem');
     T createdItem;
     createdItem = cache.set(newItem);
 
@@ -56,7 +56,7 @@ abstract class Client {
 
   Future<T> updateItem<T extends Item>(T newItem) async {
     assert(newItem.id != null, 'Item id must not be null for update');
-    logger.d('[LocalDevClient.updateItem] item: $newItem');
+    logger.d('[Client.updateItem] item: $newItem');
     T updatedItem;
     if (!cache.exists(newItem.id!)) {
       updatedItem = cache.set(newItem);

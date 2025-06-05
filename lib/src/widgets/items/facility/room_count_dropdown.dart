@@ -5,8 +5,8 @@ import '../../../resources/labels.dart';
 import '../../platform/dropdown.dart';
 import '../../platform/field_label.dart';
 
-final List<OptionProps<int>> menuItemsProps = roomCountColors.entries
-    .map((entry) => OptionProps<int>(
+final List<DropdownOptionProps<int>> menuItemsProps = roomCountColors.entries
+    .map((entry) => DropdownOptionProps<int>(
           value: entry.key,
           title: Labels.facilityRoomCount(entry.key),
           color: entry.value,
@@ -16,11 +16,13 @@ final List<OptionProps<int>> menuItemsProps = roomCountColors.entries
 class RoomCountDropdown extends StatelessWidget {
   final int? value;
   final TextStyle? style;
+  final double? itemHeight;
   final ValueChanged<int?>? onChanged;
 
   const RoomCountDropdown({
     this.value,
     this.style,
+    this.itemHeight,
     this.onChanged,
   });
 
@@ -30,6 +32,7 @@ class RoomCountDropdown extends StatelessWidget {
       label: ItemsLabels.getFieldLabels('facility')['roomCount']!,
       child: Dropdown<int>(
         value: value,
+        itemHeight: itemHeight,
         optionsProps: menuItemsProps,
         onChanged: onChanged,
         style: style,

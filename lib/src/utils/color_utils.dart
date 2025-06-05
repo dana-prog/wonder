@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
@@ -17,4 +17,13 @@ Brightness estimateBrightnessForColor(Color color) {
     return Brightness.light;
   }
   return Brightness.dark;
+}
+
+TextStyle? applyOnColor(TextStyle? defaultStyle, Color? backgroundColor) {
+  if (backgroundColor == null) {
+    return defaultStyle;
+  }
+
+  final color = getOnColor(backgroundColor);
+  return TextStyle(color: color).merge(defaultStyle);
 }

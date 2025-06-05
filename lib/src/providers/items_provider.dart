@@ -51,15 +51,6 @@ class ItemListNotifier extends StateNotifier<AsyncValue<List<Item>>> {
       ];
     });
   }
-
-  void onItemDeleted(Item item) {
-    state = state.whenData((items) {
-      return [
-        for (final i in items)
-          if (i.id != item.id) i
-      ];
-    });
-  }
 }
 
 final itemListProvider =
