@@ -4,8 +4,9 @@ import '../theme/app_theme.dart';
 
 Color getOnColor(Color background) {
   final brightness = estimateBrightnessForColor(background);
-  final theme = (brightness == Brightness.light) ? AppTheme.light : AppTheme.dark;
-  return theme.colorScheme.onSurface;
+  return (brightness == Brightness.light)
+      ? AppTheme.light.colorScheme.onSurfaceVariant
+      : AppTheme.dark.colorScheme.onSurface;
 }
 
 Brightness estimateBrightnessForColor(Color color) {

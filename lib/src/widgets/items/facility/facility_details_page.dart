@@ -13,7 +13,6 @@ import '../list_value/list_values_dropdown.dart';
 import '../user/users_dropdown.dart';
 import 'room_count_dropdown.dart';
 
-const _numberFieldWidth = 100.0;
 const _fieldHeight = 36.0;
 
 class FacilityDetailsPage extends StatefulWidget {
