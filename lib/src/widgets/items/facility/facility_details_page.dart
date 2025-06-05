@@ -69,51 +69,19 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
-        children: spaceWidgets(
-          verticalSpace: 16.0,
-          widgets: [
-            // Row(
-            //   children: spaceWidgets(
-            //     horizontalSpace: 16.0,
-            //     widgets: [
-            //       SizedBox(
-            //         width: _numberFieldWidth,
-            //         child: _numberFormFieldBuilder(),
-            //       ),
-            //       Expanded(
-            //         child: _ownerFormFieldBuilder(),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            _numberFormFieldBuilder(),
-            _ownerFormFieldBuilder(),
-            _statusFormFieldBuilder(),
-            _subtypeFormFieldBuilder(),
-            _roomCountFormFieldBuilder(),
-            _picturesBuilder(),
-            _saveButton(),
-          ],
-        ),
+        spacing: 16,
+        children: [
+          widget.initialItem == null ? _numberFormFieldBuilder() : null,
+          _ownerFormFieldBuilder(),
+          _statusFormFieldBuilder(),
+          _subtypeFormFieldBuilder(),
+          _roomCountFormFieldBuilder(),
+          _picturesBuilder(),
+          _saveButton(),
+        ].whereType<Widget>().toList(),
       ),
     );
   }
-
-  // TODO: replace with padding instead of SizedBox
-  List<Widget> spaceWidgets({
-    required List<Widget> widgets,
-    double? verticalSpace,
-    double? horizontalSpace,
-  }) =>
-      widgets.fold(<Widget>[], (previous, element) {
-        return previous.isEmpty
-            ? [element]
-            : [
-                ...previous,
-                SizedBox(height: verticalSpace, width: horizontalSpace),
-                element,
-              ];
-      });
 
   Widget _numberFormFieldBuilder() => FieldLabel(
         label: fields['number']!,
@@ -135,7 +103,10 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
             keyboardType: TextInputType.number,
             // textAlignVertical: TextAlignVertical.center,
             textAlign: TextAlign.center,
-            onChanged: (value) => onChanged(context, () => _number = int.tryParse(value)),
+            onChanged: (value) => onChanged(
+              context,
+              () => _number = int.tryParse(value),
+            ),
           ),
         ),
       );
