@@ -72,20 +72,22 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         children: spaceWidgets(
           verticalSpace: 16.0,
           widgets: [
-            Row(
-              children: spaceWidgets(
-                horizontalSpace: 16.0,
-                widgets: [
-                  SizedBox(
-                    width: _numberFieldWidth,
-                    child: _numberFormFieldBuilder(),
-                  ),
-                  Expanded(
-                    child: _ownerFormFieldBuilder(),
-                  ),
-                ],
-              ),
-            ),
+            // Row(
+            //   children: spaceWidgets(
+            //     horizontalSpace: 16.0,
+            //     widgets: [
+            //       SizedBox(
+            //         width: _numberFieldWidth,
+            //         child: _numberFormFieldBuilder(),
+            //       ),
+            //       Expanded(
+            //         child: _ownerFormFieldBuilder(),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            _numberFormFieldBuilder(),
+            _ownerFormFieldBuilder(),
             _statusFormFieldBuilder(),
             _subtypeFormFieldBuilder(),
             _roomCountFormFieldBuilder(),
@@ -124,12 +126,16 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
               isDense: true,
               // set filled to true to add background color
               filled: true,
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                // TODO: remove hard coded value (unify with the one in dropdown)
+                borderRadius: BorderRadius.circular(6.0),
+              ),
             ),
             keyboardType: TextInputType.number,
             // textAlignVertical: TextAlignVertical.center,
             textAlign: TextAlign.center,
             onChanged: (value) => onChanged(context, () => _number = int.tryParse(value)),
-            validator: (value) => value == null || value.isEmpty ? 'Required' : null,
           ),
         ),
       );
