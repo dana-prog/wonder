@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../data/item_helpers.dart';
 import '../../../data/user_item.dart';
 import 'initials_avatar.dart';
 
 // TODO: move to assets folder
-const _defaultUserPicture = '$mediaPublicUrlPrefix/1246fe_7609a78c62784e4788f3fb2c6a65fb95~mv2.png';
+const _defaultUserPicture = 'assets/images/default_user.png';
 
 class UserAvatar extends StatelessWidget {
   final UserItem? item;
@@ -15,13 +14,13 @@ class UserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (item == null) {
-      return CircleAvatar(backgroundImage: NetworkImage(_defaultUserPicture));
+      return CircleAvatar(backgroundImage: AssetImage(_defaultUserPicture));
     }
 
     if (item!.avatar == null) {
       return InitialsAvatar(user: item!);
     }
 
-    return CircleAvatar(backgroundImage: AssetImage(item!.avatar!));
+    return CircleAvatar(backgroundImage: AssetImage('assets/images/${item!.avatar!}'));
   }
 }

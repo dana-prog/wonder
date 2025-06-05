@@ -61,7 +61,8 @@ class ItemsLabels {
       pluralLabel: 'Villas',
       shortTitle: (Item item) {
         assert(item is FacilityItem, 'Expected FacilityItem, got ${item.runtimeType}');
-        return '${ItemsLabels.getSingularLabel(item.itemType)} #${item['number']}';
+        final facilityItem = item as FacilityItem;
+        return '${ItemsLabels.getSingularLabel(facilityItem.itemType)} ${facilityItem.displayNumber}';
       },
       fieldLabels: {
         'number': 'Number',

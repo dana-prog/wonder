@@ -26,6 +26,8 @@ class FacilityItem extends Item {
 
   int get number => (this['number']).toInt();
 
+  String get displayNumber => '# ${number.toString().padLeft(3, "0")}';
+
   String? get owner => containsField('owner') ? this['owner'] : null;
 
   String get type => this['type'];

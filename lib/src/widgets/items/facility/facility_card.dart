@@ -45,7 +45,7 @@ class FacilityCard extends ConsumerWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '# ${item.number.toString().padLeft(3, '0')}',
+              item.displayNumber,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),

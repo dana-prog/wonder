@@ -266,9 +266,6 @@ const _itemsFields = <Map<String, dynamic>>[
     "itemType": "facility",
     "number": 64.0,
     "subtype": "258ff7a8-a983-4d69-9682-28621500803f",
-    "pictures": [
-      "https://static.wixstatic.com/media/1246fe_45611c767be14754b1eb59c98f693937~mv2.jpg"
-    ],
     "roomCount": 1.0,
     "status": "ca8bcd2d-edd1-415a-aa6a-9cd338227f25",
     "owner": "00df2d48-2337-48e8-af52-a620cd767c7f",

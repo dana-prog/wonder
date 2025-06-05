@@ -1,5 +1,4 @@
 import 'item.dart';
-import 'item_helpers.dart';
 
 class UserItem extends Item {
   UserItem.fromFields(super.fields)
@@ -27,16 +26,16 @@ class UserItem extends Item {
   @override
   String? get avatar => getFieldValue('picture');
 
-  @override
-  void operator []=(String fieldName, dynamic fieldValue) {
-    dynamic resolvedValue;
-    if (fieldName == 'picture') {
-      assert(fieldValue is String, 'Picture field must be a String');
-      resolvedValue = isWixImageUrl(fieldValue) ? getStorageUrl(fieldValue) : fieldValue;
-    } else {
-      resolvedValue = fieldValue;
-    }
-
-    super[fieldName] = resolvedValue;
-  }
+  // @override
+  // void operator []=(String fieldName, dynamic fieldValue) {
+  //   dynamic resolvedValue;
+  //   if (fieldName == 'picture') {
+  //     assert(fieldValue is String, 'Picture field must be a String');
+  //     resolvedValue = isWixImageUrl(fieldValue) ? getStorageUrl(fieldValue) : fieldValue;
+  //   } else {
+  //     resolvedValue = fieldValue;
+  //   }
+  //
+  //   super[fieldName] = resolvedValue;
+  // }
 }
