@@ -40,6 +40,7 @@ class FacilityCard extends ConsumerWidget {
                     : AppAssetImage(assetPath: _defaultPicture))),
         numberWidget: SizedBox(
           height: _cardHeight,
+          // TODO: remove hard coded value
           width: 65,
           child: Align(
             alignment: Alignment.centerLeft,
@@ -49,15 +50,20 @@ class FacilityCard extends ConsumerWidget {
             ),
           ),
         ),
-        ownerWidget: UserChipConsumer(id: item.owner),
+        ownerWidget: UserChipConsumer(
+          id: item.owner,
+          width: double.infinity,
+        ),
         typeWidget: ListValueChipConsumer(id: item.type, labelStyle: smallChipStyle),
         subtypeWidget: ListValueChipConsumer(id: item.subtype, labelStyle: smallChipStyle),
         roomCountWidget: RoomCountChip(roomCount: item.roomCount, labelStyle: smallChipStyle),
-        statusWidget: ListValueChipConsumer(
-          id: item.status,
-          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+        statusWidget: SizedBox(
           // TODO: remove hard coded value
-          width: 85,
+          width: 150,
+          child: ListValueChipConsumer(
+            id: item.status,
+            labelStyle: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
@@ -75,30 +81,20 @@ class FacilityCard extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      spacing: 10,
       children: [
-        Row(children: [
-          imageWidget,
-          SizedBox(width: 10),
-          numberWidget,
-          SizedBox(width: 10),
-          Column(
-            spacing: 8,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+        // aad a row with all widgets except statusWidget to align these widgets to start while the status widgets is aligned to end
+        // wrap the row in Flexible so that it will not try to take more space than available and overflow
+        Flexible(
+          child: Row(
+            spacing: 10,
             children: [
-              ownerWidget,
-              Row(
-                children: [
-                  typeWidget,
-                  SizedBox(width: 8),
-                  subtypeWidget,
-                  SizedBox(width: 8),
-                  roomCountWidget,
-                ],
-              ),
+              imageWidget,
+              numberWidget,
+              Flexible(child: ownerWidget),
             ],
           ),
-        ]),
+        ),
         statusWidget,
       ],
     );

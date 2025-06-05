@@ -31,7 +31,7 @@ class Chip extends m.StatelessWidget {
         width: width,
         height: height,
         decoration: m.BoxDecoration(color: backgroundColor),
-        child: m.Center(child: m.Text(label)),
+        child: m.Text(label, overflow: m.TextOverflow.ellipsis),
       ),
       avatar: avatar,
       labelStyle: applyOnColor(labelStyle, backgroundColor),

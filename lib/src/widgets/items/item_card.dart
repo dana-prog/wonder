@@ -30,6 +30,7 @@ class ItemCard extends ConsumerWidget {
       onTap: () => _onEdit(context),
       child: Card(
         child: Padding(
+          // TODO: remove hard coded value
           padding: EdgeInsetsGeometry.all(8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
