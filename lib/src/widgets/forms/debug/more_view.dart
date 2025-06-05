@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../providers/client_provider.dart';
-import '../../resources/labels.dart';
-import '../../routes/locations.dart';
+import '../../../providers/client_provider.dart';
+import '../../../routes/locations.dart';
 
 class MoreItem {
   final String name;
@@ -24,20 +23,20 @@ class MoreItem {
 
 final _moreItems = [
   MoreItem(
-    name: 'theme',
-    title: Titles.theme,
-    icon: Icons.palette,
-    route: Locations.themeSettings,
+    name: 'editorsPlayground',
+    title: 'Editors Playground',
+    icon: Icons.widgets,
+    route: '${Locations.more}/${MoreSubLocations.editorsPlayground}',
   ),
   MoreItem(
-    name: 'debug',
-    title: Titles.debug,
-    icon: Icons.bug_report,
-    route: Locations.debug,
+    name: 'themePlayground',
+    title: 'Theme Playground',
+    icon: Icons.palette,
+    route: '${Locations.more}/${MoreSubLocations.themePlayground}',
   ),
   MoreItem(
     name: 'printMyMember',
-    title: Titles.printMyMember,
+    title: 'Print My Member',
     icon: Icons.person,
     onTap: (BuildContext context, WidgetRef ref) {
       final client = ref.watch(clientProvider);

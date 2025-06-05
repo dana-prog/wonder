@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wonder/src/logger.dart';
-import 'package:wonder/src/widgets/forms/more_view.dart';
+import 'package:wonder/src/widgets/forms/debug/more_view.dart';
 
 import '../../resources/labels.dart';
 import '../../routes/locations.dart';

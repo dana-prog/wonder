@@ -97,25 +97,31 @@ class ItemCard extends ConsumerWidget {
     return res ?? false;
   }
 
-  Widget _buttonBuilder({required IconData icon, GestureTapCallback? onTap}) {
-    return RawMaterialButton(
+  Widget _buttonBuilder({
+    required IconData icon,
+    required BuildContext context,
+    GestureTapCallback? onTap,
+  }) {
+    return IconButton(
+      color: Theme.of(context).buttonTheme.colorScheme?.tertiary,
       onPressed: onTap,
-      constraints: BoxConstraints.tight(Size(32, 32)),
-      child: Icon(icon, size: 20),
+      icon: Icon(icon),
     );
   }
 
   Widget _deleteButtonBuilder(BuildContext context, WidgetRef ref) {
     return _buttonBuilder(
-      icon: Icons.delete,
+      icon: Icons.delete_outline,
       onTap: () {
         _onDelete(context, ref);
       },
+      context: context,
     );
   }
 
   Widget _editButtonBuilder(BuildContext context, WidgetRef _) => _buttonBuilder(
-        icon: Icons.edit,
+        icon: Icons.edit_outlined,
         onTap: () => _onEdit(context),
+        context: context,
       );
 }

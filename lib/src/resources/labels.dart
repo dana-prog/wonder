@@ -8,8 +8,6 @@ class Titles {
   static const String tickets = 'Tickets';
   static const String more = 'More';
   static const String theme = 'Theme';
-  static const String debug = 'Debug';
-  static const String printMyMember = 'Print My Member';
 }
 
 class Labels {

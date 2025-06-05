@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../logger.dart';
-import '../widgets/forms/debug_view.dart';
+import '../widgets/forms/debug/editors_playground.dart';
+import '../widgets/forms/debug/theme/theme_view.dart';
 import '../widgets/forms/main_view.dart';
 import '../widgets/forms/single_view_form.dart';
 import '../widgets/items/item_form.dart';
@@ -45,20 +46,27 @@ final router = GoRouter(
         );
       },
     ),
-    // debug
-    GoRoute(
-      path: Locations.debug,
-      builder: (context, state) {
-        return SingleViewScaffold(child: DebugView());
-      },
-    ),
     // more
     GoRoute(
-      path: Locations.more,
-      builder: (context, state) {
-        return MainView(morePageName);
-      },
-    ),
+        path: Locations.more,
+        builder: (context, state) {
+          return MainView(morePageName);
+        },
+        routes: [
+          // editors playground
+          GoRoute(
+              path: MoreSubLocations.editorsPlayground,
+              builder: (context, state) {
+                return EditorsPlayground();
+              }),
+          // theme playground
+          GoRoute(
+            path: MoreSubLocations.themePlayground,
+            builder: (context, state) {
+              return ThemePlayground();
+            },
+          ),
+        ]),
     // image
     GoRoute(
       path: Locations.image,

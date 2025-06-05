@@ -5,8 +5,12 @@ class Locations {
   static const facilities = '/facilities';
   static const editItem = '/item/:itemType/:itemId';
   static const newItem = '/new_item/:itemType';
-  static const debug = '/debug';
-  static const themeSettings = '/theme_settings';
-  static const more = '/more';
   static const image = '/image/:path';
+  static const more = '/more';
+}
+
+class MoreSubLocations {
+  static const debug = 'debug';
+  static const editorsPlayground = 'editorsPlayground';
+  static const themePlayground = 'theme';
 }
