@@ -1,8 +1,14 @@
-import '../data/item.dart';
-import '../logger.dart';
-import 'client.dart';
+import 'dart:convert';
 
-const _itemsFields = <Map<String, dynamic>>[
+void main() {
+  generateNewItemIds(_itemsFields);
+  final itemsByType = splitByType(_itemsFields);
+  for (var type in itemsByType.keys) {
+    print('var $type = ${jsonEncode(itemsByType[type])};');
+  }
+}
+
+var _itemsFields = [
   {
     "id": "fea40de8-8810-493b-8fcc-b2df84b105a4",
     "itemType": "facility",
@@ -1124,30 +1130,107 @@ const _itemsFields = <Map<String, dynamic>>[
   }
 ];
 
-class LocalDevClient extends Client {
-  LocalDevClient();
-
-  @override
-  Future<T> fetchItem<T extends Item>({
-    required String itemType,
-    required String id,
-  }) async {
-    logger.t('[LocalDevClient.fetchItem] $itemType/$id');
-    return cache[id];
-  }
-
-  @override
-  Future<List<T>> fetchItems<T extends Item>({required String itemType}) async {
-    logger.t('[LocalDevClient.fetchItems] $itemType');
-    return cache.getByType<T>(itemType);
-  }
-
-  @override
-  void resetCache() {
-    super.resetCache();
-    for (final itemFields in _itemsFields) {
-      final item = getItemObject(itemFields);
-      cache.set(item);
+var _nextAvailableId = 1;
+// the function modifies the data list
+void generateNewItemIds(List<Map<String, dynamic>> itemFields) {
+  for (var item in itemFields) {
+    switch (item['itemType']) {
+      case 'facility':
+        updateFacilityId(item);
+        break;
+      case 'user':
+        updateUserId(item);
+        break;
+      case 'listValue':
+        updateListValueId(item);
+        break;
+      default:
+        break;
     }
   }
+}
+
+void updateFacilityId(Map<String, dynamic> item) {
+  item['id'] = item['number'].toString();
+}
+
+void updateUserId(Map<String, dynamic> item) {
+  final String oldId = item['id'] as String;
+  final newId = '${item['firstName']}_${item['lastName']}';
+  item['id'] = newId;
+  onUserIdUpdated(oldId, newId);
+}
+
+String updateItemId(Map<String, dynamic> item) {
+  final newId = _nextAvailableId.toString();
+  item['id'] = newId;
+  _nextAvailableId++;
+  return newId;
+}
+
+void updateListValueId(Map<String, dynamic> item) {
+  final String oldId = item['id'] as String;
+  final newId = '${item['type']}_${item['name']}';
+  item['id'] = newId;
+
+  switch (item['type']) {
+    case 'facilityStatus':
+      onFacilityStatusIdUpdate(oldId, newId);
+      break;
+    case 'facilitySubtype':
+      onFacilitySubtypeIdUpdated(oldId, newId);
+      break;
+    case 'facilityType':
+      onFacilityTypeIdUpdated(oldId, newId);
+      break;
+    case 'domain':
+    case 'ticketSeverity':
+    case 'ticketStatus':
+      break;
+    default:
+      throw Exception('[updateListValueId] unexpected list value type: ${item['type']}');
+  }
+}
+
+void onUserIdUpdated(String oldId, String newId) {
+  _itemsFields.where((i) => i['itemType'] == 'facility' && i['owner'] == oldId).forEach(
+    (facility) {
+      facility['owner'] = newId;
+    },
+  );
+}
+
+void onFacilityStatusIdUpdate(String oldId, String newId) {
+  _itemsFields.where((i) => i['itemType'] == 'facility' && i['status'] == oldId).forEach(
+    (facility) {
+      facility['status'] = newId;
+    },
+  );
+}
+
+void onFacilityTypeIdUpdated(String oldId, String newId) {
+  _itemsFields.where((i) => i['itemType'] == 'facility' && i['type'] == oldId).forEach(
+    (facility) {
+      facility['type'] = newId;
+    },
+  );
+}
+
+void onFacilitySubtypeIdUpdated(String oldId, String newId) {
+  _itemsFields.where((i) => i['itemType'] == 'facility' && i['subtype'] == oldId).forEach(
+    (facility) {
+      facility['subtype'] = newId;
+    },
+  );
+}
+
+Map<String, List<Map<String, dynamic>>> splitByType(List<Map<String, dynamic>> itemsFields) {
+  final itemsByType = <String, List<Map<String, dynamic>>>{};
+  for (var item in itemsFields) {
+    final type = item['itemType'] as String;
+    itemsByType.putIfAbsent(type, () => []);
+    itemsByType[type]!.add(item);
+  }
+
+  return itemsByType;
 }

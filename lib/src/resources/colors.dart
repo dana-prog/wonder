@@ -63,7 +63,7 @@ Color? getItemColor(Item? item) {
   };
 
   if (item is ListValueItem) {
-    final type = item.valueItemType;
+    final type = item.type;
     final colorMap = listsValuesColors[type];
     if (colorMap != null) {
       return colorMap[item.name];

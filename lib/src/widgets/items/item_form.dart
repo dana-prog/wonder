@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../data/item.dart';
+import '../../logger.dart';
 import '../../providers/items_provider.dart';
 import '../../resources/labels.dart';
-import '../async/async_value_widget.dart';
+import '../platform/constants.dart';
+import '../platform/error_view.dart';
 import 'facility/facility_details_page.dart';
+
+typedef SaveItemCallback = void Function(Item item);
 
 class ItemForm extends StatelessWidget {
   final Item? item;
   final String? itemType;
+  final SaveItemCallback save;
 
-  ItemForm({required this.item, this.itemType})
-      : assert(item == null || itemType == null || item.itemType == itemType,
+  ItemForm({
+    required this.item,
+    this.itemType,
+    required this.save,
+  }) : assert(item == null || itemType == null || item.itemType == itemType,
             'item.ItemType should be equal to itemType. item: $item, itemType: $itemType');
 
   String get resolvedItemType => item?.itemType ?? itemType!;
@@ -21,10 +30,10 @@ class ItemForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      spacing: kFormTitleBodySpacing,
       children: [
-        FormTitleBuilder(title: item?.title ?? Labels.newItem(resolvedItemType)),
-        SizedBox(height: 20),
-        FormBody(itemType: resolvedItemType, id: item?.id),
+        _FormTitle(title: item?.title ?? Labels.newItem(resolvedItemType)),
+        _FormBody(item: item, itemType: resolvedItemType, save: save),
       ],
     );
   }
@@ -42,18 +51,26 @@ class ItemFormConsumer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncItem = id != null ? ref.watch(itemProvider((itemType, id!))) : AsyncValue.data(null);
+    // final notifier = ref.watch(itemListProvider(itemType).notifier);
 
-    return AsyncValueWidget<Item?>(
-      asyncValue: asyncItem,
-      dataBuilder: (item, _) => ItemForm(item: item, itemType: itemType),
+    return asyncItem.when(
+      data: (item) => ItemForm(
+        item: item,
+        itemType: itemType,
+        // TODO: restore
+        save: (item) => logger.t('[ItemFormConsumer:build]: Saving item: $item, not implemented'),
+        // save: (item) => id == null ? notifier.create(item) : notifier.update(item),
+      ),
+      loading: LoadingItemForm.new,
+      error: ErrorView.new,
     );
   }
 }
 
-class FormTitleBuilder extends StatelessWidget {
+class _FormTitle extends StatelessWidget {
   final String title;
 
-  const FormTitleBuilder({required this.title});
+  const _FormTitle({required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -68,11 +85,16 @@ class FormTitleBuilder extends StatelessWidget {
   }
 }
 
-class FormBody extends StatelessWidget {
-  final String itemType;
-  final String? id;
+class _FormBody extends StatelessWidget {
+  final Item? item;
+  final String? itemType;
+  final SaveItemCallback save;
 
-  const FormBody({required this.itemType, this.id});
+  const _FormBody({
+    required this.item,
+    required this.save,
+    this.itemType,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +103,77 @@ class FormBody extends StatelessWidget {
       throw Exception('No form body registered for item type: $itemType');
     }
 
-    return FacilityDetailsPageConsumer(itemType: itemType, id: id);
+    return FacilityDetailsPage(
+      initialItem: item,
+      save: save,
+    );
   }
+}
+
+class LoadingItemForm extends StatelessWidget {
+  const LoadingItemForm({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      enabled: true,
+      child: Column(
+        spacing: kFormTitleBodySpacing,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          titlePlaceholderBuilder(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: kFieldSpacing,
+            children: [
+              fieldPlaceholderBuilder(),
+              fieldPlaceholderBuilder(),
+              fieldPlaceholderBuilder(),
+              fieldPlaceholderBuilder(),
+              picturesField(),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget placeholderBuilder({double? width, double? height}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      height: height,
+      width: width,
+    );
+  }
+
+  Widget titlePlaceholderBuilder() => placeholderBuilder(width: 200, height: 36);
+
+  Widget fieldPlaceholderBuilder() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: kFieldLabelSpacing,
+        children: [
+          fieldLabelPlaceholderBuilder(),
+          fieldEditorPlaceholderBuilder(),
+        ],
+      );
+
+  Widget fieldLabelPlaceholderBuilder() => placeholderBuilder(width: 50, height: 20);
+
+  Widget fieldEditorPlaceholderBuilder() =>
+      placeholderBuilder(width: double.infinity, height: kFieldEditorHeight);
+
+  Widget picturesField() => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: kFieldLabelSpacing,
+        children: [
+          fieldLabelPlaceholderBuilder(),
+          placeholderBuilder(width: double.infinity, height: 216),
+        ],
+      );
 }

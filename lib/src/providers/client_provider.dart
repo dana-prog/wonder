@@ -4,8 +4,7 @@ import '../client/client.dart';
 import '../client/wix_client.dart';
 
 final clientProvider = Provider<Client>((ref) {
-  return _client;
+  return client;
 });
 
-// final _client = LocalDevClient();
-final _client = WixClient();
+final client = WixClient();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const spacing = 6.0;
+import 'constants.dart';
 
 class FieldLabel extends StatelessWidget {
   final String label;
@@ -15,7 +15,7 @@ class FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: spacing,
+      spacing: kFieldLabelSpacing,
       children: [
         Text(label, style: Theme.of(context).inputDecorationTheme.labelStyle),
         child,

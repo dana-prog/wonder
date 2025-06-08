@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart' hide Chip;
 
-import '../../../resources/colors.dart';
-import '../../../resources/labels.dart';
-import '../../platform/chip.dart';
+import '../../../../resources/colors.dart';
+import '../../../../resources/labels.dart';
+import '../../../platform/chip.dart';
 
 class RoomCountChip extends StatelessWidget {
   final int roomCount;

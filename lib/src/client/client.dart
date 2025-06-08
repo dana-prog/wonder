@@ -107,6 +107,7 @@ abstract class Client {
   void resetCache() async => cache.clear();
 }
 
+// TODO: remove cache (should not be in the base class)
 class _Cache {
   static final _Cache _instance = _Cache._internal();
 

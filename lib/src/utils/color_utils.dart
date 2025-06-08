@@ -20,11 +20,11 @@ Brightness estimateBrightnessForColor(Color color) {
   return Brightness.dark;
 }
 
-TextStyle? applyOnColor(TextStyle? defaultStyle, Color? backgroundColor) {
+TextStyle? applyOnColor(TextStyle? style, Color? backgroundColor) {
   if (backgroundColor == null) {
-    return defaultStyle;
+    return style;
   }
 
   final color = getOnColor(backgroundColor);
-  return TextStyle(color: color).merge(defaultStyle);
+  return TextStyle(color: color).merge(style);
 }

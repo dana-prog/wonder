@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:wonder/src/routes/locations.dart';
 
 import '../../data/item.dart';
 import '../../logger.dart';
 import '../../providers/items_provider.dart';
 import '../../resources/labels.dart';
-import '../overlay/blurred_overlay.dart';
-import 'item_form.dart';
 
 typedef ItemCardLayoutBuilder = Widget Function(BuildContext context, WidgetRef ref, Item item);
 
@@ -26,7 +26,7 @@ class ItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
+    return InkWell(
       onTap: () => _onEdit(context),
       child: Card(
         child: Padding(
@@ -63,19 +63,27 @@ class ItemCard extends ConsumerWidget {
   }
 
   void _onEdit(BuildContext context) {
-    final route = '/${item.itemType}/${item.id}';
+    final route = Locations.editItem
+        .replaceFirst(':itemType', item.itemType)
+        .replaceFirst(':itemId', item.id!);
     logger.d('[ItemCard.onEdit] navigate to $route');
-    Navigator.of(context).push(
-      // TODO: check this solution again: it might be a problem when we want to share the route (to send a ticket link for example)
-      PageRouteBuilder(
-        opaque: false,
-        // TODO: [THEME]
-        barrierColor: Colors.black38, // dim background
-        pageBuilder: (_, __, ___) => BlurredOverlay(
-          child: ItemFormConsumer(itemType: item.itemType, id: item.id),
-        ),
-      ),
-    );
+    context.push(route);
+    // Navigator.of(context).push(
+    //   // TODO: check this solution again: it might be a problem when we want to share the route (to send a ticket link for example)
+    //   PageRouteBuilder(
+    //     opaque: false,
+    //     // TODO: remove hard coded value
+    //     barrierColor: Colors.black38, // dim background
+    //     pageBuilder: (_, __, ___) => Scaffold(
+    //         appBar: AppBar(
+    //           automaticallyImplyLeading: true,
+    //         ),
+    //         body: ItemFormConsumer(itemType: item.itemType, id: item.id)),
+    //     // pageBuilder: (_, __, ___) => BlurredOverlay(
+    //     //   child: ItemFormConsumer(itemType: item.itemType, id: item.id),
+    //     // ),
+    //   ),
+    // );
   }
 
   Future<bool> _confirmDelete({

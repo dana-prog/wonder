@@ -32,10 +32,10 @@ class ListsValuesCache {
     for (var item in valueItems) {
       assert(item.id != null,
           'ListValueItem id must not be null (cannot add new items without id to the cache)');
-      _listsByType[item.valueItemType] ??= {};
+      _listsByType[item.type] ??= {};
 
       _itemsById[item.id!] = item;
-      _listsByType[item.valueItemType]![item.name] = item;
+      _listsByType[item.type]![item.name] = item;
     }
   }
 

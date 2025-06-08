@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../data/item.dart';
-import '../../../globals.dart';
+import '../../data/item.dart';
+import '../../globals.dart';
 
 class ItemAvatar extends StatelessWidget {
   final Item item;

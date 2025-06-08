@@ -7,6 +7,11 @@
 
 # The following line activates a set of recommended lints for Flutter apps,
 # packages, and plugins designed to encourage good coding practices.
+analyzer:
+
+  errors:
+    avoid_print: ignore
+
 include: package:flutter_lints/flutter.yaml
 
 linter:
@@ -22,6 +27,7 @@ linter:
   # producing the lint.
   rules:
     use_key_in_widget_constructors: false
+    implementation_imports: false  # Uncomment to disable the `implementation_imports` rule
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 

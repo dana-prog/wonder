@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wonder/src/widgets/items/facility/fields/facility_dropdowns.dart';
+import 'package:wonder/src/widgets/platform/error_view.dart';
 
 import '../../../data/facility_item.dart';
 import '../../../data/item.dart';
 import '../../../logger.dart';
 import '../../../providers/items_provider.dart';
 import '../../../resources/labels.dart';
-import '../../async/async_value_widget.dart';
 import '../../media/image_manager.dart';
+import '../../platform/constants.dart';
 import '../../platform/field_label.dart';
-import '../list_value/list_values_dropdown.dart';
 import '../user/users_dropdown.dart';
-import 'room_count_dropdown.dart';
-
-const _fieldHeight = 36.0;
+import './fields/room_count_dropdown.dart';
+import 'fields/facility_number_text_box.dart';
 
 class FacilityDetailsPage extends StatefulWidget {
   final Item? initialItem;
@@ -52,15 +52,6 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
       _owner = item.owner;
       _roomCount = item.roomCount;
       _pictures = item.pictures;
-    } else {
-      logger.d('[FacilityDetailsPage.initState] Initial item is null, setting default values');
-      _number = 2;
-      // TODO: remove hard coded value for villa
-      _type = 'd9c1d2a1-17fe-4f3f-b035-dcbe4905e444';
-      _subtype = '41af2d26-7a9d-49f4-91f7-34f7965410e4';
-      _status = '126cd917-9ee1-45a7-8bdf-190ed1f67e3c';
-      _owner = 'c8cbd709-bdb7-4fb7-8b83-49fa90d2ecfc';
-      _roomCount = 1;
     }
   }
 
@@ -68,7 +59,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
-        spacing: 16,
+        spacing: kFieldSpacing,
         children: [
           widget.initialItem == null ? _numberFormFieldBuilder() : null,
           _ownerFormFieldBuilder(),
@@ -84,70 +75,48 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
 
   Widget _numberFormFieldBuilder() => FieldLabel(
         label: fields['number']!,
-        child: SizedBox(
-          height: _fieldHeight,
-          child: TextFormField(
-            initialValue: _number?.toString(),
-            decoration: InputDecoration(
-              // set isDense to true to avoid extra top padding
-              isDense: true,
-              // set filled to true to add background color
-              filled: true,
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                // TODO: remove hard coded value (unify with the one in dropdown)
-                borderRadius: BorderRadius.circular(6.0),
-              ),
-            ),
-            keyboardType: TextInputType.number,
-            // textAlignVertical: TextAlignVertical.center,
-            textAlign: TextAlign.center,
-            onChanged: (value) => onChanged(
-              context,
-              () => _number = int.tryParse(value),
-            ),
-          ),
+        child: FacilityNumberTextBox(
+          initialValue: _number,
+          onChanged: (value) => onChanged(context, () => _number = value),
         ),
       );
 
   Widget _subtypeFormFieldBuilder() => FieldLabel(
         label: fields['subtype']!,
-        child: ListValuesDropdownConsumer(
-          listType: 'facilitySubtype',
-          style: TextStyle(fontWeight: FontWeight.bold),
-          itemHeight: _fieldHeight,
-          value: _subtype,
-          onChanged: (value) => onChanged(context, () => _subtype = value),
+        child: FacilitySubtypeDropdown(
+          // style: TextStyle(fontWeight: FontWeight.bold),
+          // itemHeight: kFieldEditorHeight,
+          selectedId: _subtype,
+          onChanged: (value) => onChanged(context, () => _subtype = value?.id),
         ),
       );
 
   Widget _statusFormFieldBuilder() => FieldLabel(
         label: fields['status']!,
-        child: ListValuesDropdownConsumer(
-          listType: 'facilityStatus',
-          value: _status,
-          style: TextStyle(fontWeight: FontWeight.bold),
-          itemHeight: _fieldHeight,
-          onChanged: (value) => onChanged(context, () => _status = value),
+        child: FacilityStatusDropdown(
+          selectedId: _status,
+          // style: TextStyle(fontWeight: FontWeight.bold),
+          // itemHeight: kFieldEditorHeight,
+          onChanged: (value) => onChanged(context, () => _status = value?.id),
         ),
       );
 
   Widget _ownerFormFieldBuilder() => FieldLabel(
         label: fields['owner']!,
         child: UsersDropdownConsumer(
-          value: _owner,
-          // style: TextStyle(fontWeight: FontWeight.bold),
-          itemHeight: _fieldHeight,
+          selectedId: _owner,
+          // itemHeight: kFieldEditorHeight,
           onChanged: (value) => onChanged(context, () => _owner = value),
-          validator: (value) => value == null ? 'Required' : null,
         ),
       );
 
-  Widget _roomCountFormFieldBuilder() => RoomCountDropdown(
-        value: _roomCount,
-        onChanged: (value) => onChanged(context, () => _roomCount = value),
-        style: TextStyle(fontWeight: FontWeight.bold),
-        itemHeight: _fieldHeight,
+  Widget _roomCountFormFieldBuilder() => FieldLabel(
+        label: ItemsLabels.getFieldLabels('facility')['roomCount']!,
+        child: RoomCountDropdown(
+          value: _roomCount,
+          onChanged: (value) => onChanged(context, () => _roomCount = value),
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       );
 
   Widget _picturesBuilder() {
@@ -212,25 +181,35 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
 }
 
 class FacilityDetailsPageConsumer extends ConsumerWidget {
-  final String itemType;
   final String? id;
 
-  const FacilityDetailsPageConsumer({
-    required this.itemType,
-    this.id,
-  });
+  const FacilityDetailsPageConsumer({required this.id});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncItem = id != null ? ref.watch(itemProvider((itemType, id!))) : AsyncValue.data(null);
-    final notifier = ref.watch(itemListProvider(itemType).notifier);
+    final asyncItem =
+        id != null ? ref.watch(itemProvider(('facility', id!))) : AsyncValue.data(null);
+    final notifier = ref.watch(itemListProvider('facility').notifier);
 
-    return AsyncValueWidget(
-      asyncValue: asyncItem,
-      dataBuilder: (initialItem, _) => FacilityDetailsPage(
+    return asyncItem.when(
+      data: (initialItem) => FacilityDetailsPage(
         initialItem: initialItem,
         save: (item) => initialItem == null ? notifier.create(item) : notifier.update(item),
       ),
+      loading: LoadingFacilityDetailsPage.new,
+      error: ErrorView.new,
+    );
+  }
+}
+
+class LoadingFacilityDetailsPage extends StatelessWidget {
+  const LoadingFacilityDetailsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    logger.d('[LoadingFacilityDetailsPage] build');
+    return const Center(
+      child: CircularProgressIndicator(),
     );
   }
 }

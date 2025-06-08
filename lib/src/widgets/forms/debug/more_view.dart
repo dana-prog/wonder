@@ -23,12 +23,6 @@ class MoreItem {
 
 final _moreItems = [
   MoreItem(
-    name: 'editorsPlayground',
-    title: 'Editors Playground',
-    icon: Icons.widgets,
-    route: '${Locations.more}/${MoreSubLocations.editorsPlayground}',
-  ),
-  MoreItem(
     name: 'themePlayground',
     title: 'Theme Playground',
     icon: Icons.palette,

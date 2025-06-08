@@ -2,11 +2,11 @@ import 'package:flutter/material.dart' hide Chip;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/resources/colors.dart';
 import 'package:wonder/src/resources/labels.dart';
-import 'package:wonder/src/widgets/async/async_value_widget.dart';
 
 import '../../data/item.dart';
 import '../../providers/items_provider.dart';
 import '../platform/chip.dart';
+import '../platform/error_view.dart';
 
 class ItemChip extends StatelessWidget {
   final Item? item;
@@ -64,17 +64,26 @@ class ItemChipConsumer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncItem = ref.watch(itemProvider((itemType, id)));
-    return AsyncValueWidget(
-        asyncValue: asyncItem,
-        dataBuilder: (item, _) {
-          return ItemChip(
-              item: item,
-              itemType: itemType,
-              avatar: avatar,
-              labelStyle: labelStyle,
-              padding: padding,
-              height: height,
-              width: width);
-        });
+    return asyncItem.when(
+      data: (item) {
+        return ItemChip(
+            item: item,
+            itemType: itemType,
+            avatar: avatar,
+            labelStyle: labelStyle,
+            padding: padding,
+            height: height,
+            width: width);
+      },
+      error: ErrorView.new,
+      loading: () => ItemChipLoading(),
+    );
+  }
+}
+
+class ItemChipLoading extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CircularProgressIndicator();
   }
 }

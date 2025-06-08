@@ -33,14 +33,11 @@ class ListValueItem extends Item {
       : assert(fields['itemType'] == 'listValue',
             'ListValueItem must be of type listValue and not ${fields['itemType']}');
 
-  String get valueItemType => this['type'];
+  String get type => this['type'];
 
   String get name => this['name'];
 
   String get description => this['description'];
 
   int get order => this['order'] ?? -1;
-
-  @override
-  String toString() => '$valueItemType:$name';
 }

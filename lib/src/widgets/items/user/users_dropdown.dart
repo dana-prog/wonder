@@ -8,36 +8,35 @@ import '../dropdown_item_option_props.dart';
 import 'user_avatar.dart';
 
 class UsersDropdownConsumer extends ConsumerWidget {
-  final String? value;
+  final String? selectedId;
   final TextStyle? style;
-  final double? itemHeight;
   final ValueChanged<String?>? onChanged;
-  final FormFieldValidator<String>? validator;
+  // final double? itemHeight;
+  // final FormFieldValidator<String>? validator;
 
   const UsersDropdownConsumer({
-    this.value,
+    this.selectedId,
     this.style,
-    this.itemHeight,
     this.onChanged,
-    this.validator,
+    // this.itemHeight,
+    // this.validator,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final users = ref.watch(userListProvider);
-    return Dropdown<String>(
-      value: value,
-      optionsProps: users.map(DropdownUserOptionProps.new).toList(),
+    return Dropdown<UserItem>(
+      selectedItem: users.where((user) => user.id == selectedId).firstOrNull,
+      options: users.map((user) => DropdownUserOptionProps(value: user)).toList(),
       style: style,
-      itemHeight: itemHeight,
     );
   }
 }
 
-class DropdownUserOptionProps extends DropdownItemOptionProps {
-  DropdownUserOptionProps(UserItem super.item)
+class DropdownUserOptionProps extends DropdownItemOptionProps<UserItem> {
+  DropdownUserOptionProps({required super.value})
       : super(
-          avatar: UserAvatar(item: item),
+          avatar: UserAvatar(item: value),
           color: Colors.grey.shade200,
         );
 }

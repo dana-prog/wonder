@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart' hide Chip;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/widgets/items/item_chip.dart';
-import 'package:wonder/src/widgets/items/user/user_avatar.dart';
 
 import '../../../data/user_item.dart';
 import '../../../providers/users_provider.dart';
+import 'user_avatar.dart';
 
 enum ChipLabelSize {
   small,

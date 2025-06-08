@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../logger.dart';
-import '../widgets/forms/debug/editors_playground.dart';
-import '../widgets/forms/debug/theme/theme_view.dart';
 import '../widgets/forms/main_view.dart';
 import '../widgets/forms/single_view_form.dart';
 import '../widgets/items/item_form.dart';
@@ -41,7 +39,7 @@ final router = GoRouter(
 
         // TODO: check this as the initial route
         // TODO: try replacing the SingleViewScaffold with Material
-        return SingleViewScaffold(
+        return RouteContainer(
           child: ItemFormConsumer(itemType: itemType, id: id),
         );
       },
@@ -52,21 +50,7 @@ final router = GoRouter(
         builder: (context, state) {
           return MainView(morePageName);
         },
-        routes: [
-          // editors playground
-          GoRoute(
-              path: MoreSubLocations.editorsPlayground,
-              builder: (context, state) {
-                return EditorsPlayground();
-              }),
-          // theme playground
-          GoRoute(
-            path: MoreSubLocations.themePlayground,
-            builder: (context, state) {
-              return ThemePlayground();
-            },
-          ),
-        ]),
+        routes: []),
     // image
     GoRoute(
       path: Locations.image,
@@ -88,9 +72,64 @@ final router = GoRouter(
         }),
   ],
   observers: [LoggingObserver()],
-  onException: (exception, state, router) {
-    logger.e(
-      '[router] exception: $exception, state: $state',
+  errorBuilder: (context, state) {
+    logger.e('[router] error: ${state.error}');
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+      ),
+      body: Text(state.error!.toString()),
     );
   },
+  // onException: (exception, state, router) {
+  //   logger.e(
+  //     '[router] exception: $exception, state: $state',
+  //   );
+  // },
 );
+
+class RouteContainer extends StatefulWidget {
+  final bool isChildVisible;
+  final Widget child;
+
+  const RouteContainer({
+    required this.child,
+    this.isChildVisible = true,
+  });
+
+  @override
+  State<RouteContainer> createState() => _RouteContainerState();
+}
+
+class _RouteContainerState extends State<RouteContainer> {
+  late bool isOn;
+
+  @override
+  void initState() {
+    super.initState();
+    isOn = widget.isChildVisible;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: isOn
+            ? Center(child: widget.child)
+            : const Center(
+                child: Text('Child is hidden'),
+              ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() => isOn = !isOn);
+        },
+        child: Icon(isOn ? Icons.visibility : Icons.visibility_off),
+      ),
+    );
+  }
+}

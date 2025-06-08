@@ -7,7 +7,7 @@ import '../../items/item_card.dart';
 import '../../media/app_image.dart';
 import '../list_value/list_value_chip.dart';
 import '../user/user_chip.dart';
-import 'room_count_chip.dart';
+import 'fields/room_count_chip.dart';
 
 typedef Builder = Widget Function(BuildContext context, WidgetRef ref);
 
