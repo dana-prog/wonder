@@ -36,8 +36,8 @@ class FacilityCard extends ConsumerWidget {
             height: _cardHeight,
             child: ClipOval(
                 child: item.avatar != null
-                    ? AppFileImage(path: item.avatar!)
-                    : AppAssetImage(assetPath: _defaultPicture))),
+                    ? AppImage(filePath: item.avatar!)
+                    : AppImage(assetName: _defaultPicture))),
         numberWidget: SizedBox(
           height: _cardHeight,
           // TODO: remove hard coded value

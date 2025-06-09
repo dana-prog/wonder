@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 import 'package:wonder/src/widgets/items/facility/fields/facility_dropdowns.dart';
-import 'package:wonder/src/widgets/items/facility/fields/room_count_dropdown.dart';
+import 'package:wonder/src/widgets/items/facility/fields/facility_number_text_box.dart';
+import 'package:wonder/src/widgets/items/user/users_dropdown.dart';
 import 'package:wonder_widgetbook/src/folders.dart';
 
 const _folder = '${FolderNames.facility}/${FolderNames.editors}';
@@ -19,9 +20,13 @@ final _statusId = 'facilityStatus_operational';
 Widget status(BuildContext _) => FacilityStatusDropdown(selectedId: _statusId);
 
 final _roomCount = 3;
-@UseCase(name: '# Rooms', type: RoomCountDropdown, path: _folder)
-Widget roomCount(BuildContext _) => RoomCountDropdown(value: _roomCount);
+@UseCase(name: '# Rooms', type: FacilityRoomCountDropdown, path: _folder)
+Widget roomCount(BuildContext _) => FacilityRoomCountDropdown(value: _roomCount);
 
 final _number = 104;
-@UseCase(name: '# Rooms', type: RoomCountDropdown, path: _folder)
-Widget number(BuildContext _) => RoomCountDropdown(value: _number);
+@UseCase(name: 'number', type: FacilityNumberTextBox, path: _folder)
+Widget number(BuildContext _) => FacilityNumberTextBox(initialValue: _number);
+
+final _ownerId = 'dana_shalev';
+@UseCase(name: 'Owner', type: UsersDropdownConsumer, path: _folder)
+Widget owner(BuildContext _) => UsersDropdownConsumer(selectedId: _ownerId);

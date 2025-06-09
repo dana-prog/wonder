@@ -86,31 +86,6 @@ class ImageManager extends StatelessWidget {
       },
     );
   }
-
-  Widget buildAddImagePlaceholder(fileStorage, context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final size = (constraints.maxWidth - 2 * _removeBtnPadding) / 3;
-      return InkWell(
-        onTap: () async {
-          final picker = ImagePicker();
-          final picked = await picker.pickImage(source: ImageSource.gallery);
-          if (picked != null) {
-            final id = await (save ?? fileStorage.saveFile).call(picked.openRead(), picked.name);
-            onAdd?.call(id);
-          }
-        },
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(Icons.add_a_photo),
-        ),
-      );
-    });
-  }
 }
 
 class _ImageThumbnail extends StatelessWidget {
@@ -137,7 +112,7 @@ class _ImageThumbnail extends StatelessWidget {
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(defaultBorderRadius),
-            child: AppFileImage(path: path, width: width, height: height),
+            child: AppImage(filePath: path, width: width, height: height),
           ),
         ),
         onRemove != null

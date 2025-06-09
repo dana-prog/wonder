@@ -15,7 +15,7 @@ class UsersDropdownConsumer extends ConsumerWidget {
   // final FormFieldValidator<String>? validator;
 
   const UsersDropdownConsumer({
-    this.selectedId,
+    required this.selectedId,
     this.style,
     this.onChanged,
     // this.itemHeight,

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:wonder/src/globals.dart';
+import 'package:wonder/src/widgets/items/user/initials_avatar.dart';
+import 'package:wonder/src/widgets/media/app_image.dart';
 
 import '../../../data/user_item.dart';
-import 'initials_avatar.dart';
 
 // TODO: move to assets folder
-const _defaultUserPicture = 'assets/images/default_user.png';
+const _defaultUserPicture = 'default_user.png';
 
 class UserAvatar extends StatelessWidget {
   final UserItem? item;
@@ -13,14 +15,16 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (item == null) {
-      return CircleAvatar(backgroundImage: AssetImage(_defaultUserPicture));
-    }
-
-    if (item!.avatar == null) {
+    if (item != null && item!.avatar == null) {
+      // user with no pic - show initials
       return InitialsAvatar(user: item!);
     }
 
-    return CircleAvatar(backgroundImage: AssetImage('assets/images/${item!.avatar!}'));
+    return ClipOval(
+      child: AppImage(
+        assetName: '$imagesPath/${item?.avatar ?? _defaultUserPicture}',
+        fit: BoxFit.cover,
+      ),
+    );
   }
 }

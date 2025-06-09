@@ -53,7 +53,7 @@ class BlurredOverlay extends StatelessWidget {
     );
   }
 
-  void _close(context) {
+  void _close(BuildContext context) {
     if (close != null) {
       close!(context);
     } else {

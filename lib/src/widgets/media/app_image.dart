@@ -1,89 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../globals.dart';
 import '../../logger.dart';
 import '../../providers/file_provider.dart';
 
-class AppFileImage extends ConsumerWidget {
-  final String path;
-  final double? width;
-  final double? height;
-
-  const AppFileImage({
-    required this.path,
-    this.width,
-    this.height,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    logger.t('[AppFileImage:build]: path: $path');
-    final asyncFile = ref.watch(fileProvider(path));
-
-    return asyncFile.when(
-        data: (file) => Image.file(
-              file,
-              width: width,
-              height: height,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                logger.e('[AppFileImage:build]: Error loading file: ${file.path}: $error',
-                    stackTrace: stackTrace);
-                return Text(error.toString());
-              },
-            ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) {
-          logger.e(
-            '[AppFileImage:build]: Error loading file: $path: $error',
-            stackTrace: stackTrace,
-          );
-          return Text(error.toString());
-        });
-
-    // return AsyncValueWidget(
-    //   asyncValue: asyncFile,
-    //   loadingBuilder: (context) => const Center(child: CircularProgressIndicator()),
-    //   dataBuilder: (file, _) => Image.file(
-    //     file,
-    //     width: width,
-    //     height: height,
-    //     fit: BoxFit.cover,
-    //     errorBuilder: (context, error, stackTrace) {
-    //       logger.e('[AppFileImage:build]: Error loading file: ${file.path}: $error',
-    //           stackTrace: stackTrace);
-    //       return Text(error.toString());
-    //     },
-    //   ),
-    // );
-  }
+class AppAssetImage extends AssetImage {
+  const AppAssetImage(super.name) : super(package: assetsPackage);
 }
 
-class AppAssetImage extends StatelessWidget {
-  final String assetPath;
+class AppImage extends StatelessWidget {
+  final String? assetName;
+  final String? filePath;
   final double? width;
   final double? height;
+  final BoxFit? fit;
 
-  const AppAssetImage({
-    required this.assetPath,
+  const AppImage({
+    super.key,
+    this.assetName,
+    this.filePath,
     this.width,
     this.height,
-    super.key,
-  });
+    this.fit,
+  }) : assert(
+            assetName != null || filePath != null, 'Either assetName or filePath must be provided');
 
   @override
   Widget build(BuildContext context) {
-    logger.t('[AppAssetImage:build]: assetPath: $assetPath');
+    return assetName != null ? buildAssetImage(assetName!) : buildFileImage(filePath!);
+  }
+
+  Widget buildAssetImage(String name) {
     return Image.asset(
-      assetPath,
+      name,
+      package: assetsPackage,
       width: width,
       height: height,
-      fit: BoxFit.cover,
+      fit: fit,
       errorBuilder: (context, error, stackTrace) {
-        logger.e('[AppAssetImage:build]: Error loading asset image: $assetPath: $error',
+        logger.e('[AppAssetImage:build]: Error loading asset image: $name: $error',
             stackTrace: stackTrace);
         return Text(error.toString());
+      },
+    );
+  }
+
+  Widget buildFileImage(String path) {
+    logger.t('[AppFileImage:build]: path: $path');
+    return Consumer(
+      builder: (context, ref, child) {
+        final asyncFile = ref.watch(fileProvider(path));
+
+        return asyncFile.when(
+            data: (file) => Image.file(
+                  file,
+                  width: width,
+                  height: height,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    logger.e('[AppFileImage:build]: Error loading file: ${file.path}: $error',
+                        stackTrace: stackTrace);
+                    return Text(error.toString());
+                  },
+                ),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stackTrace) {
+              logger.e(
+                '[AppFileImage:build]: Error loading file: $path: $error',
+                stackTrace: stackTrace,
+              );
+              return Text(error.toString());
+            });
       },
     );
   }

@@ -4,5 +4,6 @@ class FolderNames {
   static const detailsPage = '[DetailsPage]';
 
   static const facility = '[Facility]';
+  static const user = '[User]';
   static const platform = '[Platform]';
 }

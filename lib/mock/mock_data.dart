@@ -20,7 +20,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_operational",
-      "owner": "Henning_Helmich",
+      "owner": "henning_helmich",
       "type": "facilityType_villa"
     },
     {
@@ -30,7 +30,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Maria_Lovina",
+      "owner": "maria_lovina",
       "type": "facilityType_villa"
     },
     {
@@ -40,7 +40,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Jane_Dwyer",
+      "owner": "jane_dwyer",
       "type": "facilityType_villa"
     },
     {
@@ -50,7 +50,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Shmuel_Constantini",
+      "owner": "shmuel_constantini",
       "type": "facilityType_villa"
     },
     {
@@ -60,7 +60,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 3.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Ofer_Rotem",
+      "owner": "ofer_rotem",
       "type": "facilityType_villa"
     },
     {
@@ -70,7 +70,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 2.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Evelin_Haimovich",
+      "owner": "evelin_haimovich",
       "type": "facilityType_villa"
     },
     {
@@ -80,7 +80,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 2.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Christian_Buettne",
+      "owner": "christian_buettne",
       "type": "facilityType_villa"
     },
     {
@@ -90,7 +90,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 3.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Lee_Birman",
+      "owner": "lee_birman",
       "type": "facilityType_villa"
     },
     {
@@ -100,7 +100,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 2.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Michal_Rotem",
+      "owner": "michal_rotem",
       "type": "facilityType_villa"
     },
     {
@@ -110,7 +110,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 3.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Eyal_Zaichic",
+      "owner": "eyal_zaichic",
       "type": "facilityType_villa"
     },
     {
@@ -120,7 +120,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 2.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Alexander_Kuchar",
+      "owner": "alexander_kuchar",
       "type": "facilityType_villa"
     },
     {
@@ -130,7 +130,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 3.0,
       "status": "facilityStatus_notStarted",
-      "owner": "David_Ben Ari",
+      "owner": "david_ben ari",
       "type": "facilityType_villa"
     },
     {
@@ -140,7 +140,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 2.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Baha_Shoucair",
+      "owner": "baha_shoucair",
       "type": "facilityType_villa"
     },
     {
@@ -150,7 +150,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 2.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Alex_Zak",
+      "owner": "alex_zak",
       "type": "facilityType_villa"
     },
     {
@@ -160,7 +160,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 2.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Gad_Baum",
+      "owner": "gad_baum",
       "type": "facilityType_villa"
     },
     {
@@ -170,7 +170,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Noga_Polansky",
+      "owner": "noga_polansky",
       "type": "facilityType_villa"
     },
     {
@@ -180,7 +180,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Roy_Ben Abraham",
+      "owner": "roy_ben abraham",
       "type": "facilityType_villa"
     },
     {
@@ -190,7 +190,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Esther_Ben Ari",
+      "owner": "esther_ben ari",
       "type": "facilityType_villa"
     },
     {
@@ -200,7 +200,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Shachar_Cohen",
+      "owner": "shachar_cohen",
       "type": "facilityType_villa"
     },
     {
@@ -219,7 +219,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 3.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Yaron_Weber",
+      "owner": "yaron_weber",
       "type": "facilityType_villa"
     },
     {
@@ -229,7 +229,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 3.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Yut_Doe",
+      "owner": "yut_doe",
       "type": "facilityType_villa"
     },
     {
@@ -239,7 +239,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Patrizia_Chiozza",
+      "owner": "patrizia_chiozza",
       "type": "facilityType_villa"
     },
     {
@@ -249,7 +249,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Aly_hazlewood",
+      "owner": "aly_hazlewood",
       "type": "facilityType_villa"
     },
     {
@@ -259,7 +259,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Lilac_Lopez",
+      "owner": "lilac_lopez",
       "type": "facilityType_villa"
     },
     {
@@ -269,7 +269,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Igal_Daiboch",
+      "owner": "igal_daiboch",
       "type": "facilityType_villa"
     },
     {
@@ -279,7 +279,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Guy_Ben Ami",
+      "owner": "guy_ben ami",
       "type": "facilityType_villa"
     },
     {
@@ -289,7 +289,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Boaz_Birman",
+      "owner": "boaz_birman",
       "type": "facilityType_villa"
     },
     {
@@ -299,7 +299,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Binyamin_Markus",
+      "owner": "binyamin_markus",
       "type": "facilityType_villa"
     },
     {
@@ -309,7 +309,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Trillium_Seafyre",
+      "owner": "trillium_seafyre",
       "type": "facilityType_villa"
     },
     {
@@ -319,7 +319,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Michael_Rosen",
+      "owner": "michael_rosen",
       "type": "facilityType_villa"
     },
     {
@@ -329,7 +329,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Bishara_Haroni",
+      "owner": "bishara_haroni",
       "type": "facilityType_villa"
     },
     {
@@ -339,7 +339,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Yuval_Birman",
+      "owner": "yuval_birman",
       "type": "facilityType_villa"
     },
     {
@@ -349,7 +349,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Luisa_Nebel",
+      "owner": "luisa_nebel",
       "type": "facilityType_villa"
     },
     {
@@ -359,7 +359,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Shai_Ben Saadon",
+      "owner": "shai_ben saadon",
       "type": "facilityType_villa"
     },
     {
@@ -369,7 +369,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Yonathan_Covary",
+      "owner": "yonathan_covary",
       "type": "facilityType_villa"
     },
     {
@@ -379,7 +379,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Guy_Regev",
+      "owner": "guy_regev",
       "type": "facilityType_villa"
     },
     {
@@ -389,7 +389,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 3.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Erez_Zaichic",
+      "owner": "erez_zaichic",
       "type": "facilityType_villa"
     },
     {
@@ -399,7 +399,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Ido_Keinan",
+      "owner": "ido_keinan",
       "type": "facilityType_villa"
     },
     {
@@ -409,7 +409,7 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Arnauld_Boulard",
+      "owner": "arnauld_boulard",
       "type": "facilityType_villa"
     },
     {
@@ -419,7 +419,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Asaf_Yigal",
+      "owner": "asaf_yigal",
       "type": "facilityType_villa"
     },
     {
@@ -429,7 +429,7 @@ class MockData {
       "subtype": "facilitySubtype_b",
       "roomCount": 1.0,
       "status": "facilityStatus_notStarted",
-      "owner": "Tzvi_Kaplan",
+      "owner": "tzvi_kaplan",
       "type": "facilityType_villa"
     },
     {
@@ -439,13 +439,27 @@ class MockData {
       "subtype": "facilitySubtype_a",
       "roomCount": 5.0,
       "status": "facilityStatus_planning",
-      "owner": "Ziv_Shalev",
+      "owner": "ziv_shalev",
       "type": "facilityType_villa"
     }
   ].map(FacilityItem.fromFields).toList();
   static final users = [
     {
-      "id": "Igal_Daiboch",
+      "id": "no_pic",
+      "itemType": "user",
+      "email": "no.pic@gmail.com",
+      "lastName": "pic",
+      "firstName": "no",
+    },
+    {
+      "id": "verylongfirstname_verylonglastname",
+      "itemType": "user",
+      "email": "no.pic@gmail.com",
+      "lastName": "verylonglastname",
+      "firstName": "verylongfirstname",
+    },
+    {
+      "id": "igal_daiboch",
       "itemType": "user",
       "middleName": "Shai",
       "email": "igal.daiboch@gmail.com",
@@ -480,42 +494,42 @@ class MockData {
       "phone": "972529246310"
     },
     {
-      "id": "Alex_Zak",
+      "id": "alex_zak",
       "itemType": "user",
       "email": "a@alexzak.me",
       "lastName": "Zak",
       "firstName": "Alex"
     },
     {
-      "id": "Alexander_Kuchar",
+      "id": "alexander_kuchar",
       "itemType": "user",
       "email": "tesnom333@gmail.com",
       "lastName": "Kuchar",
       "firstName": "Alexander"
     },
     {
-      "id": "Aly_hazlewood",
+      "id": "aly_hazlewood",
       "itemType": "user",
       "email": "Aly.hazlewood@gmail.com",
       "lastName": "hazlewood",
       "firstName": "Aly"
     },
     {
-      "id": "Arnauld_Boulard",
+      "id": "arnauld_boulard",
       "itemType": "user",
       "email": "aboulard@mac.com",
       "lastName": "Boulard",
       "firstName": "Arnauld"
     },
     {
-      "id": "Asaf_Yigal",
+      "id": "asaf_yigal",
       "itemType": "user",
       "email": "Asaf.yigal@gmail.com",
       "lastName": "Yigal",
       "firstName": "Asaf"
     },
     {
-      "id": "Baha_Shoucair",
+      "id": "baha_shoucair",
       "itemType": "user",
       "middleName": "Kefi Ep",
       "email": "wshoucair@gmail.com",
@@ -523,21 +537,21 @@ class MockData {
       "firstName": "Baha"
     },
     {
-      "id": "Binyamin_Markus",
+      "id": "binyamin_markus",
       "itemType": "user",
       "email": "benmar71@gmail.com",
       "lastName": "Markus",
       "firstName": "Binyamin"
     },
     {
-      "id": "Bishara_Haroni",
+      "id": "bishara_haroni",
       "itemType": "user",
       "email": "Bashbash1111@gmail.com",
       "lastName": "Haroni",
       "firstName": "Bishara"
     },
     {
-      "id": "Boaz_Birman",
+      "id": "boaz_birman",
       "itemType": "user",
       "email": "boaz_birman@gmail.com",
       "lastName": "Birman",
@@ -568,19 +582,18 @@ class MockData {
         "postalCode": "84280",
         "subdivision": "84"
       },
-      "picture":
-          "https://static.wixstatic.com/media/1246fe_d1dee5a0ef654c58922dea570e9a40a7~mv2.jpg",
+      "picture": "boaz_birman.jpg",
       "phone": "66651219799"
     },
     {
-      "id": "Christian_Buettne",
+      "id": "christian_buettne",
       "itemType": "user",
       "email": "cbuettner@live.com",
       "lastName": "Buettne",
       "firstName": "Christian"
     },
     {
-      "id": "Dana_Shalev",
+      "id": "dana_shalev",
       "itemType": "user",
       "email": "danashalev100@gmail.com",
       "lastName": "Shalev",
@@ -612,82 +625,81 @@ class MockData {
         "formatted": "Dan Street 34, Kokhav Ya'ir Tzur Yigal, Israel",
         "country": "IL"
       },
-      "picture":
-          "https://static.wixstatic.com/media/1246fe_b56c192a93b243c9a59a37ba02f26aee~mv2.jpg",
+      "picture": "dana_shalev.jpg",
       "phone": "972548145556"
     },
     {
-      "id": "David_Ben Ari",
+      "id": "david_ben ari",
       "itemType": "user",
       "email": "eliyaba@gmail.com",
       "lastName": "Ben Ari",
       "firstName": "David"
     },
     {
-      "id": "Erez_Zaichic",
+      "id": "erez_zaichic",
       "itemType": "user",
       "email": "Erez@tamarail.co.il",
       "lastName": "Zaichic",
       "firstName": "Erez"
     },
     {
-      "id": "Esther_Ben Ari",
+      "id": "esther_ben ari",
       "itemType": "user",
       "email": "egbenari@gmail.com",
       "lastName": "Ben Ari",
       "firstName": "Esther"
     },
     {
-      "id": "Evelin_Haimovich",
+      "id": "evelin_haimovich",
       "itemType": "user",
       "email": "Tohar13@hotmail.com",
       "lastName": "Haimovich",
       "firstName": "Evelin"
     },
     {
-      "id": "Eyal_Zaichic",
+      "id": "eyal_zaichic",
       "itemType": "user",
       "email": "anatnevo20@gmail.com",
       "lastName": "Zaichic",
       "firstName": "Eyal"
     },
     {
-      "id": "Gad_Baum",
+      "id": "gad_baum",
       "itemType": "user",
       "email": "gadbaum@gmail.com",
       "lastName": "Baum",
       "firstName": "Gad"
     },
     {
-      "id": "Guy_Ben Ami",
+      "id": "guy_ben ami",
       "itemType": "user",
       "email": "guybena@gmail.com",
       "lastName": "Ben Ami",
       "firstName": "Guy"
     },
     {
-      "id": "Guy_Regev",
+      "id": "guy_regev",
       "itemType": "user",
       "email": "guyreg3@gmail.com",
       "lastName": "Regev",
       "firstName": "Guy"
     },
     {
-      "id": "Henning_Helmich",
+      "id": "henning_helmich",
       "itemType": "user",
       "email": "Henning.Helmich@gmx.net",
       "lastName": "Helmich",
       "firstName": "Henning"
     },
     {
-      "id": "Ido_Keinan",
+      "id": "ido_keinan",
       "itemType": "user",
       "email": "Idochalten@gmail.com",
       "lastName": "Keinan",
       "firstName": "Ido"
     },
     {
-      "id": "Jane_Dwyer",
+      "id": "jane_dwyer",
       "itemType": "user",
       "middleName": "Aniela",
       "email": "Pbyrne7@bigpond.com",
@@ -695,7 +707,7 @@ class MockData {
       "firstName": "Jane"
     },
     {
-      "id": "Lee_Birman",
+      "id": "lee_birman",
       "itemType": "user",
       "email": "_tmpleebirman@gmail.com",
       "lastName": "Birman",
@@ -703,14 +715,14 @@ class MockData {
       "nickname": "Yellow"
     },
     {
-      "id": "Lilac_Lopez",
+      "id": "lilac_lopez",
       "itemType": "user",
       "email": "lilaclopezco@gmail.com",
       "lastName": "Lopez",
       "firstName": "Lilac"
     },
     {
-      "id": "Luisa_Nebel",
+      "id": "luisa_nebel",
       "itemType": "user",
       "middleName": "Barbara",
       "email": "luisa.nebel@me.com",
@@ -718,7 +730,7 @@ class MockData {
       "firstName": "Luisa"
     },
     {
-      "id": "Maria_Lovina",
+      "id": "maria_lovina",
       "itemType": "user",
       "middleName": "Rosario Ines P.",
       "email": "macky.lovina@gmail.com",
@@ -726,7 +738,7 @@ class MockData {
       "firstName": "Maria"
     },
     {
-      "id": "Michael_Patzer",
+      "id": "michael_patzer",
       "itemType": "user",
       "middleName": "Alfred",
       "email": "nils@4fr.de",
@@ -734,70 +746,70 @@ class MockData {
       "firstName": "Michael"
     },
     {
-      "id": "Michael_Rosen",
+      "id": "michael_rosen",
       "itemType": "user",
       "email": "michael0390@gmail.com",
       "lastName": "Rosen",
       "firstName": "Michael"
     },
     {
-      "id": "Michal_Rotem",
+      "id": "michal_rotem",
       "itemType": "user",
       "email": "michalrote@gmail.com",
       "lastName": "Rotem",
       "firstName": "Michal"
     },
     {
-      "id": "Nava_Sanders",
+      "id": "nava_sanders",
       "itemType": "user",
       "email": "navanavax@gmail.com",
       "lastName": "Sanders",
       "firstName": "Nava"
     },
     {
-      "id": "Noga_Polansky",
+      "id": "noga_polansky",
       "itemType": "user",
       "email": "noga.polansky@gmail.com",
       "lastName": "Polansky",
       "firstName": "Noga"
     },
     {
-      "id": "Ofer_Rotem",
+      "id": "ofer_rotem",
       "itemType": "user",
       "email": "oferrotem@gmail.com",
       "lastName": "Rotem",
       "firstName": "Ofer"
     },
     {
-      "id": "Patrizia_Chiozza",
+      "id": "patrizia_chiozza",
       "itemType": "user",
       "email": "patpita999@gmail.com",
       "lastName": "Chiozza",
       "firstName": "Patrizia"
     },
     {
-      "id": "Roy_Ben Abraham",
+      "id": "roy_ben abraham",
       "itemType": "user",
       "email": "roy.ben.abraham@gmail.com",
       "lastName": "Ben Abraham",
       "firstName": "Roy"
     },
     {
-      "id": "Shachar_Cohen",
+      "id": "shachar_cohen",
       "itemType": "user",
       "email": "Sha900@gmail.com",
       "lastName": "Cohen",
       "firstName": "Shachar"
     },
     {
-      "id": "Shai_Ben Saadon",
+      "id": "shai_ben saadon",
       "itemType": "user",
       "email": "SHAI@SHABASTV.COM",
       "lastName": "Ben Saadon",
       "firstName": "Shai"
     },
     {
-      "id": "Shmuel_Constantini",
+      "id": "shmuel_constantini",
       "itemType": "user",
       "middleName": "Uli",
       "email": "uli@eau.co.il",
@@ -805,21 +817,21 @@ class MockData {
       "firstName": "Shmuel"
     },
     {
-      "id": "Trillium_Seafyre",
+      "id": "trillium_seafyre",
       "itemType": "user",
       "email": "trillium765@gmail.com",
       "lastName": "Seafyre",
       "firstName": "Trillium"
     },
     {
-      "id": "Tzvi_Kaplan",
+      "id": "tzvi_kaplan",
       "itemType": "user",
       "email": "Kaplan.tzvika@gmail.com",
       "lastName": "Kaplan",
       "firstName": "Tzvi"
     },
     {
-      "id": "Yaron_Weber",
+      "id": "yaron_weber",
       "itemType": "user",
       "email": "yaronweber@gmail.com",
       "lastName": "Weber",
@@ -850,27 +862,26 @@ class MockData {
         "postalCode": "84280",
         "subdivision": "84"
       },
-      "picture":
-          "https://static.wixstatic.com/media/1246fe_f917449ddcb84ed281370647d928dd54~mv2.jpg",
+      "picture": "yaron_weber.jpg",
       "phone": "66651219699",
       "nickname": "John"
     },
     {
-      "id": "Yonathan_Covary",
+      "id": "yonathan_covary",
       "itemType": "user",
       "email": "ykoevary@gmail.com",
       "lastName": "Covary",
       "firstName": "Yonathan"
     },
     {
-      "id": "Yut_Doe",
+      "id": "yut_doe",
       "itemType": "user",
       "email": "yutdoe@gmail.com",
       "lastName": "Doe",
       "firstName": "Yut"
     },
     {
-      "id": "Yuval_Birman",
+      "id": "yuval_birman",
       "itemType": "user",
       "email": "flokichokdee@gmail.com",
       "lastName": "Birman",
@@ -901,13 +912,12 @@ class MockData {
         "postalCode": "84280",
         "subdivision": "84"
       },
-      "picture":
-          "https://static.wixstatic.com/media/1246fe_a714ce3ce72e472398c1864b77be8d2f~mv2.jpg",
+      "picture": "yuval_birman.jpg",
       "phone": "66651219899",
       "nickname": "Fluke"
     },
     {
-      "id": "Ziv_Shalev",
+      "id": "ziv_shalev",
       "itemType": "user",
       "email": "shallevziv@gmail.com",
       "lastName": "Shalev",
@@ -934,8 +944,7 @@ class MockData {
         "formatted": "Dan Street 34, Kokhav Ya'ir Tzur Yigal, Israel",
         "country": "IL"
       },
-      "picture":
-          "https://static.wixstatic.com/media/1246fe_d3abff9ea20646038b7024bb899d0bad~mv2.jpg",
+      "picture": "ziv_shalev.jpg",
       "phone": "972525697025"
     }
   ].map(UserItem.fromFields).toList();

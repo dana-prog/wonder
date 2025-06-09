@@ -13,6 +13,7 @@ import './src/logger.dart';
 import 'main.directories.g.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final overrides = _getProviderOverrides();
 
   runApp(
@@ -32,9 +33,10 @@ class WidgetbookApp extends StatelessWidget {
     logger.d('[WidgetbookApp.build]');
 
     return Widgetbook.material(
-      // initialRoute: '?path=facility/facilitydetailspage/view',
-      initialRoute: '[Facility]/FacilityDetailsPage/Edit',
-      directories: directories,
+      // initialRoute: '?path=facility/editors/facilitystatusdropdown/status',
+      initialRoute: '?path=user/all/all',
+      // initialRoute: '?path=debug/unboundedwidth/not_working',
+      directories: getDirectories(),
       addons: [
         MaterialThemeAddon(themes: [
           WidgetbookTheme(name: 'Light', data: AppTheme.light),
@@ -42,9 +44,10 @@ class WidgetbookApp extends StatelessWidget {
         ])
       ],
       appBuilder: (context, child) => Container(
+          constraints: BoxConstraints.expand(),
           padding: EdgeInsets.all(20),
           alignment: Alignment.topCenter,
-          child: child), // or any wrapper
+          child: child),
     );
   }
 }

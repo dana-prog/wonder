@@ -12,7 +12,6 @@ import '../../media/image_manager.dart';
 import '../../platform/constants.dart';
 import '../../platform/field_label.dart';
 import '../user/users_dropdown.dart';
-import './fields/room_count_dropdown.dart';
 import 'fields/facility_number_text_box.dart';
 
 class FacilityDetailsPage extends StatefulWidget {
@@ -112,7 +111,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
 
   Widget _roomCountFormFieldBuilder() => FieldLabel(
         label: ItemsLabels.getFieldLabels('facility')['roomCount']!,
-        child: RoomCountDropdown(
+        child: FacilityRoomCountDropdown(
           value: _roomCount,
           onChanged: (value) => onChanged(context, () => _roomCount = value),
           style: TextStyle(fontWeight: FontWeight.bold),

@@ -479,6 +479,20 @@ var _itemsFields = [
     "phone": "972529246310"
   },
   {
+    "id": "no_pic",
+    "itemType": "user",
+    "email": "no.pic@gmail.com",
+    "lastName": "pic",
+    "firstName": "no",
+  },
+  {
+    "id": "verylongfirstname_verylonglastname",
+    "itemType": "user",
+    "email": "no.pic@gmail.com",
+    "lastName": "verylonglastname",
+    "firstName": "verylongfirstname",
+  },
+  {
     "id": "6b31c377-97f4-4d25-9d8d-106eec5a38bc",
     "itemType": "listValue",
     "name": "airCondioning",
@@ -771,7 +785,7 @@ var _itemsFields = [
       "postalCode": "84280",
       "subdivision": "84"
     },
-    "picture": "https://static.wixstatic.com/media/1246fe_d1dee5a0ef654c58922dea570e9a40a7~mv2.jpg",
+    "picture": "boaz_birman.jpg",
     "phone": "66651219799"
   },
   {
@@ -814,7 +828,7 @@ var _itemsFields = [
       "formatted": "Dan Street 34, Kokhav Ya'ir Tzur Yigal, Israel",
       "country": "IL"
     },
-    "picture": "https://static.wixstatic.com/media/1246fe_b56c192a93b243c9a59a37ba02f26aee~mv2.jpg",
+    "picture": "dana_shalev.jpg",
     "phone": "972548145556"
   },
   {
@@ -1047,7 +1061,7 @@ var _itemsFields = [
       "postalCode": "84280",
       "subdivision": "84"
     },
-    "picture": "https://static.wixstatic.com/media/1246fe_f917449ddcb84ed281370647d928dd54~mv2.jpg",
+    "picture": "yaron_weber.jpg",
     "phone": "66651219699",
     "nickname": "John"
   },
@@ -1093,7 +1107,7 @@ var _itemsFields = [
       "postalCode": "84280",
       "subdivision": "84"
     },
-    "picture": "https://static.wixstatic.com/media/1246fe_a714ce3ce72e472398c1864b77be8d2f~mv2.jpg",
+    "picture": "yuval_birman.jpg",
     "phone": "66651219899",
     "nickname": "Fluke"
   },
@@ -1125,7 +1139,7 @@ var _itemsFields = [
       "formatted": "Dan Street 34, Kokhav Ya'ir Tzur Yigal, Israel",
       "country": "IL"
     },
-    "picture": "https://static.wixstatic.com/media/1246fe_d3abff9ea20646038b7024bb899d0bad~mv2.jpg",
+    "picture": "ziv_shalev.jpg",
     "phone": "972525697025"
   }
 ];
@@ -1156,7 +1170,7 @@ void updateFacilityId(Map<String, dynamic> item) {
 
 void updateUserId(Map<String, dynamic> item) {
   final String oldId = item['id'] as String;
-  final newId = '${item['firstName']}_${item['lastName']}';
+  final newId = '${item['firstName']}_${item['lastName']}'.toLowerCase();
   item['id'] = newId;
   onUserIdUpdated(oldId, newId);
 }

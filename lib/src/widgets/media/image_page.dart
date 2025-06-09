@@ -10,7 +10,7 @@ class ImagePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Center(child: AppFileImage(path: path)),
+        Center(child: AppImage(filePath: path)),
         Positioned(
           top: 16,
           right: 16,

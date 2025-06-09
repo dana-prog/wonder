@@ -16,7 +16,7 @@ class Root extends StatelessWidget {
       routerConfig: router,
       locale: _locale,
       supportedLocales: [_locale],
-      showPerformanceOverlay: true,
+      // showPerformanceOverlay: true,
     );
   }
 }

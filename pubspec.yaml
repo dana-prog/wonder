@@ -1,5 +1,5 @@
 name: wonder
-description: "A new Flutter project."
+description: "Wonder Resources Management."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -11,6 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  assets:
+    path: assets
+
   http: ^1.4.0
   logger: ^2.5.0
   tuple: ^2.0.2
@@ -19,7 +22,7 @@ dependencies:
   pkce: ^1.1.0+1
   url_launcher: ^6.3.1
   flex_color_scheme: ^8.2.0
-  go_router: ^15.1.2
+  go_router: ^15.1.3
   flutter_riverpod: ^2.6.1
   recase: ^4.1.0
   shimmer: ^3.0.0
@@ -33,19 +36,17 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   path_provider: ^2.1.5
   uuid: ^4.5.1
-  top_snackbar_flutter: ^3.3.0
   dotted_border: ^3.0.1
   auto_size_text_plus: ^3.0.2
   widgetbook: ^3.14.2
   widgetbook_annotation: ^3.5.0
   dropdown_search: ^6.0.2
+  top_snackbar_flutter: ^3.3.0
 
 dev_dependencies:
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   build_runner: ^2.4.15
   widgetbook_generator: ^3.13.0
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/

@@ -17,7 +17,9 @@ ThemeData _getLightTheme() {
     visualDensity: FlexColorScheme.comfortablePlatformDensity,
     // Component theme configurations for light mode.
     subThemesData: const FlexSubThemesData(
-      defaultRadius: defaultBorderRadius,
+      // inputDecoratorRadius: defaultBorderRadius,
+      // inputDecoratorBorderSchemeColor: SchemeColor.transparent,
+      // inputDecoratorBorderType: FlexInputBorderType.outline,
       chipPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       // chipRadius,
       // chipBlendColors,
