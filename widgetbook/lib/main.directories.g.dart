@@ -56,7 +56,7 @@ List<_i1.WidgetbookNode> getDirectories() {
               name: 'FacilityStatusDropdown',
               useCase: _i1.WidgetbookUseCase(
                 name: 'Status',
-                builder: _i3.status,
+                builder: _i3.facilityStatus,
               ),
             ),
             _i1.WidgetbookLeafComponent(

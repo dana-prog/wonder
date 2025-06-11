@@ -83,8 +83,6 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   Widget _subtypeFormFieldBuilder() => FieldLabel(
         label: fields['subtype']!,
         child: FacilitySubtypeDropdown(
-          // style: TextStyle(fontWeight: FontWeight.bold),
-          // itemHeight: kFieldEditorHeight,
           selectedId: _subtype,
           onChanged: (value) => onChanged(context, () => _subtype = value?.id),
         ),
@@ -104,7 +102,6 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         label: fields['owner']!,
         child: UsersDropdownConsumer(
           selectedId: _owner,
-          // itemHeight: kFieldEditorHeight,
           onChanged: (value) => onChanged(context, () => _owner = value),
         ),
       );

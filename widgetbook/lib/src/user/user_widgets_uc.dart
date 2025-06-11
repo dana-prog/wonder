@@ -7,12 +7,55 @@ import 'package:wonder/src/widgets/items/user/user_avatar.dart';
 import 'package:wonder/src/widgets/items/user/user_chip.dart';
 import 'package:wonder/src/widgets/items/user/users_dropdown.dart';
 
+import '../facility/facility_fields_editors_uc.dart';
 import '../folders.dart';
+import '../utils/use_cases_layout.dart';
 
 const _folder = FolderNames.user;
 const _userId = 'dana_shalev';
 const _userIdNoPic = 'no_pic';
 const _userIdLongName = 'verylongfirstname_verylonglastname';
+
+@UseCase(name: 'all', type: All, path: _folder)
+Widget all(BuildContext _) => UseCasesLayout(sections: {
+      'InitialsAvatar': GridProps(
+        builders: {
+          'width = 25': initialsAvatar25,
+          'width = 50': initialsAvatar50,
+        },
+      ),
+      'UserAvatar': GridProps(
+        builders: {
+          'default': userAvatar,
+          'no pic': userAvatarNoPic,
+          'no user': userAvatarNoUser,
+          'size = 25': userAvatar25,
+          'size = 50': userAvatar50,
+        },
+      ),
+      'UserChip': GridProps(
+        builders: {
+          'default': userChip,
+          'no pic': userChipNoPic,
+          'no user': userChipNoUser,
+          'overflow': userChipOverflow,
+        },
+      ),
+      'UsersDropdown': GridProps(
+        builders: {
+          'default': usersDropdown,
+          'no pic': usersDropdownNoPic,
+          'no user': usersDropdownNoUser,
+          'overflow': usersDropdownOverflow,
+        },
+        childAspectRatio: 1.5,
+      ),
+      'UsersDropdownLayout': GridProps(
+        builders: {'user': usersDropdown, 'list value': facilityStatus},
+        rowWidgetCount: 1,
+        childAspectRatio: 4.0,
+      ),
+    });
 
 @UseCase(name: 'width = 25', type: InitialsAvatar, path: _folder)
 Widget initialsAvatar25(BuildContext _) =>
@@ -99,123 +142,3 @@ Widget usersDropdownNoUser(BuildContext _) => UsersDropdownConsumer(selectedId: 
 
 @UseCase(name: 'overflow', type: UsersDropdownConsumer, path: _folder)
 Widget usersDropdownOverflow(BuildContext _) => UsersDropdownConsumer(selectedId: _userIdLongName);
-
-@UseCase(name: 'all', type: All, path: _folder)
-Widget all(BuildContext _) => All(sections: getSections());
-
-List<SectionProps> getSections() => [
-      // InitialsAvatar
-      SectionProps(
-        label: 'InitialsAvatar',
-        builders: {
-          'width = 25': initialsAvatar25,
-          'width = 50': initialsAvatar50,
-        },
-      ),
-      // UserAvatar
-      SectionProps(
-        label: 'UserAvatar',
-        builders: {
-          'default': userAvatar,
-          'no pic': userAvatarNoPic,
-          'no user': userAvatarNoUser,
-          'size = 25': userAvatar25,
-          'size = 50': userAvatar50,
-        },
-      ),
-      // UserChip
-      SectionProps(
-        label: 'UserChip',
-        builders: {
-          'default': userChip,
-          'no pic': userChipNoPic,
-          'no user': userChipNoUser,
-          'overflow': userChipOverflow,
-        },
-      ),
-      // UsersDropdown
-      SectionProps(
-        label: 'UsersDropdown',
-        builders: {
-          'default': usersDropdown,
-          'no pic': usersDropdownNoPic,
-          'no user': usersDropdownNoUser,
-          'overflow': usersDropdownOverflow,
-        },
-        childAspectRatio: 1.5,
-      )
-    ];
-
-class All extends StatelessWidget {
-  static final defaultSpacing = 16.0;
-  static final defaultUserImageAssetPath = 'images/default_user.png';
-  static final userImageAssetPath = 'images/dana_shalev.jpg';
-
-  final List<SectionProps> sections;
-  const All({
-    super.key,
-    required this.sections,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.all(16),
-      children: sections
-          .map(
-            (section) => buildWidgetSection(section: section, context: context),
-          )
-          .toList(),
-    );
-  }
-
-  Widget buildWidgetSection({
-    required BuildContext context,
-    required SectionProps section,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(border: Border.all(color: Theme.of(context).dividerColor)),
-      child: Column(
-        spacing: defaultSpacing,
-        children: [
-          Text(section.label, style: Theme.of(context).textTheme.titleLarge),
-          GridView.count(
-            crossAxisCount: section.rowWidgetCount,
-            childAspectRatio: section.childAspectRatio,
-            // TODO: learn about shrinkWrap, NeverScrollableScrollPhysics, SilverXXX
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            children: section.builders.entries
-                .map(
-                  (entry) => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: defaultSpacing,
-                    children: [
-                      Text(entry.key, style: TextStyle(fontWeight: FontWeight.w500)),
-                      entry.value.call(context),
-                      // entry.value,
-                    ],
-                  ),
-                )
-                .toList(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class SectionProps {
-  final String label;
-  final Map<String, WidgetBuilder> builders;
-  final int rowWidgetCount;
-  final double childAspectRatio;
-
-  SectionProps({
-    required this.label,
-    required this.builders,
-    this.rowWidgetCount = 3,
-    this.childAspectRatio = 2.0,
-  });
-}

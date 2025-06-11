@@ -23,7 +23,7 @@ class FieldLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Flex(
-      // crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       direction: position == LabelPosition.top ? Axis.vertical : Axis.horizontal,
       spacing: spacing ?? kFieldLabelSpacing,
       children: [

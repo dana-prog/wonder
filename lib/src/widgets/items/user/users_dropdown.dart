@@ -29,6 +29,7 @@ class UsersDropdownConsumer extends ConsumerWidget {
       selectedItem: users.where((user) => user.id == selectedId).firstOrNull,
       options: users.map((user) => DropdownUserOptionProps(value: user)).toList(),
       style: style,
+      popupItemAlignment: MainAxisAlignment.start,
     );
   }
 }
@@ -37,6 +38,6 @@ class DropdownUserOptionProps extends DropdownItemOptionProps<UserItem> {
   DropdownUserOptionProps({required super.value})
       : super(
           avatar: UserAvatar(item: value),
-          color: Colors.grey.shade200,
+          // color: Colors.grey.shade200,
         );
 }

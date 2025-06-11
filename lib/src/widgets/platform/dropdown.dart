@@ -7,6 +7,7 @@ import '../../utils/color_utils.dart';
 
 const kDropdownListViewPadding = 8.0;
 const kDropdownPopupOptionVPadding = 3.0;
+const _defaultAlignment = MainAxisAlignment.center;
 
 class Dropdown<T> extends StatelessWidget {
   final List<T> items;
@@ -17,6 +18,8 @@ class Dropdown<T> extends StatelessWidget {
   final ValueChanged<T?>? onChanged;
   final ds.Mode? mode;
   final AutovalidateMode autoValidateMode;
+  final MainAxisAlignment? selectedItemAlignment;
+  final MainAxisAlignment? popupItemAlignment;
 
   Dropdown({
     super.key,
@@ -28,6 +31,8 @@ class Dropdown<T> extends StatelessWidget {
     this.itemHeight,
     this.mode,
     this.autoValidateMode = AutovalidateMode.disabled,
+    this.selectedItemAlignment,
+    this.popupItemAlignment,
     // this.itemAsString,
     // this.dropdownBuilder,
     // this.suffixProps = const DropdownSuffixProps(),
@@ -57,8 +62,6 @@ class Dropdown<T> extends StatelessWidget {
           // remove the border for the input decoration
           border: OutlineInputBorder(borderSide: BorderSide.none),
         ),
-        // set the text style
-        // baseStyle: style,
       ),
       selectedItem: selectedOption?.value,
       items: (_, __) => items,
@@ -67,6 +70,7 @@ class Dropdown<T> extends StatelessWidget {
       dropdownBuilder: (_, T? item) => _DropdownOption(
         option: getOption(item),
         style: style,
+        alignment: selectedItemAlignment,
       ),
       itemAsString: (item) => item?.toString() ?? 'itemAsString called with null',
       popupProps: ds.PopupProps.menu(
@@ -78,6 +82,7 @@ class Dropdown<T> extends StatelessWidget {
           isDisabled: isDisabled,
           isSelected: isSelected,
           style: style,
+          alignment: popupItemAlignment ?? selectedItemAlignment,
         ),
       ),
       suffixProps: ds.DropdownSuffixProps(
@@ -112,12 +117,14 @@ class _DropdownOption<T> extends StatelessWidget {
   final double? height;
   final TextStyle? style;
   final EdgeInsetsGeometry? padding;
+  final MainAxisAlignment? alignment;
 
   const _DropdownOption({
     required this.option,
     this.height,
     this.style,
     this.padding,
+    this.alignment,
   });
 
   @override
@@ -127,7 +134,6 @@ class _DropdownOption<T> extends StatelessWidget {
       padding: EdgeInsets.all(3),
       child: Container(
         height: height ?? kMinInteractiveDimension,
-        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(defaultBorderRadius),
@@ -138,28 +144,24 @@ class _DropdownOption<T> extends StatelessWidget {
   }
 
   Widget contentBuilder(BuildContext context, Color backgroundColor) {
-    final textWidget = Align(
-      // setting widthFactor to 1.0 since the default behavior is that the Align widget takes up all available space in that axis
-      widthFactor: 1.0,
-      child: Text(
-        option?.title ?? Labels.selectOption,
-        style: applyOnColor(style, backgroundColor),
-        overflow: TextOverflow.ellipsis,
-      ),
+    final textWidget = Text(
+      option?.title ?? Labels.selectOption,
+      style: applyOnColor(style, backgroundColor),
+      overflow: TextOverflow.ellipsis,
     );
 
-    if (option?.avatar == null) {
-      return textWidget;
-    }
-
     return Row(
+      mainAxisAlignment: alignment ?? _defaultAlignment,
       children: [
-        Padding(
-          // TODO: remove hard coded value
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-          child: option!.avatar!,
-        ),
-        Expanded(child: textWidget),
+        option?.avatar != null
+            ? Padding(
+                // TODO: remove hard coded value
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                child: option!.avatar!,
+              )
+            : SizedBox.shrink(),
+        // textWidget,
+        Flexible(child: textWidget),
       ],
     );
   }
@@ -171,6 +173,7 @@ class _DropdownPopupOption<T> extends StatelessWidget {
   final bool isSelected;
   final double? height;
   final TextStyle? style;
+  final MainAxisAlignment? alignment;
 
   const _DropdownPopupOption({
     required this.option,
@@ -178,6 +181,7 @@ class _DropdownPopupOption<T> extends StatelessWidget {
     required this.isSelected,
     this.height,
     this.style,
+    this.alignment,
   });
 
   @override
@@ -186,6 +190,7 @@ class _DropdownPopupOption<T> extends StatelessWidget {
       option: option,
       style: style,
       padding: EdgeInsets.symmetric(vertical: kDropdownPopupOptionVPadding),
+      alignment: alignment,
     );
   }
 }

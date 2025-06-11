@@ -17,7 +17,7 @@ Widget subtype(BuildContext _) => FacilitySubtypeDropdown(selectedId: _subtypeId
 
 final _statusId = 'facilityStatus_operational';
 @UseCase(name: 'Status', type: FacilityStatusDropdown, path: _folder)
-Widget status(BuildContext _) => FacilityStatusDropdown(selectedId: _statusId);
+Widget facilityStatus(BuildContext _) => FacilityStatusDropdown(selectedId: _statusId);
 
 final _roomCount = 3;
 @UseCase(name: '# Rooms', type: FacilityRoomCountDropdown, path: _folder)
