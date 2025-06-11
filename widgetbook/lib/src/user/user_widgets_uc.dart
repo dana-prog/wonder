@@ -7,7 +7,6 @@ import 'package:wonder/src/widgets/items/user/user_avatar.dart';
 import 'package:wonder/src/widgets/items/user/user_chip.dart';
 import 'package:wonder/src/widgets/items/user/users_dropdown.dart';
 
-import '../facility/facility_fields_editors_uc.dart';
 import '../folders.dart';
 import '../utils/use_cases_layout.dart';
 
@@ -51,7 +50,7 @@ Widget all(BuildContext _) => UseCasesLayout(sections: {
         childAspectRatio: 1.5,
       ),
       'UsersDropdownLayout': GridProps(
-        builders: {'user': usersDropdown, 'list value': facilityStatus},
+        builders: {'user': usersDropdown},
         rowWidgetCount: 1,
         childAspectRatio: 4.0,
       ),

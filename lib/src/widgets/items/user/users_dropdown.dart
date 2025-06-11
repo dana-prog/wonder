@@ -30,6 +30,7 @@ class UsersDropdownConsumer extends ConsumerWidget {
       options: users.map((user) => DropdownUserOptionProps(value: user)).toList(),
       style: style,
       popupItemAlignment: MainAxisAlignment.start,
+      showSearchBox: true,
     );
   }
 }

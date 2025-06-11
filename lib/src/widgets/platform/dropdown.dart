@@ -8,6 +8,7 @@ import '../../utils/color_utils.dart';
 const kDropdownListViewPadding = 8.0;
 const kDropdownPopupOptionVPadding = 3.0;
 const _defaultAlignment = MainAxisAlignment.center;
+final _defaultShowSearchBox = false;
 
 class Dropdown<T> extends StatelessWidget {
   final List<T> items;
@@ -20,6 +21,7 @@ class Dropdown<T> extends StatelessWidget {
   final AutovalidateMode autoValidateMode;
   final MainAxisAlignment? selectedItemAlignment;
   final MainAxisAlignment? popupItemAlignment;
+  final bool? showSearchBox;
 
   Dropdown({
     super.key,
@@ -33,19 +35,7 @@ class Dropdown<T> extends StatelessWidget {
     this.autoValidateMode = AutovalidateMode.disabled,
     this.selectedItemAlignment,
     this.popupItemAlignment,
-    // this.itemAsString,
-    // this.dropdownBuilder,
-    // this.suffixProps = const DropdownSuffixProps(),
-    // this.clickProps = const ClickProps(),
-    // this.enabled = true,
-    // this.filterFn,
-    // this.onBeforeChange,
-    // this.onBeforePopupOpening,
-    // PopupProps<T> popupProps = const PopupProps.menu(),
-    //form properties
-    // this.onSaved,
-    // this.validator,
-    // DropDownDecoratorProps? decoratorProps,
+    this.showSearchBox,
   })  : assert(items != null || options != null, 'Either items or options must be provided.'),
         items = items ?? options!.map((option) => option.value!).toList(),
         options = options ?? items!.map((item) => DropdownOptionProps(value: item)).toList();
@@ -73,8 +63,22 @@ class Dropdown<T> extends StatelessWidget {
         alignment: selectedItemAlignment,
       ),
       itemAsString: (item) => item?.toString() ?? 'itemAsString called with null',
+      filterFn: (T? item, String? filter) {
+        if (filter == null || filter.isEmpty) return true;
+        final option = getOption(item);
+        return option?.title.toLowerCase().contains(filter.toLowerCase()) ?? false;
+      },
       popupProps: ds.PopupProps.menu(
         fit: FlexFit.loose,
+        showSearchBox: showSearchBox ?? _defaultShowSearchBox,
+        searchFieldProps: ds.TextFieldProps(
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: Labels.searchHint,
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          ),
+        ),
         listViewProps: ds.ListViewProps(padding: EdgeInsets.all(kDropdownListViewPadding)),
         itemBuilder: (BuildContext context, T? item, bool isDisabled, bool isSelected) =>
             _DropdownPopupOption(

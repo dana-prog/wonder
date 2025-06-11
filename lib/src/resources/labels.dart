@@ -17,6 +17,7 @@ class Labels {
   static const String delete = 'Delete';
   static const String loading = 'Loading';
   static const String selectOption = 'Select Option';
+  static const String searchHint = 'Search...';
   static String facilityRoomCount(int count) => count == 1 ? '$count Bedroom' : '$count Bedrooms';
   static String noItem(String? typeName) => '${typeName?.capitalize() ?? 'Item'} Not Set';
   static String newItem(String itemType) => 'New ${ItemsLabels.getSingularLabel(itemType)}';
