@@ -14,9 +14,16 @@ import '../../platform/field_label.dart';
 import '../user/users_dropdown.dart';
 import 'fields/facility_number_text_box.dart';
 
+enum SaveMode {
+  onChange,
+  onExplicitSave,
+}
+
+typedef SaveCallback<T> = void Function(T item);
+
 class FacilityDetailsPage extends StatefulWidget {
   final Item? initialItem;
-  final void Function(Item item) save;
+  final SaveCallback<FacilityItem> save;
 
   const FacilityDetailsPage({
     this.initialItem,
@@ -30,6 +37,7 @@ class FacilityDetailsPage extends StatefulWidget {
 
 class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   final fields = ItemsLabels.getFieldLabels('facility');
+  SaveMode? saveMode;
   int? _number;
   String? _type;
   String? _subtype;
@@ -43,6 +51,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
     super.initState();
     assert(widget.initialItem is FacilityItem?, 'Initial item must be of type FacilityItem');
     final item = widget.initialItem as FacilityItem?;
+    saveMode = item != null ? SaveMode.onChange : SaveMode.onExplicitSave;
     if (item != null) {
       _number = item.number;
       _type = item.type;
@@ -66,7 +75,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
           _subtypeFormFieldBuilder(),
           _roomCountFormFieldBuilder(),
           _picturesBuilder(),
-          _saveButton(),
+          saveMode == SaveMode.onExplicitSave ? _saveButton() : null,
         ].whereType<Widget>().toList(),
       ),
     );
@@ -162,7 +171,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
 
   void onChanged(BuildContext context, VoidCallback fn) {
     setState(fn);
-    if (widget.initialItem != null) {
+    if (saveMode == SaveMode.onChange) {
       widget.save(FacilityItem.fromFields({
         ...(widget.initialItem?.fields ?? {}),
         'status': _status,

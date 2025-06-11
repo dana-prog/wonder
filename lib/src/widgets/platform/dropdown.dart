@@ -148,9 +148,10 @@ class _DropdownOption<T> extends StatelessWidget {
   }
 
   Widget contentBuilder(BuildContext context, Color backgroundColor) {
+    final noSelection = option == null || option!.title.isEmpty;
     final textWidget = Text(
-      option?.title ?? Labels.selectOption,
-      style: applyOnColor(style, backgroundColor),
+      noSelection == true ? Labels.selectOption : option!.title,
+      style: applyOnColor(style, backgroundColor)?.copyWith(fontWeight: FontWeight.normal),
       overflow: TextOverflow.ellipsis,
     );
 
