@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wonder/src/globals.dart';
 import 'package:wonder/src/widgets/items/user/initials_avatar.dart';
 import 'package:wonder/src/widgets/media/app_image.dart';
 
 import '../../../data/user_item.dart';
+import '../../../globals.dart';
 
 // TODO: move to assets folder
 const _defaultUserPicture = 'default_user.png';
@@ -20,10 +20,13 @@ class UserAvatar extends StatelessWidget {
       return InitialsAvatar(user: item!);
     }
 
-    return ClipOval(
-      child: AppImage(
-        assetName: '$imagesPath/${item?.avatar ?? _defaultUserPicture}',
-        fit: BoxFit.cover,
+    return AspectRatio(
+      aspectRatio: 1,
+      child: ClipOval(
+        child: AppImage(
+          assetName: '$imagesPath/${item?.avatar ?? _defaultUserPicture}',
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
