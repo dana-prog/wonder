@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../data/item.dart';
 import '../../logger.dart';
 import '../../providers/items_provider.dart';
 import '../../resources/labels.dart';
+import '../../routes/locations.dart';
 import '../platform/constants.dart';
 import '../platform/error_view.dart';
 import 'facility/facility_details_page.dart';
@@ -28,13 +30,15 @@ class ItemForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      spacing: kFormTitleBodySpacing,
-      children: [
-        _FormTitle(title: item?.title ?? Labels.newItem(resolvedItemType)),
-        _FormBody(item: item, itemType: resolvedItemType, save: save),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: kFormTitleBodySpacing,
+        children: [
+          _FormTitle(title: item?.title ?? Labels.newItem(resolvedItemType)),
+          _FormBody(item: item, itemType: resolvedItemType, save: save),
+        ],
+      ),
     );
   }
 }
@@ -51,19 +55,35 @@ class ItemFormConsumer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncItem = id != null ? ref.watch(itemProvider((itemType, id!))) : AsyncValue.data(null);
-    // final notifier = ref.watch(itemListProvider(itemType).notifier);
 
     return asyncItem.when(
       data: (item) => ItemForm(
         item: item,
         itemType: itemType,
-        // TODO: restore
-        save: (item) => logger.t('[ItemFormConsumer:build]: Saving item: $item, not implemented'),
-        // save: (item) => id == null ? notifier.create(item) : notifier.update(item),
+        save: (item) async =>
+            id == null ? await addItem(context, ref, item) : await updateItem(context, ref, item),
       ),
       loading: LoadingItemForm.new,
       error: ErrorView.new,
     );
+  }
+
+  Future<void> updateItem(BuildContext _, WidgetRef ref, Item item) async {
+    logger.d('[ItemCard.updateItem] add item: $item');
+    final notifier = ref.watch(itemListProvider(itemType).notifier);
+
+    await notifier.update(item);
+  }
+
+  Future<void> addItem(BuildContext context, WidgetRef ref, Item item) async {
+    logger.d('[ItemCard.addItem] add item: $item');
+    final router = GoRouter.of(context);
+    final notifier = ref.watch(itemListProvider(itemType).notifier);
+
+    final newItem = await notifier.add(item.fields);
+    final route = getItemRoute(item: newItem);
+    logger.d('[ItemCard.addItem] navigate to $route');
+    router.replace(route);
   }
 }
 

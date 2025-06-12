@@ -31,14 +31,21 @@ class ItemListNotifier extends StateNotifier<AsyncValue<List<Item>>> {
     return _load();
   }
 
-  Future<Item> create(Item item) async {
-    logger.d('[FacilityListNotifier.create] $item');
-    return await client.createItem(item);
+  Future<Item> add(Map<String, dynamic> fields) async {
+    logger.d('[FacilityListNotifier.create] $fields');
+    final items = state.asData?.value ?? [];
+    final newItem = await client.addItem(fields);
+    state = AsyncData([newItem, ...items]);
+    return newItem;
   }
 
   Future<Item> update(Item item) async {
     logger.d('[FacilityListNotifier.update] $item');
-    return await client.updateItem(item);
+    final updatedItem = await client.updateItem(item);
+    state = AsyncData(
+      state.asData!.value.map((i) => i.id == updatedItem.id ? updatedItem : i).toList(),
+    );
+    return updatedItem;
   }
 
   Future<void> delete(Item item) async {

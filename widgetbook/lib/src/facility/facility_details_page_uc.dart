@@ -12,15 +12,15 @@ final _facility = MockData.facilities[1];
 @UseCase(name: 'Edit', type: FacilityDetailsPage, path: _folder)
 Widget editFacility(BuildContext context) {
   FacilityItem? initialItem = _facility;
-  return StatefulBuilder(
-    builder: (context, setState) => FacilityDetailsPage(
+  return StatefulBuilder(builder: (context, setState) {
+    return FacilityDetailsPage(
       initialItem: initialItem,
       save: (item) {
         setState(() => initialItem = item);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Saved Item')));
       },
-    ),
-  );
+    );
+  });
 }
 
 @UseCase(name: 'New', type: FacilityDetailsPage, path: _folder)

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:wonder/src/routes/locations.dart';
 
 import '../../data/item.dart';
-import '../../logger.dart';
 import '../../providers/items_provider.dart';
 import '../../resources/labels.dart';
 
@@ -63,10 +62,7 @@ class ItemCard extends ConsumerWidget {
   }
 
   void _onEdit(BuildContext context) {
-    final route = Locations.editItem
-        .replaceFirst(':itemType', item.itemType)
-        .replaceFirst(':itemId', item.id!);
-    logger.d('[ItemCard.onEdit] navigate to $route');
+    final route = getItemRoute(item: item);
     context.push(route);
     // Navigator.of(context).push(
     //   // TODO: check this solution again: it might be a problem when we want to share the route (to send a ticket link for example)

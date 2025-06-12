@@ -10,7 +10,7 @@ import 'user_avatar.dart';
 class UsersDropdownConsumer extends ConsumerWidget {
   final String? selectedId;
   final TextStyle? style;
-  final ValueChanged<String?>? onChanged;
+  final ValueChanged<UserItem?>? onChanged;
   // final double? itemHeight;
   // final FormFieldValidator<String>? validator;
 
@@ -31,6 +31,7 @@ class UsersDropdownConsumer extends ConsumerWidget {
       style: style,
       popupItemAlignment: MainAxisAlignment.start,
       showSearchBox: true,
+      onChanged: onChanged,
     );
   }
 }

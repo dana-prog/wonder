@@ -37,7 +37,6 @@ class FacilityDetailsPage extends StatefulWidget {
 
 class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   final fields = ItemsLabels.getFieldLabels('facility');
-  SaveMode? saveMode;
   int? _number;
   String? _type;
   String? _subtype;
@@ -50,8 +49,9 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   void initState() {
     super.initState();
     assert(widget.initialItem is FacilityItem?, 'Initial item must be of type FacilityItem');
+    logger.t(
+        '[FacilityDetailsPage.initState] Initial item: ${widget.initialItem?.toString() ?? 'null'}');
     final item = widget.initialItem as FacilityItem?;
-    saveMode = item != null ? SaveMode.onChange : SaveMode.onExplicitSave;
     if (item != null) {
       _number = item.number;
       _type = item.type;
@@ -103,7 +103,11 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
           selectedId: _status,
           // style: TextStyle(fontWeight: FontWeight.bold),
           // itemHeight: kFieldEditorHeight,
-          onChanged: (value) => onChanged(context, () => _status = value?.id),
+          onChanged: (value) => onChanged(context, () {
+            logger.d(
+                '[FacilityDetailsPage._statusFormFieldBuilder.onChanged] Selected status: $value');
+            _status = value?.id;
+          }),
         ),
       );
 
@@ -111,7 +115,14 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         label: fields['owner']!,
         child: UsersDropdownConsumer(
           selectedId: _owner,
-          onChanged: (value) => onChanged(context, () => _owner = value),
+          onChanged: (value) => onChanged(
+            context,
+            () {
+              logger.d(
+                  '[FacilityDetailsPage._ownerFormFieldBuilder.onChanged] Selected owner: $value');
+              _owner = value?.id;
+            },
+          ),
         ),
       );
 
@@ -159,7 +170,6 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
             ...(widget.initialItem?.fields ?? {}),
             'number': _number,
             'status': _status,
-            'type': _type,
             'subtype': _subtype,
             'owner': _owner,
             'roomCount': _roomCount,
@@ -168,6 +178,8 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
         },
         child: Text('Save'),
       );
+
+  SaveMode get saveMode => widget.initialItem == null ? SaveMode.onExplicitSave : SaveMode.onChange;
 
   void onChanged(BuildContext context, VoidCallback fn) {
     setState(fn);
@@ -199,7 +211,7 @@ class FacilityDetailsPageConsumer extends ConsumerWidget {
     return asyncItem.when(
       data: (initialItem) => FacilityDetailsPage(
         initialItem: initialItem,
-        save: (item) => initialItem == null ? notifier.create(item) : notifier.update(item),
+        save: (item) => initialItem == null ? notifier.add(item.fields) : notifier.update(item),
       ),
       loading: LoadingFacilityDetailsPage.new,
       error: ErrorView.new,

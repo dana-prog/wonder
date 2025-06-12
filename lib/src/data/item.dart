@@ -51,11 +51,8 @@ abstract class Fields {
   }
 
   dynamic operator [](String fieldName) {
-    return _fields.containsKey(fieldName)
-        ? _fields[fieldName]
-        : throw Exception(
-            'Field $fieldName not found for Fields = ${toFullString()}',
-          );
+    assert(fieldName.isNotEmpty, 'Field $fieldName for $this must not be empty');
+    return _fields[fieldName];
   }
 
   void operator []=(String fieldName, dynamic fieldValue) {

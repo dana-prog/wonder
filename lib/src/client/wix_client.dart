@@ -26,11 +26,18 @@ enum _HeaderContentType {
   }
 }
 
+// TODO: move to server or to item initialization in the client
+final defaultFieldValues = {
+  'facility': {'type': 'd9c1d2a1-17fe-4f3f-b035-dcbe4905e444'}
+};
+
 // TODO: separate the authentication and db apis
 class WixClient extends Client {
   final _authentication = WixAuthentication();
 
-  WixClient();
+  WixClient() {
+    logger.d('[WixClient]');
+  }
 
   @override
   Future<T> fetchItem<T extends Item>({
@@ -98,31 +105,33 @@ class WixClient extends Client {
   }
 
   @override
-  Future<T> createItem<T extends Item>(T newItem) async {
-    logger.d('[WixClient.createItem] $newItem');
+  Future<T> addItem<T extends Item>(Map<String, dynamic> fields) async {
+    logger.d('[WixClient.addItem] $fields');
 
     await _ensureMemberLogin();
 
-    final fields = newItem.fields;
-    final dataCollectionId = metadata.getByName(newItem.itemType).dataCollectionId;
+    final dataCollectionId = metadata.getByName(fields['itemType']).dataCollectionId;
     final response = await http.post(
       Uri.parse(_itemsApiBaseUrl),
       headers: _getHeaders(),
       body: jsonEncode({
         'dataCollectionId': dataCollectionId,
-        'dataItem': {'data': fields},
+        'dataItem': {
+          'data': {
+            ...defaultFieldValues[fields['itemType']] ?? {},
+            ...fields,
+          }
+        },
       }),
     );
 
     logger.d('[WixClient.createItem] ${response.statusCode}\n${response.body}');
 
     if (response.statusCode != 200) {
-      throw Exception('[WixClient.updateItem] Failed to update item $newItem: ${response.body}');
+      throw Exception('[WixClient.updateItem] Failed to update item $fields: ${response.body}');
     }
 
-    final dataItem = jsonDecode(response.body)['dataItem'];
-    final item = getItemObject(dataItem) as T;
-    return super.createItem(item);
+    return super.addItem(jsonDecode(response.body)['dataItem']);
   }
 
   @override
@@ -226,6 +235,14 @@ class WixClient extends Client {
   Future<void> logout() async => await _authentication.logout();
 
   @override
-  T getItemObject<T extends Item>(Map<String, dynamic> dataItem) =>
-      super.getItemObject<T>({...dataItem, 'id': dataItem['id']});
+  T getItemObject<T extends Item>(Map<String, dynamic> fields) {
+    final id = fields['id'];
+    final dataCollectionId = fields['dataCollectionId'];
+    final itemMetadata = metadata.getByCollectionId(dataCollectionId);
+    return super.getItemObject({
+      'id': id,
+      'itemType': itemMetadata.name,
+      ...fields['data'],
+    });
+  }
 }

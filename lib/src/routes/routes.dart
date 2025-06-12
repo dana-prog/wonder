@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import '../logger.dart';
 import '../widgets/forms/main_view.dart';
-import '../widgets/forms/single_view_form.dart';
 import '../widgets/items/item_form.dart';
 import '../widgets/media/image_page.dart';
 import 'locations.dart';
@@ -66,7 +65,7 @@ final router = GoRouter(
           final itemType = state.pathParameters['itemType']!;
           assert(itemType == 'facility', 'only facility is supported for new items');
 
-          return SingleViewScaffold(
+          return RouteContainer(
             child: ItemFormConsumer(itemType: itemType, id: null),
           );
         }),
@@ -88,27 +87,10 @@ final router = GoRouter(
   // },
 );
 
-class RouteContainer extends StatefulWidget {
-  final bool isChildVisible;
+class RouteContainer extends StatelessWidget {
   final Widget child;
 
-  const RouteContainer({
-    required this.child,
-    this.isChildVisible = true,
-  });
-
-  @override
-  State<RouteContainer> createState() => _RouteContainerState();
-}
-
-class _RouteContainerState extends State<RouteContainer> {
-  late bool isOn;
-
-  @override
-  void initState() {
-    super.initState();
-    isOn = widget.isChildVisible;
-  }
+  const RouteContainer({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -116,20 +98,8 @@ class _RouteContainerState extends State<RouteContainer> {
       appBar: AppBar(
         automaticallyImplyLeading: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: isOn
-            ? Center(child: widget.child)
-            : const Center(
-                child: Text('Child is hidden'),
-              ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() => isOn = !isOn);
-        },
-        child: Icon(isOn ? Icons.visibility : Icons.visibility_off),
-      ),
+      // TODO: remove hard coded value
+      body: Padding(padding: const EdgeInsets.all(16.0), child: child),
     );
   }
 }

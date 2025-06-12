@@ -45,24 +45,18 @@ abstract class Client {
 
   Future<List<T>> fetchItems<T extends Item>({required String itemType});
 
-  Future<T> createItem<T extends Item>(T newItem) async {
-    logger.d('[Client.createItem] item: $newItem');
-    T createdItem;
-    createdItem = cache.set(newItem);
-
-    notifyItemCreated(createdItem);
-    return createdItem;
+  Future<T> addItem<T extends Item>(Map<String, dynamic> fields) async {
+    logger.d('[Client.addItem] fields: $fields');
+    T item = getItemObject(fields);
+    cache.set(item);
+    notifyItemCreated(item);
+    return item;
   }
 
   Future<T> updateItem<T extends Item>(T newItem) async {
     assert(newItem.id != null, 'Item id must not be null for update');
     logger.d('[Client.updateItem] item: $newItem');
-    T updatedItem;
-    if (!cache.exists(newItem.id!)) {
-      updatedItem = cache.set(newItem);
-    } else {
-      updatedItem = cache.update(newItem);
-    }
+    T updatedItem = cache.exists(newItem.id!) ? cache.update(newItem) : cache.set(newItem);
 
     notifyItemUpdated(updatedItem);
     return updatedItem;
@@ -75,22 +69,22 @@ abstract class Client {
   }
 
   @protected
-  T getItemObject<T extends Item>(Map<String, dynamic> dataItem) {
-    final id = dataItem['id'];
-    final dataCollectionId = dataItem['dataCollectionId'];
-    final itemMetadata = metadata.getByCollectionId(dataCollectionId);
+  T getItemObject<T extends Item>(Map<String, dynamic> fields) {
+    // TODO: review getItemObject implementations
+    final id = fields['id'];
+    final itemType = fields['itemType'];
+    final itemMetadata = metadata.getByName(itemType);
     if (!cache.exists(id)) {
       cache.set(itemMetadata.deserializer({
-        'id': dataItem['id'],
-        'itemType': itemMetadata.name,
+        'id': fields['id'],
+        'itemType': itemType,
       }));
     }
 
     final item = cache[id];
-    final data = dataItem['data'] as Map<String, dynamic>;
 
-    for (var entry in data.entries) {
-      item[entry.key] = entry.value;
+    for (var fieldsEntry in fields.entries) {
+      item[fieldsEntry.key] = fieldsEntry.value;
     }
 
     return item;

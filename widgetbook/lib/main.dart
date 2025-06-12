@@ -33,11 +33,13 @@ class WidgetbookApp extends StatelessWidget {
     logger.d('[WidgetbookApp.build]');
 
     return Widgetbook.material(
+      initialRoute: '?path=facility/facilitydetailspage/edit',
       // initialRoute: '?path=facility/editors/facilitystatusdropdown/status',
-      initialRoute: '?path=user/all/all',
+      // initialRoute: '?path=user/all/all',
       // initialRoute: '?path=debug/unboundedwidth/not_working',
       directories: getDirectories(),
       addons: [
+        _RouteLoggerAddon(),
         MaterialThemeAddon(themes: [
           WidgetbookTheme(name: 'Light', data: AppTheme.light),
           WidgetbookTheme(name: 'Dark', data: AppTheme.dark),
@@ -50,6 +52,28 @@ class WidgetbookApp extends StatelessWidget {
           child: child),
     );
   }
+}
+
+class _RouteLoggerAddon extends WidgetbookAddon<String> {
+  _RouteLoggerAddon() : super(name: 'Route Logger');
+
+  @override
+  Widget buildUseCase(
+    BuildContext context,
+    Widget child,
+    String setting,
+  ) {
+    // Log the path on each use case build
+    final path = WidgetbookState.of(context).path;
+    logger.d('📍 Widgetbook route: $path');
+    return child;
+  }
+
+  @override
+  List<Field<String>> get fields => [];
+
+  @override
+  String valueFromQueryGroup(Map<String, String> group) => '';
 }
 
 List<Override> _getProviderOverrides() {

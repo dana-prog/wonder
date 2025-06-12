@@ -4,20 +4,44 @@ import 'package:wonder/src/data/item.dart';
 import '../src/logger.dart';
 import 'mock_data.dart';
 
+// TODO: remove
+final defaultFieldValues = {
+  'facility': {'type': 'facilityType_villa'}
+};
+
 final defaultMockItems = [
-  ...MockData.facilities,
+  ...MockData.facilities.sublist(0, 3),
   ...MockData.users,
   ...MockData.listValues,
 ];
 
+var _nextItemId = 1;
+
 class MockClient extends Client {
-  late List<Item> initialItems;
+  late List<Item> items;
 
   MockClient({List<Item>? items}) {
-    initialItems = items ?? defaultMockItems;
-    for (final item in initialItems) {
+    logger.d('[MockClient]');
+    this.items = items ?? defaultMockItems;
+    for (final item in this.items) {
       cache.set(item);
     }
+  }
+
+  @override
+  Future<T> addItem<T extends Item>(Map<String, dynamic> fields) async {
+    logger.d('[MockClient.createItem] fields: $fields');
+    final id = fields['id'] ?? fields['title']?.toSnakeCase() ?? (_nextItemId++).toString();
+    final dataCollectionId = metadata.getByName(fields['itemType']).dataCollectionId;
+
+    T item = await super.addItem({
+      ...defaultFieldValues[fields['itemType']] ?? {},
+      ...fields,
+      'id': id,
+      'dataCollectionId': dataCollectionId,
+    });
+    items.add(item);
+    return item;
   }
 
   @override
@@ -39,7 +63,7 @@ class MockClient extends Client {
   void resetCache() {
     cache.clear();
 
-    for (final item in initialItems) {
+    for (final item in items) {
       cache.set(item);
     }
   }
