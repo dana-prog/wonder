@@ -6,14 +6,16 @@ class FacilityItem extends Item {
   FacilityItem.fromFields(Map<String, dynamic> fields) : super({'itemType': 'facility', ...fields});
 
   FacilityItem({
+    required String id,
     required int number,
     required String status,
     required String type,
     required String subtype,
-    required String owner,
+    String? owner,
     int? roomCount,
     List<String>? pictures,
   }) : this.fromFields({
+          'id': id,
           'dataCollectionId': ItemType.facility.pluralName,
           'number': number,
           'status': status,

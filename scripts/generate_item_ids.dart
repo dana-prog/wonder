@@ -590,7 +590,7 @@ var _itemsFields = [
     "name": "construction",
     "description": "Construction work is currently in progress.",
     "order": 3.0,
-    "title": "Under Construction",
+    "title": "Construction",
     "type": "facilityStatus"
   },
   {

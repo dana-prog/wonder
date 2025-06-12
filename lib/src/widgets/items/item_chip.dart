@@ -16,6 +16,7 @@ class ItemChip extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final double? height;
   final double? width;
+  final TextAlign? textAlign;
 
   const ItemChip({
     required this.item,
@@ -25,6 +26,7 @@ class ItemChip extends StatelessWidget {
     this.padding,
     this.height,
     this.width,
+    this.textAlign,
   }) : assert(item != null || itemType != null,
             'Either item or itemType must be provided. If item is null, itemType must be provided to fetch the item.');
 
@@ -38,6 +40,7 @@ class ItemChip extends StatelessWidget {
       padding: padding,
       height: height,
       width: width,
+      textAlign: textAlign,
     );
   }
 }

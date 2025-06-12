@@ -11,6 +11,7 @@ class ListValueChipConsumer extends ConsumerWidget {
   final EdgeInsetsGeometry? padding;
   final double? height;
   final double? width;
+  final TextAlign? textAlign;
 
   const ListValueChipConsumer({
     required this.id,
@@ -19,6 +20,7 @@ class ListValueChipConsumer extends ConsumerWidget {
     this.padding,
     this.height,
     this.width,
+    this.textAlign,
   });
 
   @override
@@ -31,6 +33,7 @@ class ListValueChipConsumer extends ConsumerWidget {
       padding: padding,
       height: height,
       width: width,
+      textAlign: textAlign,
     );
   }
 }

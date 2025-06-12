@@ -6,23 +6,6 @@ import '../../../data/user_item.dart';
 import '../../../providers/users_provider.dart';
 import 'user_avatar.dart';
 
-enum ChipLabelSize {
-  small,
-  medium,
-  large;
-
-  double getFontSize(BuildContext context) {
-    switch (this) {
-      case ChipLabelSize.small:
-        return Theme.of(context).textTheme.labelSmall?.fontSize ?? 11.0;
-      case ChipLabelSize.medium:
-        return Theme.of(context).textTheme.labelMedium?.fontSize ?? 12.0;
-      case ChipLabelSize.large:
-        return Theme.of(context).textTheme.labelLarge?.fontSize ?? 15.0;
-    }
-  }
-}
-
 class UserChip extends StatelessWidget {
   final UserItem? item;
   final Color? backgroundColor;

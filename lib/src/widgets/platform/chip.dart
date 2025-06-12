@@ -9,6 +9,7 @@ class Chip extends m.StatelessWidget {
   final m.Color? backgroundColor;
   final double? height;
   final double? width;
+  final m.TextAlign? textAlign;
   final m.EdgeInsetsGeometry? padding;
   final m.OutlinedBorder? shape;
 
@@ -20,6 +21,7 @@ class Chip extends m.StatelessWidget {
     this.padding,
     this.height,
     this.width,
+    this.textAlign,
     this.shape,
   });
 
@@ -31,7 +33,11 @@ class Chip extends m.StatelessWidget {
         width: width,
         height: height,
         decoration: m.BoxDecoration(color: backgroundColor),
-        child: m.Text(label, overflow: m.TextOverflow.ellipsis),
+        child: m.Text(
+          label,
+          overflow: m.TextOverflow.ellipsis,
+          textAlign: textAlign,
+        ),
       ),
       avatar: avatar,
       labelStyle: applyOnColor(labelStyle, backgroundColor),

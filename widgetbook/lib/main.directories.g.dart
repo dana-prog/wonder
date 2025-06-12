@@ -11,27 +11,35 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:widgetbook/widgetbook.dart' as _i1;
-import 'package:wonder_widgetbook/src/debug_uc.dart' as _i6;
-import 'package:wonder_widgetbook/src/facility/facility_details_page_uc.dart' as _i2;
-import 'package:wonder_widgetbook/src/facility/facility_fields_editors_uc.dart' as _i3;
-import 'package:wonder_widgetbook/src/platform/chip_uc.dart' as _i4;
-import 'package:wonder_widgetbook/src/user/user_widgets_uc.dart' as _i5;
+import 'package:wonder_widgetbook/src/debug_uc.dart' as _i7;
+import 'package:wonder_widgetbook/src/facility/facility_card_uc.dart' as _i2;
+import 'package:wonder_widgetbook/src/facility/facility_details_page_uc.dart' as _i3;
+import 'package:wonder_widgetbook/src/facility/facility_fields_editors_uc.dart' as _i4;
+import 'package:wonder_widgetbook/src/platform/chip_uc.dart' as _i5;
+import 'package:wonder_widgetbook/src/user/user_widgets_uc.dart' as _i6;
 
 List<_i1.WidgetbookNode> getDirectories() {
   return [
     _i1.WidgetbookCategory(
       name: 'Facility',
       children: [
+        _i1.WidgetbookLeafComponent(
+          name: 'FacilityCard',
+          useCase: _i1.WidgetbookUseCase(
+            name: 'default',
+            builder: _i2.facilityCard,
+          ),
+        ),
         _i1.WidgetbookComponent(
           name: 'FacilityDetailsPage',
           useCases: [
             _i1.WidgetbookUseCase(
               name: 'Edit',
-              builder: _i2.editFacility,
+              builder: _i3.editFacility,
             ),
             _i1.WidgetbookUseCase(
               name: 'New',
-              builder: _i2.newFacility,
+              builder: _i3.newFacility,
             ),
           ],
         ),
@@ -42,42 +50,42 @@ List<_i1.WidgetbookNode> getDirectories() {
               name: 'FacilityNumberTextBox',
               useCase: _i1.WidgetbookUseCase(
                 name: 'number',
-                builder: _i3.number,
+                builder: _i4.number,
               ),
             ),
             _i1.WidgetbookLeafComponent(
               name: 'FacilityRoomCountDropdown',
               useCase: _i1.WidgetbookUseCase(
                 name: '# Rooms',
-                builder: _i3.roomCount,
+                builder: _i4.roomCount,
               ),
             ),
             _i1.WidgetbookLeafComponent(
               name: 'FacilityStatusDropdown',
               useCase: _i1.WidgetbookUseCase(
                 name: 'Status',
-                builder: _i3.facilityStatus,
+                builder: _i4.facilityStatus,
               ),
             ),
             _i1.WidgetbookLeafComponent(
               name: 'FacilitySubtypeDropdown',
               useCase: _i1.WidgetbookUseCase(
                 name: 'Subtype',
-                builder: _i3.subtype,
+                builder: _i4.subtype,
               ),
             ),
             _i1.WidgetbookLeafComponent(
               name: 'FacilityTypeDropdown',
               useCase: _i1.WidgetbookUseCase(
                 name: 'Type',
-                builder: _i3.type,
+                builder: _i4.type,
               ),
             ),
             _i1.WidgetbookLeafComponent(
               name: 'UsersDropdownConsumer',
               useCase: _i1.WidgetbookUseCase(
                 name: 'Owner',
-                builder: _i3.owner,
+                builder: _i4.owner,
               ),
             ),
           ],
@@ -94,7 +102,7 @@ List<_i1.WidgetbookNode> getDirectories() {
               name: 'Chip',
               useCase: _i1.WidgetbookUseCase(
                 name: 'Default',
-                builder: _i4.defaultChip,
+                builder: _i5.defaultChip,
               ),
             )
           ],
@@ -108,7 +116,7 @@ List<_i1.WidgetbookNode> getDirectories() {
           name: 'All',
           useCase: _i1.WidgetbookUseCase(
             name: 'all',
-            builder: _i5.all,
+            builder: _i6.all,
           ),
         ),
         _i1.WidgetbookComponent(
@@ -116,11 +124,11 @@ List<_i1.WidgetbookNode> getDirectories() {
           useCases: [
             _i1.WidgetbookUseCase(
               name: 'width = 25',
-              builder: _i5.initialsAvatar25,
+              builder: _i6.initialsAvatar25,
             ),
             _i1.WidgetbookUseCase(
               name: 'width = 50',
-              builder: _i5.initialsAvatar50,
+              builder: _i6.initialsAvatar50,
             ),
           ],
         ),
@@ -129,23 +137,23 @@ List<_i1.WidgetbookNode> getDirectories() {
           useCases: [
             _i1.WidgetbookUseCase(
               name: 'default',
-              builder: _i5.userAvatar,
+              builder: _i6.userAvatar,
             ),
             _i1.WidgetbookUseCase(
               name: 'no pic',
-              builder: _i5.userAvatarNoPic,
+              builder: _i6.userAvatarNoPic,
             ),
             _i1.WidgetbookUseCase(
               name: 'no user',
-              builder: _i5.userAvatarNoUser,
+              builder: _i6.userAvatarNoUser,
             ),
             _i1.WidgetbookUseCase(
               name: 'size = 25',
-              builder: _i5.userAvatar25,
+              builder: _i6.userAvatar25,
             ),
             _i1.WidgetbookUseCase(
               name: 'size = 50',
-              builder: _i5.userAvatar50,
+              builder: _i6.userAvatar50,
             ),
           ],
         ),
@@ -154,15 +162,19 @@ List<_i1.WidgetbookNode> getDirectories() {
           useCases: [
             _i1.WidgetbookUseCase(
               name: 'default',
-              builder: _i5.userChip,
+              builder: _i6.userChip,
             ),
             _i1.WidgetbookUseCase(
               name: 'no pic',
-              builder: _i5.userChipNoPic,
+              builder: _i6.userChipNoPic,
             ),
             _i1.WidgetbookUseCase(
               name: 'no user',
-              builder: _i5.userChipNoUser,
+              builder: _i6.userChipNoUser,
+            ),
+            _i1.WidgetbookUseCase(
+              name: 'overflow',
+              builder: _i6.userChipOverflow,
             ),
           ],
         ),
@@ -171,15 +183,19 @@ List<_i1.WidgetbookNode> getDirectories() {
           useCases: [
             _i1.WidgetbookUseCase(
               name: 'default',
-              builder: _i5.usersDropdown,
+              builder: _i6.usersDropdown,
             ),
             _i1.WidgetbookUseCase(
               name: 'no pic',
-              builder: _i5.usersDropdownNoPic,
+              builder: _i6.usersDropdownNoPic,
             ),
             _i1.WidgetbookUseCase(
               name: 'no user',
-              builder: _i5.usersDropdownNoUser,
+              builder: _i6.usersDropdownNoUser,
+            ),
+            _i1.WidgetbookUseCase(
+              name: 'overflow',
+              builder: _i6.usersDropdownOverflow,
             ),
           ],
         ),
@@ -193,11 +209,11 @@ List<_i1.WidgetbookNode> getDirectories() {
           useCases: [
             _i1.WidgetbookUseCase(
               name: 'not_working',
-              builder: _i6.notWorking,
+              builder: _i7.notWorking,
             ),
             _i1.WidgetbookUseCase(
               name: 'unbounded_width',
-              builder: _i6.unboundedWidth,
+              builder: _i7.unboundedWidth,
             ),
           ],
         )

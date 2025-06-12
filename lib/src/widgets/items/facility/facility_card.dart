@@ -57,13 +57,11 @@ class FacilityCard extends ConsumerWidget {
         typeWidget: ListValueChipConsumer(id: item.type, labelStyle: smallChipStyle),
         subtypeWidget: ListValueChipConsumer(id: item.subtype, labelStyle: smallChipStyle),
         roomCountWidget: RoomCountChip(roomCount: item.roomCount, labelStyle: smallChipStyle),
-        statusWidget: SizedBox(
-          // TODO: remove hard coded value
-          width: 150,
-          child: ListValueChipConsumer(
-            id: item.status,
-            labelStyle: TextStyle(fontWeight: FontWeight.bold),
-          ),
+        statusWidget: ListValueChipConsumer(
+          id: item.status,
+          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+          width: double.infinity,
+          textAlign: TextAlign.center,
         ),
       ),
     );
@@ -86,6 +84,7 @@ class FacilityCard extends ConsumerWidget {
         // aad a row with all widgets except statusWidget to align these widgets to start while the status widgets is aligned to end
         // wrap the row in Flexible so that it will not try to take more space than available and overflow
         Flexible(
+          flex: 3,
           child: Row(
             spacing: 10,
             children: [
@@ -95,7 +94,10 @@ class FacilityCard extends ConsumerWidget {
             ],
           ),
         ),
-        statusWidget,
+        Expanded(
+          flex: 1,
+          child: statusWidget,
+        ),
       ],
     );
   }
