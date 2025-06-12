@@ -9,20 +9,30 @@ import '../../resources/labels.dart';
 
 class EventMessenger extends ConsumerWidget {
   final Widget child;
-  const EventMessenger({required this.child});
+  const EventMessenger({required this.child, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final overlay = Overlay.of(context, rootOverlay: true);
     ref.listen<(String, Item)?>(eventProvider, (prev, next) {
       if (next != null) {
-        final message = NotificationMessages.itemEvent(next.$1, next.$2);
-        showTopSnackBar(
-          overlay,
-          CustomSnackBar.success(message: message),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-        ref.read(eventProvider.notifier).clear();
+        // defer UI interaction to after build
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final overlay = Overlay.of(context, rootOverlay: true);
+          final messenger = ScaffoldMessenger.of(context);
+          final message = NotificationMessages.itemEvent(next.$1, next.$2);
+
+          showTopSnackBar(
+            overlay,
+            CustomSnackBar.success(message: message),
+          );
+
+          messenger.showSnackBar(
+            SnackBar(
+              content: Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text(message)),
+            ),
+          );
+          ref.read(eventProvider.notifier).clear();
+        });
       }
     });
 

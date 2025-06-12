@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wonder/src/widgets/notifications/event_messenger.dart';
 
 import '../routes/routes.dart';
 import '../theme/app_theme.dart';
@@ -16,6 +17,16 @@ class Root extends StatelessWidget {
       routerConfig: router,
       locale: _locale,
       supportedLocales: [_locale],
+      builder: (context, child) {
+        return Overlay(
+          initialEntries: [
+            OverlayEntry(
+              builder: (context) =>
+                  child != null ? EventMessenger(child: child) : SizedBox.shrink(),
+            ),
+          ],
+        );
+      },
       // showPerformanceOverlay: true,
     );
   }

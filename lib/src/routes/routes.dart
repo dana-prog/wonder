@@ -87,6 +87,7 @@ final router = GoRouter(
   // },
 );
 
+// TODO: reconsider this class
 class RouteContainer extends StatelessWidget {
   final Widget child;
 
