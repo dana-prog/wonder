@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../platform/constants.dart';
+import '../../../platform/form.dart';
 
 class FacilityNumberTextBox extends StatelessWidget {
   final int? initialValue;
@@ -29,6 +30,8 @@ class FacilityNumberTextBox extends StatelessWidget {
         // textAlignVertical: TextAlignVertical.center,
         textAlign: TextAlign.center,
         onChanged: (value) => onChanged?.call(value.isEmpty ? null : int.tryParse(value)),
+        validator: requiredValidator,
+        autovalidateMode: defaultAutoValidateMode,
       ),
     );
   }

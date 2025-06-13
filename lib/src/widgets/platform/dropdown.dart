@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' hide Chip;
 import '../../resources/labels.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/color_utils.dart';
+import 'form.dart';
 
 const kDropdownListViewPadding = 8.0;
 const kDropdownPopupOptionVPadding = 3.0;
@@ -18,10 +19,10 @@ class Dropdown<T> extends StatelessWidget {
   final double? itemHeight;
   final ValueChanged<T?>? onChanged;
   final ds.Mode? mode;
-  final AutovalidateMode autoValidateMode;
   final MainAxisAlignment? selectedItemAlignment;
   final MainAxisAlignment? popupItemAlignment;
   final bool? showSearchBox;
+  final FormFieldValidator<T>? validator;
 
   Dropdown({
     super.key,
@@ -32,10 +33,10 @@ class Dropdown<T> extends StatelessWidget {
     this.style,
     this.itemHeight,
     this.mode,
-    this.autoValidateMode = AutovalidateMode.disabled,
     this.selectedItemAlignment,
     this.popupItemAlignment,
     this.showSearchBox,
+    this.validator,
   })  : assert(items != null || options != null, 'Either items or options must be provided.'),
         items = items ?? options!.map((option) => option.value!).toList(),
         options = options ?? items!.map((item) => DropdownOptionProps(value: item)).toList();
@@ -93,6 +94,8 @@ class Dropdown<T> extends StatelessWidget {
         clearButtonProps: ds.ClearButtonProps(isVisible: false),
         dropdownButtonProps: ds.DropdownButtonProps(isVisible: false),
       ),
+      validator: validator,
+      autoValidateMode: defaultAutoValidateMode,
     );
   }
 

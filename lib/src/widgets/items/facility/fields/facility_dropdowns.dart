@@ -4,6 +4,7 @@ import 'package:wonder/src/widgets/items/list_value/list_values_dropdown.dart';
 import '../../../../resources/colors.dart';
 import '../../../../resources/labels.dart';
 import '../../../platform/dropdown.dart';
+import '../../../platform/form.dart';
 import '../../constants.dart';
 
 class FacilityTypeDropdown extends ListValuesDropdownConsumer {
@@ -11,7 +12,7 @@ class FacilityTypeDropdown extends ListValuesDropdownConsumer {
     super.key,
     super.selectedId,
     super.onChanged,
-  }) : super(listType: 'facilityType');
+  }) : super(listType: 'facilityType', validator: requiredValidator);
 }
 
 class FacilitySubtypeDropdown extends ListValuesDropdownConsumer {
@@ -19,7 +20,7 @@ class FacilitySubtypeDropdown extends ListValuesDropdownConsumer {
     super.key,
     super.selectedId,
     super.onChanged,
-  }) : super(listType: 'facilitySubtype');
+  }) : super(listType: 'facilitySubtype', validator: requiredValidator);
 }
 
 class FacilityStatusDropdown extends ListValuesDropdownConsumer {
@@ -27,7 +28,7 @@ class FacilityStatusDropdown extends ListValuesDropdownConsumer {
     super.key,
     super.selectedId,
     super.onChanged,
-  }) : super(listType: 'facilityStatus');
+  }) : super(listType: 'facilityStatus', validator: requiredValidator);
 }
 
 final List<DropdownOptionProps<int>> menuItemsProps = roomCountColors.entries
@@ -56,6 +57,7 @@ class FacilityRoomCountDropdown extends StatelessWidget {
       options: menuItemsProps,
       onChanged: onChanged,
       style: kDefaultDropdownTextStyle.merge(style),
+      validator: requiredValidator,
     );
   }
 }

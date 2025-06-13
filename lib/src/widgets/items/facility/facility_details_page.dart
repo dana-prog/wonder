@@ -44,6 +44,7 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
   String? _owner;
   int? _roomCount;
   List<String>? _pictures;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -65,18 +66,21 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        spacing: kFieldSpacing,
-        children: [
-          widget.initialItem == null ? _numberFormFieldBuilder() : null,
-          _ownerFormFieldBuilder(),
-          _statusFormFieldBuilder(),
-          _subtypeFormFieldBuilder(),
-          _roomCountFormFieldBuilder(),
-          _picturesBuilder(),
-          saveMode == SaveMode.onExplicitSave ? _saveButton() : null,
-        ].whereType<Widget>().toList(),
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          spacing: kFieldSpacing,
+          children: [
+            widget.initialItem == null ? _numberFormFieldBuilder() : null,
+            _ownerFormFieldBuilder(),
+            _statusFormFieldBuilder(),
+            _subtypeFormFieldBuilder(),
+            _roomCountFormFieldBuilder(),
+            _picturesBuilder(),
+            saveMode == SaveMode.onExplicitSave ? _saveButton() : null,
+          ].whereType<Widget>().toList(),
+        ),
       ),
     );
   }
@@ -163,20 +167,10 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
     );
   }
 
+  // TODO: move save to item_form?
   Widget _saveButton() => ElevatedButton(
-        onPressed: () {
-          logger.d('[FacilityDetailsPage._saveButton.onPressed]');
-          widget.save(FacilityItem.fromFields({
-            ...(widget.initialItem?.fields ?? {}),
-            'number': _number,
-            'status': _status,
-            'subtype': _subtype,
-            'owner': _owner,
-            'roomCount': _roomCount,
-            'pictures': _pictures ?? [],
-          }));
-        },
-        child: Text('Save'),
+        onPressed: onSave,
+        child: Text(Labels.save),
       );
 
   SaveMode get saveMode => widget.initialItem == null ? SaveMode.onExplicitSave : SaveMode.onChange;
@@ -195,12 +189,36 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
       }));
     }
   }
+
+  void onSave() {
+    logger.d('[FacilityDetailsPage.onSave]');
+
+    if (!(_formKey.currentState?.validate() ?? true)) {
+      logger.d('[FacilityDetailsPage.onSave] Form validation failed');
+      return;
+    }
+
+    widget.save(FacilityItem.fromFields({
+      ...(widget.initialItem?.fields ?? {}),
+      'number': _number,
+      'status': _status,
+      'subtype': _subtype,
+      'owner': _owner,
+      'roomCount': _roomCount,
+      'pictures': _pictures ?? [],
+    }));
+  }
 }
 
 class FacilityDetailsPageConsumer extends ConsumerWidget {
   final String? id;
+  final SaveCallback<FacilityItem>? save;
 
-  const FacilityDetailsPageConsumer({required this.id});
+  const FacilityDetailsPageConsumer({
+    required this.id,
+    this.save,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -211,7 +229,12 @@ class FacilityDetailsPageConsumer extends ConsumerWidget {
     return asyncItem.when(
       data: (initialItem) => FacilityDetailsPage(
         initialItem: initialItem,
-        save: (item) => initialItem == null ? notifier.add(item.fields) : notifier.update(item),
+        save: (item) {
+          logger.d(
+            '[FacilityDetailsPageConsumer] save: ${item.toString()}',
+          );
+          initialItem == null ? notifier.add(item.fields) : notifier.update(item);
+        },
       ),
       loading: LoadingFacilityDetailsPage.new,
       error: ErrorView.new,

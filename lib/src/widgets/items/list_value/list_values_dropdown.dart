@@ -13,6 +13,7 @@ class ListValuesDropdownConsumer extends ConsumerWidget {
   final TextStyle? style;
   final ValueChanged<ListValueItem?>? onChanged;
   final double? itemHeight;
+  final FormFieldValidator<ListValueItem>? validator;
 
   const ListValuesDropdownConsumer({
     super.key,
@@ -21,6 +22,7 @@ class ListValuesDropdownConsumer extends ConsumerWidget {
     this.style,
     this.onChanged,
     this.itemHeight,
+    this.validator,
   });
 
   @override
@@ -39,6 +41,7 @@ class ListValuesDropdownConsumer extends ConsumerWidget {
           .toList(),
       style: kDefaultDropdownTextStyle.merge(style),
       itemHeight: itemHeight,
+      validator: validator,
     );
   }
 }

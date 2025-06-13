@@ -33,7 +33,8 @@ class WidgetbookApp extends StatelessWidget {
     logger.d('[WidgetbookApp.build]');
 
     return Widgetbook.material(
-      initialRoute: '?path=facility/facilitycard/default',
+      initialRoute: '?path=facility/facilitydetailspage/new',
+      // initialRoute: '?path=facility/facilitycard/default',
       // initialRoute: '?path=facility/editors/facilitystatusdropdown/status',
       // initialRoute: '?path=user/all/all',
       // initialRoute: '?path=debug/unboundedwidth/not_working',
