@@ -1,6 +1,20 @@
 import 'dart:convert';
 
-enum GrantType { anonymous, authorizationCode }
+import 'package:wonder/src/logger.dart';
+
+enum GrantType {
+  anonymous,
+  member;
+
+  String getWixLabel() {
+    switch (this) {
+      case GrantType.anonymous:
+        return 'anonymous';
+      case GrantType.member:
+        return 'authorization_code';
+    }
+  }
+}
 
 class Token {
   late GrantType grantType;
@@ -8,35 +22,48 @@ class Token {
   late String refreshToken;
   late DateTime expiresAt;
 
-  Token.fromString(String tokenString) {
-    final token = jsonDecode(tokenString);
-    grantType = GrantType.values.byName(token['grantType']);
-    accessToken = token['accessToken'];
-    refreshToken = token['refreshToken'];
-    expiresAt = DateTime.parse(token['expiresAt']);
-  }
+  Token({
+    required this.grantType,
+    required this.accessToken,
+    required this.refreshToken,
+    required this.expiresAt,
+  });
 
-  Token.fromBody(GrantType type, String bodyString) {
-    grantType = type;
-    final bodyProps = jsonDecode(bodyString);
-    accessToken = bodyProps['access_token'] as String;
-    refreshToken = bodyProps['refresh_token'] as String;
-    expiresAt = DateTime.now().add(
-      Duration(seconds: bodyProps['expires_in'] as int),
+  static Token fromString(String tokenString) {
+    final token = jsonDecode(tokenString);
+    return Token(
+      grantType: GrantType.values.byName(token['grantType']),
+      accessToken: token['accessToken'],
+      refreshToken: token['refreshToken'],
+      expiresAt: DateTime.parse(token['expiresAt']),
     );
   }
 
-  bool get isExpired {
-    return DateTime.now().isAfter(expiresAt);
+  bool get isValid {
+    try {
+      return DateTime.now().isBefore(expiresAt);
+    } catch (e) {
+      logger.e('[Token.isValid] Error checking expiration: $e');
+      return false; // If there's an error, assume the token is not valid
+    }
   }
+
+  GrantType get type => grantType;
 
   @override
   String toString() {
     return jsonEncode({
       'grantType': grantType.name,
+      'expiresAt': expiresAt.toIso8601String(),
+    });
+  }
+
+  String toFullString() {
+    return jsonEncode({
+      'grantType': grantType.name,
+      'expiresAt': expiresAt.toIso8601String(),
       'accessToken': accessToken,
       'refreshToken': refreshToken,
-      'expiresAt': expiresAt.toIso8601String(),
     });
   }
 }

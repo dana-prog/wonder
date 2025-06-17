@@ -1,7 +1,9 @@
 import 'package:wonder/src/client/client.dart';
+import 'package:wonder/src/client/wix/wix_utils.dart';
 import 'package:wonder/src/data/item.dart';
 
 import '../src/logger.dart';
+import 'mock_authentication.dart';
 import 'mock_data.dart';
 
 // TODO: remove
@@ -18,30 +20,30 @@ final defaultMockItems = [
 var _nextItemId = 1;
 
 class MockClient extends Client {
-  late List<Item> items;
+  late List<Item> initialItems;
 
-  MockClient({List<Item>? items}) {
+  MockClient({List<Item>? items}) : super(authentication: MockAuthentication()) {
     logger.d('[MockClient]');
-    this.items = items ?? defaultMockItems;
-    for (final item in this.items) {
-      cache.set(item);
+    initialItems = items ?? defaultMockItems;
+    for (final item in initialItems) {
+      notifyItemFetched(item);
     }
   }
 
   @override
-  Future<T> addItem<T extends Item>(Map<String, dynamic> fields) async {
+  Future<T> createItem<T extends Item>(Map<String, dynamic> fields) async {
     logger.d('[MockClient.createItem] fields: $fields');
     final id = fields['id'] ?? fields['title']?.toSnakeCase() ?? (_nextItemId++).toString();
     final dataCollectionId = metadata.getByName(fields['itemType']).dataCollectionId;
 
-    T item = await super.addItem({
+    T item = dataItemToItem({
       ...defaultFieldValues[fields['itemType']] ?? {},
       ...fields,
       'id': id,
       'dataCollectionId': dataCollectionId,
     });
-    items.add(item);
-    return item;
+    notifyItemCreated(item);
+    return getCachedItem(item.itemType, item.id!)!;
   }
 
   @override
@@ -50,7 +52,7 @@ class MockClient extends Client {
     required String id,
   }) async {
     logger.t('[MockClient.fetchItem] $itemType/$id');
-    return cache[id];
+    return getCachedItem<T>(itemType, id)!;
   }
 
   @override
@@ -63,8 +65,20 @@ class MockClient extends Client {
   void resetCache() {
     cache.clear();
 
-    for (final item in items) {
+    for (final item in initialItems) {
       cache.set(item);
     }
+  }
+
+  @override
+  Future<T> deleteItem<T extends Item>(T item) async {
+    notifyItemDeleted(item);
+    return item;
+  }
+
+  @override
+  Future<T> updateItem<T extends Item>(T newItem) async {
+    notifyItemUpdated(newItem);
+    return getCachedItem(newItem.itemType, newItem.id!)!;
   }
 }

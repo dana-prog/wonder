@@ -34,7 +34,7 @@ class ItemListNotifier extends StateNotifier<AsyncValue<List<Item>>> {
   Future<Item> add(Map<String, dynamic> fields) async {
     logger.d('[FacilityListNotifier.create] $fields');
     final items = state.asData?.value ?? [];
-    final newItem = await client.addItem(fields);
+    final newItem = await client.createItem(fields);
     state = AsyncData([newItem, ...items]);
     return newItem;
   }

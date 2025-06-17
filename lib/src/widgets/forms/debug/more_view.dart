@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../providers/client_provider.dart';
-import '../../../routes/locations.dart';
+import '../../../router/routes_names.dart';
 
 class MoreItem {
   final String name;
@@ -26,7 +26,7 @@ final _moreItems = [
     name: 'themePlayground',
     title: 'Theme Playground',
     icon: Icons.palette,
-    route: '${Locations.more}/${MoreSubLocations.themePlayground}',
+    route: '${RouteNames.more}/${MoreSubLocations.themePlayground}',
   ),
   MoreItem(
     name: 'printMyMember',

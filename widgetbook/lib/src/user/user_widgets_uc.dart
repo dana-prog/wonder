@@ -6,9 +6,10 @@ import 'package:wonder/src/widgets/items/user/initials_avatar.dart';
 import 'package:wonder/src/widgets/items/user/user_avatar.dart';
 import 'package:wonder/src/widgets/items/user/user_chip.dart';
 import 'package:wonder/src/widgets/items/user/users_dropdown.dart';
+import 'package:wonder_test/src/utils/widgets_layout.dart';
 
+import '../debug_uc.dart';
 import '../folders.dart';
-import '../utils/use_cases_layout.dart';
 
 const _folder = FolderNames.user;
 const _userId = 'dana_shalev';
@@ -16,41 +17,41 @@ const _userIdNoPic = 'no_pic';
 const _userIdLongName = 'verylongfirstname_verylonglastname';
 
 @UseCase(name: 'all', type: All, path: _folder)
-Widget all(BuildContext _) => UseCasesLayout(sections: {
-      'InitialsAvatar': GridProps(
-        builders: {
-          'width = 25': initialsAvatar25,
-          'width = 50': initialsAvatar50,
+Widget all(BuildContext context) => WidgetsLayout(sections: {
+      'InitialsAvatar': SectionProps(
+        widgets: {
+          'width = 25': initialsAvatar25(context),
+          'width = 50': initialsAvatar50(context),
         },
       ),
-      'UserAvatar': GridProps(
-        builders: {
-          'default': userAvatar,
-          'no pic': userAvatarNoPic,
-          'no user': userAvatarNoUser,
-          'size = 25': userAvatar25,
-          'size = 50': userAvatar50,
+      'UserAvatar': SectionProps(
+        widgets: {
+          'default': userAvatar(context),
+          'no pic': userAvatarNoPic(context),
+          'no user': userAvatarNoUser(context),
+          'size = 25': userAvatar25(context),
+          'size = 50': userAvatar50(context),
         },
       ),
-      'UserChip': GridProps(
-        builders: {
-          'default': userChip,
-          'no pic': userChipNoPic,
-          'no user': userChipNoUser,
-          'overflow': userChipOverflow,
+      'UserChip': SectionProps(
+        widgets: {
+          'default': userChip(context),
+          'no pic': userChipNoPic(context),
+          'no user': userChipNoUser(context),
+          'overflow': userChipOverflow(context),
         },
       ),
-      'UsersDropdown': GridProps(
-        builders: {
-          'default': usersDropdown,
-          'no pic': usersDropdownNoPic,
-          'no user': usersDropdownNoUser,
-          'overflow': usersDropdownOverflow,
+      'UsersDropdown': SectionProps(
+        widgets: {
+          'default': usersDropdown(context),
+          'no pic': usersDropdownNoPic(context),
+          'no user': usersDropdownNoUser(context),
+          'overflow': usersDropdownOverflow(context),
         },
         childAspectRatio: 1.5,
       ),
-      'UsersDropdownLayout': GridProps(
-        builders: {'user': usersDropdown},
+      'UsersDropdownLayout': SectionProps(
+        widgets: {'user': usersDropdown(context)},
         rowWidgetCount: 1,
         childAspectRatio: 4.0,
       ),

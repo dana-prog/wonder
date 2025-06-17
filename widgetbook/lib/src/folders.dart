@@ -6,4 +6,5 @@ class FolderNames {
   static const facility = '[Facility]';
   static const user = '[User]';
   static const platform = '[Platform]';
+  static const authentication = '[Authentication]';
 }

@@ -2,30 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../logger.dart';
+import '../utils/debug_utils.dart';
 import '../widgets/forms/main_view.dart';
 import '../widgets/items/item_form.dart';
 import '../widgets/media/image_page.dart';
-import 'locations.dart';
 import 'logging_observer.dart';
+import 'routes_names.dart';
 
 final router = GoRouter(
-  initialLocation: Locations.initial,
+  initialLocation: RouteNames.initial,
   routes: [
     // tickets
     GoRoute(
-        path: Locations.tickets,
+        path: RouteNames.tickets,
         builder: (context, state) {
           return MainView(ticketsPageName);
         }),
     // facilities
     GoRoute(
-        path: Locations.facilities,
+        path: RouteNames.facilities,
         builder: (context, state) {
           return MainView(facilitiesPageName);
         }),
     // item
     GoRoute(
-      path: Locations.editItem,
+      path: RouteNames.editItem,
       builder: (context, state) {
         final itemType = state.pathParameters['itemType']!;
         final id = state.pathParameters['itemId']!;
@@ -45,14 +46,14 @@ final router = GoRouter(
     ),
     // more
     GoRoute(
-        path: Locations.more,
+        path: RouteNames.more,
         builder: (context, state) {
           return MainView(morePageName);
         },
         routes: []),
     // image
     GoRoute(
-      path: Locations.image,
+      path: RouteNames.image,
       builder: (context, state) {
         final path = state.pathParameters['path']!;
         return ImagePage(path: path);
@@ -60,7 +61,7 @@ final router = GoRouter(
     ),
     // new item
     GoRoute(
-        path: Locations.newItem,
+        path: RouteNames.newItem,
         builder: (context, state) {
           final itemType = state.pathParameters['itemType']!;
           assert(itemType == 'facility', 'only facility is supported for new items');
@@ -101,6 +102,10 @@ class RouteContainer extends StatelessWidget {
       ),
       // TODO: remove hard coded value
       body: Padding(padding: const EdgeInsets.all(16.0), child: child),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showNavigationDialog(context),
+        child: const Icon(Icons.navigation_outlined),
+      ),
     );
   }
 }

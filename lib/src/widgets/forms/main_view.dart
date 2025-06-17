@@ -4,7 +4,7 @@ import 'package:wonder/src/logger.dart';
 import 'package:wonder/src/widgets/forms/debug/more_view.dart';
 
 import '../../resources/labels.dart';
-import '../../routes/locations.dart';
+import '../../router/routes_names.dart';
 import '../items/facility/facilities_main_view.dart';
 import '../items/ticket/ticket_list.dart';
 
@@ -43,7 +43,7 @@ final _pages = [
     icon: Icons.house,
     bodyBuilder: (BuildContext context) => FacilitiesMainView(),
     floatingActionButtonBuilder: (BuildContext context) => FloatingActionButton(
-      onPressed: () => context.push(Locations.newItem.replaceFirst(':itemType', 'facility')),
+      onPressed: () => context.push(RouteNames.newItem.replaceFirst(':itemType', 'facility')),
       child: const Icon(Icons.add),
     ),
   ),

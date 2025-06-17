@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wonder/src/widgets/notifications/event_messenger.dart';
 
-import '../routes/routes.dart';
+import '../router/router.dart';
 import '../theme/app_theme.dart';
 
 const _locale = Locale('en');

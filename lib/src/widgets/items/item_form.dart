@@ -7,7 +7,7 @@ import '../../data/item.dart';
 import '../../logger.dart';
 import '../../providers/items_provider.dart';
 import '../../resources/labels.dart';
-import '../../routes/locations.dart';
+import '../../router/routes_names.dart';
 import '../platform/constants.dart';
 import '../platform/error_view.dart';
 import 'facility/facility_details_page.dart';

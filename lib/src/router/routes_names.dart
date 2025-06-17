@@ -1,6 +1,6 @@
 import '../data/item.dart';
 
-class Locations {
+class RouteNames {
   // static const initial = '/facility/3c34ee55-05e0-4107-9cd1-b720fe494592';
   // static const initial = '$more/${MoreSubLocations.performancePlayground}';
   static const initial = facilities;
@@ -21,7 +21,7 @@ String getItemRoute({String? itemType, String? id, Item? item}) {
   assert((itemType != null && id != null) || item != null,
       'Either itemType and id must be provided, or an item must be provided.');
 
-  return Locations.editItem
+  return RouteNames.editItem
       .replaceFirst(':itemType', itemType ?? item!.itemType)
       .replaceFirst(':itemId', id ?? item!.id!);
 }

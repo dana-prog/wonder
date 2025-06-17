@@ -3,10 +3,14 @@ import 'package:flutter/cupertino.dart';
 import '../data/item.dart';
 import '../data/metadata.dart';
 import '../logger.dart';
+import 'authentication.dart';
 
 typedef ItemCallback = void Function(Item);
 
 abstract class Client {
+  final Authentication authentication;
+  Client({required this.authentication});
+
   final List<ItemCallback> _itemCreatedCallbacks = [];
   final List<ItemCallback> _itemUpdatedCallbacks = [];
   final List<ItemCallback> _itemDeletedCallbacks = [];
@@ -24,71 +28,42 @@ abstract class Client {
   void addItemDeletedCallback(ItemCallback callback) => _itemDeletedCallbacks.add(callback);
 
   void notifyItemCreated(Item item) {
+    cache.set(item);
     for (var callback in _itemCreatedCallbacks) {
       callback(item);
     }
   }
 
   void notifyItemUpdated(Item item) {
+    Item cachedItem = cache.exists(item.id!) ? cache.update(item) : cache.set(item);
+
     for (var callback in _itemUpdatedCallbacks) {
-      callback(item);
+      callback(cachedItem);
     }
   }
 
   void notifyItemDeleted(Item item) {
+    cache.remove(item);
+
     for (var callback in _itemDeletedCallbacks) {
       callback(item);
     }
   }
 
+  void notifyItemFetched(Item item) => cache.set(item);
+
   Future<T> fetchItem<T extends Item>({required String itemType, required String id});
 
   Future<List<T>> fetchItems<T extends Item>({required String itemType});
 
-  Future<T> addItem<T extends Item>(Map<String, dynamic> fields) async {
-    logger.d('[Client.addItem] fields: $fields');
-    T item = getItemObject(fields);
-    cache.set(item);
-    notifyItemCreated(item);
-    return item;
-  }
+  Future<T> createItem<T extends Item>(Map<String, dynamic> fields);
 
-  Future<T> updateItem<T extends Item>(T newItem) async {
-    assert(newItem.id != null, 'Item id must not be null for update');
-    logger.d('[Client.updateItem] item: $newItem');
-    T updatedItem = cache.exists(newItem.id!) ? cache.update(newItem) : cache.set(newItem);
+  Future<T> updateItem<T extends Item>(T newItem);
 
-    notifyItemUpdated(updatedItem);
-    return updatedItem;
-  }
+  Future<T> deleteItem<T extends Item>(T item);
 
-  Future<T> deleteItem<T extends Item>(T item) async {
-    T deletedItem = cache.remove(item);
-    notifyItemDeleted(deletedItem);
-    return deletedItem;
-  }
-
-  @protected
-  T getItemObject<T extends Item>(Map<String, dynamic> fields) {
-    // TODO: review getItemObject implementations
-    final id = fields['id'];
-    final itemType = fields['itemType'];
-    final itemMetadata = metadata.getByName(itemType);
-    if (!cache.exists(id)) {
-      cache.set(itemMetadata.deserializer({
-        'id': fields['id'],
-        'itemType': itemType,
-      }));
-    }
-
-    final item = cache[id];
-
-    for (var fieldsEntry in fields.entries) {
-      item[fieldsEntry.key] = fieldsEntry.value;
-    }
-
-    return item;
-  }
+  T? getCachedItem<T extends Item>(String itemType, String id) =>
+      cache.exists(id) ? cache[id] as T : null;
 
   // for debugging
   void printCachedItems() => logger.e('[Client.printCachedItems] Unimplemented');

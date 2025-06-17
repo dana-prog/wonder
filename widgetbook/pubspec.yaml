@@ -11,6 +11,8 @@ dependencies:
     sdk: flutter
   wonder:
     path: ../
+  wonder_test:
+    path: ../wonder_test
   assets:
     path: ../assets
 

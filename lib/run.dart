@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,17 +10,29 @@ typedef GetProviderOverrides = Future<List<Override>> Function();
 
 void run(Future<List<Override>> Function() getProviderOverrides) async {
   logger.t('[run] Application started');
-  debugProfileBuildsEnabled = true;
-  WidgetsFlutterBinding.ensureInitialized();
+  runZonedGuarded(() async {
+    debugProfileBuildsEnabled = true;
 
-  // TODO: consider displaying a LoadingScreen while fetching initial data
-  // runApp(const ProviderScope(child: LoadingScreen()));
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details); // keep default behavior
+      logger.e('Flutter error', error: details.exception, stackTrace: details.stack);
+    };
 
-  final overrides = await getProviderOverrides();
-  logger.t('[run] Provider overrides fetched');
+    WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(ProviderScope(
-    overrides: overrides,
-    child: const Root(),
-  ));
+    // TODO: consider displaying a LoadingScreen while fetching initial data
+    // runApp(const ProviderScope(child: LoadingScreen()));
+
+    final overrides = await getProviderOverrides();
+    logger.t('[run] Provider overrides fetched');
+
+    runApp(
+      ProviderScope(
+        overrides: overrides,
+        child: const Root(),
+      ),
+    );
+  }, (error, stackTrace) {
+    logger.e('Error in runZonedGuarded', error: error, stackTrace: stackTrace);
+  });
 }

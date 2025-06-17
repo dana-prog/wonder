@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wonder/src/routes/locations.dart';
+import 'package:wonder/src/router/routes_names.dart';
 
 import '../../data/item.dart';
 import '../../providers/items_provider.dart';

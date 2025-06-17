@@ -18,10 +18,10 @@ Future<List<Override>> _getMockProviderOverrides() async {
   return [
     clientProvider.overrideWithValue(client),
     listsValuesProvider.overrideWithValue(
-      ListsValuesCache(client.items.whereType<ListValueItem>().toList()),
+      ListsValuesCache(client.initialItems.whereType<ListValueItem>().toList()),
     ),
     usersProvider.overrideWithValue(
-      UsersCache(client.items.whereType<UserItem>().toList()),
+      UsersCache(client.initialItems.whereType<UserItem>().toList()),
     ),
   ];
 }

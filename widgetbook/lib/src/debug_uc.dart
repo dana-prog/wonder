@@ -207,3 +207,5 @@ class NotWorking extends StatelessWidget {
   //   // );
   // }
 }
+
+abstract class All {}

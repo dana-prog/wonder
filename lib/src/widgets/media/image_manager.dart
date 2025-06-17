@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../logger.dart';
 import '../../providers/file_provider.dart';
-import '../../routes/locations.dart';
+import '../../router/routes_names.dart';
 import '../../theme/app_theme.dart';
 import '../platform/dotted_border.dart';
 import 'app_image.dart';
@@ -108,7 +108,7 @@ class _ImageThumbnail extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () {
-            context.push(Locations.image.replaceFirst(':path', path));
+            context.push(RouteNames.image.replaceFirst(':path', path));
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(defaultBorderRadius),
