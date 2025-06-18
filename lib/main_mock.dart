@@ -5,7 +5,7 @@ import 'mock/mock_client.dart';
 import 'src/data/list_value_item.dart';
 import 'src/data/user_item.dart';
 import 'src/providers/client_provider.dart';
-import 'src/providers/lists_of_values_provider.dart';
+import 'src/providers/lists_values_provider.dart';
 import 'src/providers/users_provider.dart';
 
 void main() async {

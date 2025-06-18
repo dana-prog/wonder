@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../providers/lists_of_values_provider.dart';
+import '../../../providers/lists_values_provider.dart';
 import '../item_chip.dart';
 
 class ListValueChipConsumer extends ConsumerWidget {

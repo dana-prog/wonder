@@ -17,12 +17,11 @@ class UserItem extends Item {
 
   String get lastName => this['lastName'];
 
-  String get middleName => getFieldValue('middleName', defaultValue: '')!;
+  String get middleName => getFieldValue('middleName', defaultValue: '') ?? '';
 
-  String get nickname => getFieldValue('nickname', defaultValue: '')!;
+  String get nickname => getFieldValue('nickname', defaultValue: '') ?? '';
 
-  String get email => this['email'];
-
+  // TODO: rename from avatar to picture?
   @override
   String? get avatar => getFieldValue('picture');
 

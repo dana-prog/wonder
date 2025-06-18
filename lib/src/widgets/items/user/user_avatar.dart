@@ -15,6 +15,7 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return InitialsAvatar(user: item!);
     if (item != null && item!.avatar == null) {
       // user with no pic - show initials
       return InitialsAvatar(user: item!);

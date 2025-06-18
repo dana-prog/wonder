@@ -58,7 +58,7 @@ final userMetadata = TypeMetadata(
 
 final listValueMetadata = TypeMetadata(
   name: 'listValue',
-  dataCollectionId: 'lists_of_values',
+  dataCollectionId: 'lists_values',
   deserializer: ListValueItem.fromFields,
   defaultSortBy: [
     ('type', SortOrder.ascending),

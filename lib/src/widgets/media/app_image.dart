@@ -31,6 +31,7 @@ class AppImage extends StatelessWidget {
     return assetName != null ? buildAssetImage(assetName!) : buildFileImage(filePath!);
   }
 
+  // Builds an image from a flutter asset
   Widget buildAssetImage(String name) {
     return Image.asset(
       name,
@@ -46,6 +47,7 @@ class AppImage extends StatelessWidget {
     );
   }
 
+  // Builds an image from a file path
   Widget buildFileImage(String path) {
     logger.t('[AppFileImage:build]: path: $path');
     return Consumer(

@@ -1,4 +1,3 @@
-import 'package:wonder/src/data/data_item.dart';
 import 'package:wonder/src/data/item.dart';
 import 'package:wonder/src/data/item_helpers.dart';
 
@@ -16,7 +15,7 @@ class FacilityItem extends Item {
     List<String>? pictures,
   }) : this.fromFields({
           'id': id,
-          'dataCollectionId': ItemType.facility.pluralName,
+          'dataCollectionId': 'facilities',
           'number': number,
           'status': status,
           'type': type,

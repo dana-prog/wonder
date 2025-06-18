@@ -81,4 +81,16 @@ abstract class Fields {
     if (this['id'] > other['id']) return 1;
     return -1;
   }
+
+  Map<String, dynamic> toJson() {
+    final res = <String, dynamic>{};
+    for (var entry in _fields.entries) {
+      if (entry.key.contains('_')) {
+        continue;
+      }
+      res[entry.key] = entry.value;
+    }
+
+    return res;
+  }
 }

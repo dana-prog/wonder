@@ -7,21 +7,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:pkce/pkce.dart';
 import 'package:uuid/uuid.dart';
-import 'package:wonder/src/client/wix/wix_constants.dart';
 
 import '../../logger.dart';
 import '../authentication.dart';
 import '../token.dart';
 import 'wix_api_service.dart';
-
-// Token _mockToken = Token(
-//   grantType: GrantType.anonymous,
-//   accessToken:
-//       "OauthNG.JWS.eyJraWQiOiJZSEJzdUpwSCIsImFsZyI6IkhTMjU2In0.eyJkYXRhIjoie1wiaW5zdGFuY2VcIjp7XCJpbnN0YW5jZUlkXCI6XCIyZWIxNDlkNC02Yzk4LTQ1ZDAtODFiMy1lYWNkMDU5NmRhYjBcIixcImFwcERlZklkXCI6XCIzZTFjZWMyOC1iMjIxLTQxNzAtYjY4OS0wZDBjYmIyZjE5YzhcIixcInNpZ25EYXRlXCI6XCIyMDI1LTA2LTE3VDA1OjIwOjI0LjM3OVpcIixcInBlcm1pc3Npb25zXCI6XCJcIixcImRlbW9Nb2RlXCI6ZmFsc2UsXCJzaXRlT3duZXJJZFwiOlwiMTI0NmZlNGQtYzJlNC00MDZiLTljYjktYjJmZWRiZjUyYzNkXCIsXCJhaWRcIjpcIjBiYWVlZGJiLTVjMDYtNDFhOC04MmE0LTVlMWM3MzRhODIzOFwiLFwibWV0YVNpdGVJZFwiOlwiZDAzYTMwOWYtNTIwZi00YjdlLTkxNjItZGJiOTkyNDRjZWI3XCIsXCJleHBpcmF0aW9uRGF0ZVwiOlwiMjAyNS0wNi0xN1QwOToyMDoyNC4zNzlaXCJ9fSIsImlhdCI6MTc1MDEzNzYyNCwiZXhwIjoxNzUwMTUyMDI0fQ.GNMX2pE2FwnCJdvAQ46Y31SpdDS9EcwlAN5EcRyh2U4",
-//   expiresAt: DateTime.now().add(Duration(seconds: 14400)),
-//   refreshToken:
-//       'JWS.eyJraWQiOiJZSEJzdUpwSCIsImFsZyI6IkhTMjU2In0.eyJkYXRhIjoiXCI5MjcwMWMyNy1mZGQ2LTRhN2UtYmMwMC02MmU3MzI3OWYwODRcIiIsImlhdCI6MTc1MDEzNzYyNCwiZXhwIjoxNzgxNjczNjI0fQ.5PExsxpFy9ZTrxobPpDgE7LZUGhFHCtllvGUAf8VKdQ',
-// );
 
 class WixAuthentication extends Authentication {
   // String get _siteId => 'd03a309f-520f-4b7e-9162-dbb99244ceb7';
@@ -29,17 +19,23 @@ class WixAuthentication extends Authentication {
   // String get _apiKeyAuth =>
   //     'IST.eyJraWQiOiJQb3pIX2FDMiIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjoie1wiaWRcIjpcIjEyZjhlMWQ1LTRmOWQtNDM0Ni1hNzk4LTA2ZGE1MjFhMzRmNVwiLFwiaWRlbnRpdHlcIjp7XCJ0eXBlXCI6XCJhcHBsaWNhd*GlvblwiLFwiaWRcIjpcIjk2NDlhYWM2LTgwMzAtNDlmMy1iMmYzLTBjNTFiYTk5ZTY3MlwifSxcInRlbmFudFwiOntcInR5cGVcIjpcImFjY291bnRcIixcImlkXCI6XCIxMjQ2ZmU0ZC1jMmU0LTQwNmItOWNiOS1iMmZlZGJmNTJjM2RcIn19IiwiaWF0IjoxNzQ3NDE5NDI1fQ.fxH6Kq8Udf9N_2eXS0l0Zd9ahNldSxleA8KHwCpOSo-yhMiD2pdJN4d3sVVED-vY_r8OF9Z7QzslNv8OSLuRvdadEPkdP6xatVCQ4U72TOnK-NAzStftyBJ5TsDCJRL-wsKqQ8Q29ZTgWMCBBLnmAJS0pGLZ6QLcaA1DWRK6SwhpKf3TBjqY7QmUG0TtdUQsfiaKxlZn0U2EjFz5A-yDQZ4UaV9k5Rb8LTaZTyJxxymPhOJVYeZdQ5ej3U6mwSuxhPpS7S6G6XN77CLsTU7iODb5PPrIkSF3nllZ4H2x_Q4FL5IIjDnqvkjit8hMi-fQBjP8uMIQR5MsoYn3Q9Zx_Q';
   static const _tokenStorageKey = 'token';
-  static final _state = Uuid().toString();
+  static final String _state = Uuid().v4();
 
+  final String authRedirectUrl;
   Token? _token;
 
   final _storage = const FlutterSecureStorage();
 
-  WixAuthentication._();
+  WixAuthentication._(this.authRedirectUrl);
 
-  Future<void> _init() async {
+  Future<void> _init({Token? token}) async {
+    if (token != null) {
+      logger.t('[WixAuthentication._init] setting token: ${token.toJson()}');
+      await _setToken(token);
+      return;
+    }
+
     final tokenString = await _storage.read(key: _tokenStorageKey);
-
     if (tokenString != null) {
       try {
         final token = jsonDecode(tokenString);
@@ -50,7 +46,8 @@ class WixAuthentication extends Authentication {
           expiresAt: DateTime.parse(token['expiresAt']),
         );
         logger.t(
-            '[WixAuthentication._init] ${_token == null ? 'No tokens found in storage' : 'loaded tokens from storage: ${_token!.toFullString()}'}');
+          '[WixAuthentication._init] ${_token == null ? 'No tokens found in storage' : 'loaded tokens from storage: ${jsonEncode(_token!.toJson())}'}',
+        );
       } catch (e) {
         logger.w('[WixAuthentication._init] Failed to parse token from storage');
         _token = null;
@@ -58,9 +55,9 @@ class WixAuthentication extends Authentication {
     }
   }
 
-  static Future<WixAuthentication> create() async {
-    final instance = WixAuthentication._();
-    await instance._init();
+  static Future<WixAuthentication> create({required String authRedirectUrl, Token? token}) async {
+    final instance = WixAuthentication._(authRedirectUrl);
+    await instance._init(token: token);
     return instance;
   }
 
@@ -69,8 +66,7 @@ class WixAuthentication extends Authentication {
     logger.d('[WixAuthentication.login]');
 
     if (_token?.isValid == false) {
-      // TODO: consider to renew token instead
-      await _setToken(null);
+      await renewToken();
     }
 
     if (_token?.grantType == GrantType.member) {
@@ -85,18 +81,21 @@ class WixAuthentication extends Authentication {
     final pkcePair = PkcePair.generate();
     final loginUrl = await FetchLoginUrlEndpoint(
       accessToken: _token!.accessToken,
+      redirectUri: authRedirectUrl,
       codeChallenge: pkcePair.codeChallenge,
       state: _state,
     ).call();
     logger.t('[WixAuthentication.login] redirecting to loginUrl: $loginUrl');
-    final code = await _redirectToLoginUrl(loginUrl);
+    final code = await _navigateToLoginUrl(loginUrl);
     if (code == null) {
       logger.d('no code received from loginUrl, abort login');
       return;
     }
 
     logger.t('[WixAuthentication.login] code received from loginUrl: $code');
-    final token = await GenerateMemberTokenEndpoint(code, pkcePair.codeVerifier).call();
+    final token = await GenerateMemberTokenEndpoint(
+            code: code, codeVerifier: pkcePair.codeVerifier, redirectUri: authRedirectUrl)
+        .call();
     await _setToken(token);
     logger.t('[WixAuthentication.login] token was set: $token');
   }
@@ -104,8 +103,8 @@ class WixAuthentication extends Authentication {
   @override
   Future<void> logout() async {
     logger.d('[WixAuthentication.logout]');
-    final url = await FetchLogoutUrlEndpoint(accessToken: _token!.accessToken).call();
-    _redirectToLogoutUrl(url);
+    // final url = await FetchLogoutUrlEndpoint(accessToken: _token!.accessToken).call();
+    // _openLogoutUrl(url);
     await _setToken(null);
   }
 
@@ -118,7 +117,7 @@ class WixAuthentication extends Authentication {
       Uri.parse('https://www.wixapis.com/members/v1/members/my'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${token?.accessToken}'
+        'Authorization': 'Bearer ${token?.accessToken}',
       },
     );
 
@@ -126,15 +125,18 @@ class WixAuthentication extends Authentication {
   }
 
   Future<void> loginAsAnonymous() async {
+    logger.t('[WixAuthentication._loginAsAnonymous]');
     final anonymousToken = await GenerateAnonymousTokenEndpoint().call();
     logger.t('[WixAuthentication._loginAsAnonymous] anonymous token generated: $anonymousToken');
     await _setToken(anonymousToken);
   }
 
   Future<void> _setToken(Token? token) async {
-    logger.d(token != null
-        ? '[WixAuthentication._setToken] setting ${token.grantType} token'
-        : '[WixAuthentication._setToken] clearing token');
+    logger.d(
+      token != null
+          ? '[WixAuthentication._setToken] setting ${token.grantType} token'
+          : '[WixAuthentication._setToken] clearing token',
+    );
     _token = token;
 
     if (_token == null) {
@@ -143,38 +145,42 @@ class WixAuthentication extends Authentication {
     }
 
     await _storage.write(
-        key: _tokenStorageKey,
-        value: _token == null
-            ? 'null'
-            : jsonEncode({
-                'grantType': _token!.grantType.name,
-                'accessToken': _token!.accessToken,
-                'refreshToken': _token!.refreshToken,
-                'expiresAt': _token!.expiresAt.toIso8601String(),
-              }));
+      key: _tokenStorageKey,
+      value: _token == null
+          ? 'null'
+          : jsonEncode({
+              'grantType': _token!.grantType.name,
+              'accessToken': _token!.accessToken,
+              'refreshToken': _token!.refreshToken,
+              'expiresAt': _token!.expiresAt.toIso8601String(),
+            }),
+    );
   }
 
-  Future<Uri?> _redirect(String url) async {
-    logger.t('[WixAuthentication._redirect] loginUrl: $url');
+  Future<Uri?> _openUrl(String url) async {
+    logger.t('[WixAuthentication._openUrl] loginUrl: $url');
 
     final authCompleter = Completer<Uri?>();
     final appLinks = AppLinks();
     late final StreamSubscription<Uri> sub;
 
-    sub = appLinks.uriLinkStream.listen((redirectUri) {
-      logger.i(
-          '[WixAuthentication._redirectToLoginUrl] (uriLinkStream) listener called with uri: $redirectUri');
-      if (redirectUri.scheme == callbackUrlScheme) {
-        sub.cancel();
-        authCompleter.complete(redirectUri);
-      }
-    }, onError: (e) {
-      logger.i(
+    sub = appLinks.uriLinkStream.listen(
+      (redirectUri) {
+        logger.i('[WixAuthentication._openUrl] listener called with uri: $redirectUri');
+        if (authRedirectUrl.startsWith(redirectUri.scheme) == true) {
+          sub.cancel();
+          authCompleter.complete(redirectUri);
+        }
+      },
+      onError: (e) {
+        logger.i(
           '[WixAuthentication._redirectToLoginUrl] (uriLinkStream) User did not authenticate on login redirect',
-          error: e);
-      sub.cancel();
-      authCompleter.complete(null);
-    });
+          error: e,
+        );
+        sub.cancel();
+        authCompleter.complete(null);
+      },
+    );
 
     try {
       await launchUrl(
@@ -192,18 +198,20 @@ class WixAuthentication extends Authentication {
         //   dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
         // ),
       );
-      logger.i('[WixAuthentication._redirect] launched url: $url');
+      logger.d('[WixAuthentication._redirect] launched url: $url');
     } catch (e) {
       logger.i('[WixAuthentication._redirect] failed to launch url: $url', error: e);
       return null;
     }
 
-    return await authCompleter.future;
+    final resUri = await authCompleter.future;
+    logger.d('[WixAuthentication._redirect] result: $resUri');
+    return resUri;
   }
 
-  Future<String?> _redirectToLoginUrl(String url) async {
+  Future<String?> _navigateToLoginUrl(String url) async {
     logger.t('[WixAuthentication._redirectToLoginUrl] loginUrl: $url');
-    final uri = await _redirect(url);
+    final uri = await _openUrl(url);
     if (uri == null) {
       return null;
     }
@@ -213,49 +221,47 @@ class WixAuthentication extends Authentication {
     final codeParam = params['code'];
 
     logger.t(
-        '[WixAuthentication._redirectToLoginUrl] uri: $uri, params: $params, responseState: $stateParam, authCode: $codeParam');
+      '[WixAuthentication._redirectToLoginUrl] uri: $uri, params: $params, responseState: $stateParam, authCode: $codeParam',
+    );
 
     if (stateParam == null) {
       throw Exception(
-          '[WixAuthentication._redirectToLoginUrl] No state returned from redirect URI');
+        '[WixAuthentication._redirectToLoginUrl] No state returned from redirect URI',
+      );
     }
     if (stateParam != _state) {
       throw Exception(
-          '[WixAuthentication._redirectToLoginUrl] State mismatch: expected $_state, got $stateParam');
+        '[WixAuthentication._redirectToLoginUrl] State mismatch: expected $_state, got $stateParam',
+      );
     }
     if (codeParam == null) {
       throw Exception(
-          '[WixAuthentication._redirectToLoginUrl] No authentication code returned from redirect URI');
+        '[WixAuthentication._redirectToLoginUrl] No authentication code returned from redirect URI',
+      );
     }
 
     return codeParam;
   }
 
-  Future<void> _redirectToLogoutUrl(String url) async {
-    logger.t('[WixAuthentication._redirectToLogoutUrl] logoutUrl: $url');
-    final uri = await _redirect(url);
-    logger.d('[WixAuthentication._redirectToLogoutUrl] _redirect returned uri: $uri');
-    // final uri = Uri.parse(logoutUrl);
-    // if (await canLaunchUrl(uri)) {
-    //   // TODO: try other launch modes
-    //   launchUrl(uri, mode: LaunchMode.externalApplication);
-    // }
-  }
+  // Future<void> _openLogoutUrl(String url) async {
+  //   logger.t('[WixAuthentication._openLogoutUrl] logoutUrl: $url');
+  //   final uri = await _openUrl(url);
+  //   logger.d('[WixAuthentication._openLogoutUrl] _redirect returned uri: $uri');
+  //   // final uri = Uri.parse(logoutUrl);
+  //   // if (await canLaunchUrl(uri)) {
+  //   //   // TODO: try other launch modes
+  //   //   launchUrl(uri, mode: LaunchMode.externalApplication);
+  //   // }
+  // }
 
-// Future<void> renewToken() async {
-//   logger.t('[WixAuthentication._renewToken] renewing token: $_token');
-//   assert(_token != null, 'Token must not be null to renew it');
-//   assert(_token?.isExpired == true, 'Token must be expired to renew it');
-//
-//   Token token = await callWixApi(
-//     api: WixRestApi.renewToken,
-//     requestBodyProps: {
-//       'refresh_token': _token!.refreshToken,
-//     },
-//   );
-//
-//   await _setToken(token);
-// }
+  Future<void> renewToken() async {
+    logger.t('[WixAuthentication._renewToken] renewing token: $_token');
+    assert(_token != null, 'Token must not be null to renew it');
+    assert(_token?.isValid == true, 'Token must be expired to renew it');
+
+    final renewedToken = await RenewTokenEndpoint(token: _token!).call();
+    await _setToken(renewedToken);
+  }
 }
 
 // TODO: check whether we can use the following class for logout (so that we will use wix logout url but will not open a new browser which does not redirect back to our app)

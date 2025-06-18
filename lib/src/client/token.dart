@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:wonder/src/logger.dart';
+import '../logger.dart';
 
 enum GrantType {
   anonymous,
@@ -29,16 +29,6 @@ class Token {
     required this.expiresAt,
   });
 
-  static Token fromString(String tokenString) {
-    final token = jsonDecode(tokenString);
-    return Token(
-      grantType: GrantType.values.byName(token['grantType']),
-      accessToken: token['accessToken'],
-      refreshToken: token['refreshToken'],
-      expiresAt: DateTime.parse(token['expiresAt']),
-    );
-  }
-
   bool get isValid {
     try {
       return DateTime.now().isBefore(expiresAt);
@@ -52,18 +42,29 @@ class Token {
 
   @override
   String toString() {
-    return jsonEncode({
-      'grantType': grantType.name,
-      'expiresAt': expiresAt.toIso8601String(),
-    });
+    return jsonEncode({'grantType': grantType.name, 'expiresAt': expiresAt.toIso8601String()});
   }
 
-  String toFullString() {
-    return jsonEncode({
+  dynamic toJson() {
+    return {
       'grantType': grantType.name,
-      'expiresAt': expiresAt.toIso8601String(),
       'accessToken': accessToken,
       'refreshToken': refreshToken,
-    });
+      'expiresAt': expiresAt.toIso8601String(),
+    };
+  }
+
+  factory Token.fromJson(Map<String, String> json) {
+    return Token(
+      grantType: GrantType.values.firstWhere((e) => e.name == json['grantType']),
+      accessToken: json['accessToken'] as String,
+      refreshToken: json['refreshToken'] as String,
+      expiresAt: DateTime.parse(json['expiresAt'] as String),
+    );
+  }
+
+  factory Token.fromJsonStr(String jsonStr) {
+    final Map<String, String> json = jsonDecode(jsonStr);
+    return Token.fromJson(json);
   }
 }

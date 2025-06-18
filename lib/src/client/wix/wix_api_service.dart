@@ -6,10 +6,9 @@ import '../../data/item.dart';
 import '../../data/metadata.dart';
 import '../../logger.dart';
 import '../token.dart';
-import 'wix_constants.dart';
 import 'wix_utils.dart';
 
-const _clientId = '3e1cec28-b221-4170-b689-0d0cbb2f19c8';
+const _clientId = '1ac77337-faee-4233-8f67-d700faa547da';
 const _scheme = 'https';
 const _host = 'www.wixapis.com';
 
@@ -90,17 +89,14 @@ class GenerateAnonymousTokenEndpoint extends WixRestEndpoint<Token> {
       : super(
           path: 'oauth2/token',
           methodType: 'POST',
-          body: {
-            'grantType': 'anonymous',
-            'grant_type': 'anonymous',
-            'clientId': _clientId,
-          },
+          body: {'grant_type': 'anonymous', 'client_id': _clientId},
           responseBodyFormatter: _ResponseBodyFormatters.toAnonymousToken,
         );
 }
 
 class GenerateMemberTokenEndpoint extends WixRestEndpoint<Token> {
-  GenerateMemberTokenEndpoint(String code, String codeVerifier)
+  GenerateMemberTokenEndpoint(
+      {required String redirectUri, required String code, required String codeVerifier})
       : super(
           path: 'oauth2/token',
           methodType: 'POST',
@@ -108,16 +104,33 @@ class GenerateMemberTokenEndpoint extends WixRestEndpoint<Token> {
             'code': code,
             'codeVerifier': codeVerifier,
             'clientId': _clientId,
-            'redirectUri': wixAuthorizationRedirectUri,
+            'redirectUri': redirectUri,
             'grantType': 'authorization_code',
           },
           responseBodyFormatter: _ResponseBodyFormatters.toMemberToken,
         );
 }
 
+class RenewTokenEndpoint extends WixRestEndpoint<Token> {
+  RenewTokenEndpoint({required Token token})
+      : super(
+          path: 'oauth2/token',
+          methodType: 'POST',
+          body: {
+            'grant_type': 'refresh_token',
+            'client_id': _clientId,
+            'refresh_token': token.refreshToken
+          },
+          responseBodyFormatter: token.grantType == GrantType.anonymous
+              ? _ResponseBodyFormatters.toAnonymousToken
+              : _ResponseBodyFormatters.toMemberToken,
+        );
+}
+
 class FetchLoginUrlEndpoint extends WixRestEndpoint<String> {
   FetchLoginUrlEndpoint({
     required super.accessToken,
+    String? redirectUri,
     required String codeChallenge,
     required String state,
   }) : super(
@@ -129,14 +142,15 @@ class FetchLoginUrlEndpoint extends WixRestEndpoint<String> {
                 'codeChallenge': codeChallenge,
                 'state': state,
                 'clientId': _clientId,
-                'redirectUri': wixAuthorizationRedirectUri,
+                'redirectUri': redirectUri,
                 'codeChallengeMethod': 'S256',
                 // TODO: check other options for responseMode, responseType and scope
                 'responseType': 'code',
                 'responseMode': 'fragment',
+                // offline_access allows the app to receive a refresh token
                 'scope': 'offline_access',
-              }
-            }
+              },
+            },
           },
           responseBodyFormatter: _ResponseBodyFormatters.toRedirectUrl,
         );
@@ -148,35 +162,49 @@ class FetchLogoutUrlEndpoint extends WixRestEndpoint<String> {
           path: '_api/redirects-api/v1/redirect-session',
           methodType: 'POST',
           body: {
-            'logout': {
-              'clientId': _clientId,
-            }
+            'logout': {'clientId': _clientId},
           },
           responseBodyFormatter: _ResponseBodyFormatters.toRedirectUrl,
         );
 }
 
+// class LoginEndpoint extends WixRestEndpoint<String> {
+//   final String email;
+//   final String password;
+//
+//   LoginEndpoint({
+//     required super.accessToken,
+//     required this.email,
+//     required this.password,
+//   }) : super(
+//           path: '_api/iam/authentication/v2/login',
+//           methodType: 'POST',
+//           body: {
+//             'loginId': {
+//               'email': email,
+//             },
+//             'password': password,
+//           },
+//           responseBodyFormatter: _ResponseBodyFormatters.toSessionToken,
+//         );
+// }
+
 class FetchItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
-  FetchItemEndpoint({
-    required super.accessToken,
-    required String itemType,
-    required String id,
-  }) : super(
+  FetchItemEndpoint({required super.accessToken, required String itemType, required String id})
+      : super(
           path: 'wix-data/v2/items/$id',
           methodType: 'GET',
-          queryParams: {
-            'dataCollectionId': Metadata().getByName('facility').dataCollectionId,
-          },
+          queryParams: {'dataCollectionId': Metadata().getByName(itemType).dataCollectionId},
           responseBodyFormatter: _ResponseBodyFormatters.toItem<T>,
         );
 }
 
 class FetchItemsEndpoint<T extends Item> extends WixRestEndpoint<List<T>> {
-  FetchItemsEndpoint({
-    required String accessToken,
-    required String itemType,
-  }) : super(
-          path: 'wix-data/v2/items/query',
+  FetchItemsEndpoint({required String accessToken, required String itemType})
+      : super(
+          path: ['user', 'listValue'].contains(itemType)
+              ? 'velo/v1/http/invoke/${Metadata().getByName(itemType).dataCollectionId}'
+              : 'wix-data/v2/items/query',
           methodType: 'POST',
           accessToken: accessToken,
           body: {
@@ -194,10 +222,8 @@ class FetchItemsEndpoint<T extends Item> extends WixRestEndpoint<List<T>> {
 class CreateItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
   final Map<String, dynamic> fields;
 
-  CreateItemEndpoint({
-    required super.accessToken,
-    required this.fields,
-  }) : super(
+  CreateItemEndpoint({required super.accessToken, required this.fields})
+      : super(
           path: 'wix-data/v2/items',
           methodType: 'POST',
           body: {
@@ -209,10 +235,8 @@ class CreateItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
 }
 
 class UpdateItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
-  UpdateItemEndpoint({
-    required super.accessToken,
-    required T item,
-  }) : super(
+  UpdateItemEndpoint({required super.accessToken, required T item})
+      : super(
           path: 'wix-data/v2/items/${item.id}',
           methodType: 'PUT',
           body: {
@@ -224,17 +248,55 @@ class UpdateItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
 }
 
 class DeleteItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
-  DeleteItemEndpoint({
-    required super.accessToken,
-    required String itemType,
-    required String id,
-  }) : super(
+  DeleteItemEndpoint({required super.accessToken, required String itemType, required String id})
+      : super(
           path: 'wix-data/v2/items/$id',
           methodType: 'DELETE',
-          queryParams: {
-            'dataCollectionId': Metadata().getByName(itemType).dataCollectionId,
-          },
+          queryParams: {'dataCollectionId': Metadata().getByName(itemType).dataCollectionId},
           responseBodyFormatter: _ResponseBodyFormatters.toItem<T>,
+        );
+}
+
+class GenerateUploadUrlEndpoint extends WixRestEndpoint<String> {
+  GenerateUploadUrlEndpoint({
+    required super.accessToken,
+    required String fileName,
+    String? folderPath,
+  }) : super(
+          path: 'site-media/v1/files/generate-upload-url',
+          methodType: 'POST',
+          body: {
+            "mimeType": "image/jpeg",
+            "fileName": "T-shirt.jpg",
+            "sizeInBytes": "2608831",
+            "parentFolderId": "25284aa06584441ea94338fdcfbaba12",
+            "private": false,
+            "labels": ["AMS:external_file_id", "woman", "bicycle"]
+          },
+          // {
+          //           'fileName': fileName,
+          //           // 'filePath': folderPath,
+          //           'private': false,
+          //         },
+          responseBodyFormatter: _ResponseBodyFormatters.toUploadUrl,
+        );
+}
+
+// class FetchUsersEndpoint extends WixRestEndpoint<List<UserItem>> {
+//   FetchUsersEndpoint({required super.accessToken})
+//       : super(
+//           path: 'velo/v1/http/invoke/users',
+//           methodType: 'GET',
+//           responseBodyFormatter: _ResponseBodyFormatters.toItems<UserItem>,
+//         );
+// }
+
+class FetchStaticListsEndpoint extends WixRestEndpoint<Map<String, List<Item>>> {
+  FetchStaticListsEndpoint({required super.accessToken})
+      : super(
+          path: 'velo/v1/http/invoke/staticLists',
+          methodType: 'GET',
+          responseBodyFormatter: _ResponseBodyFormatters.toItemsLists,
         );
 }
 
@@ -258,6 +320,29 @@ class _ResponseBodyFormatters {
     return dataItems.map<T>((dataItem) => dataItemToItem<T>(dataItem)).toList();
   }
 
+  static Map<String, List<Item>> toItemsLists(String bodyStr) {
+    final lists = <String, List<Item>>{};
+
+    for (final MapEntry entry in jsonDecode(bodyStr).entries) {
+      final String itemType = Metadata().getByCollectionId(entry.key).name;
+      lists[itemType] = (entry.value as List)
+          .map((dataItem) => dataItemToItem<Item>(dataItem as Map<String, dynamic>))
+          .toList();
+    }
+
+    return lists;
+  }
+
+  static String toUploadUrl(String bodyStr) {
+    final Map<String, dynamic> responseBody = jsonDecode(bodyStr);
+    return responseBody['uploadUrl'] as String;
+  }
+
+  // static String toSessionToken(String bodyStr) {
+  //   final Map<String, dynamic> responseBody = jsonDecode(bodyStr);
+  //   return responseBody['sessionToken'] as String;
+  // }
+
   static Token _responseBodyToToken(GrantType grantType, String bodyStr) {
     logger.t('[WixRestApi._responseBodyToToken] bodyStr: $bodyStr');
     final Map<String, dynamic> body = jsonDecode(bodyStr);
@@ -265,9 +350,7 @@ class _ResponseBodyFormatters {
       grantType: grantType,
       accessToken: body['access_token'] as String,
       refreshToken: body['refresh_token'] as String,
-      expiresAt: DateTime.now().add(
-        Duration(seconds: body['expires_in'] as int),
-      ),
+      expiresAt: DateTime.now().add(Duration(seconds: body['expires_in'] as int)),
     );
   }
 }

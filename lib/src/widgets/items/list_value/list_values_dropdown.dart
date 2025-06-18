@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/list_value_item.dart';
-import '../../../providers/lists_of_values_provider.dart';
+import '../../../providers/lists_values_provider.dart';
 import '../../platform/dropdown.dart';
 import '../constants.dart';
 import '../dropdown_item_option_props.dart';
@@ -28,8 +28,9 @@ class ListValuesDropdownConsumer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<ListValueItem> listValues = ref.read(listValuesProvider(listType));
-    final ListValueItem? selectedItem =
-        selectedId != null ? listValues.firstWhere((item) => item.id == selectedId) : null;
+    final ListValueItem? selectedItem = selectedId != null
+        ? listValues.firstWhere((item) => item.id == selectedId)
+        : null;
 
     return Dropdown<ListValueItem>(
       onChanged: onChanged,

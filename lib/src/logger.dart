@@ -6,6 +6,7 @@ final logger = Logger(
   printer: PrettyPrinter(
     methodCount: 0,
     printEmojis: false,
+    lineLength: 200,
     // noBoxingByDefault: true,
   ),
   // filterType: FilterType.excludeDomains,

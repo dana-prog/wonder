@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wonder/src/utils/string_extension.dart';
+import 'package:recase/recase.dart';
 import 'package:wonder/src/widgets/forms/debug/theme/color_scheme_colors.dart';
 import 'package:wonder/src/widgets/forms/debug/theme/theme_data_colors.dart';
 
@@ -16,7 +16,7 @@ class _Page {
     required this.bodyBuilder,
   });
 
-  String get label => name.capitalize();
+  String get label => name.titleCase;
 }
 
 final _pages = [
@@ -31,6 +31,7 @@ final _pages = [
   _Page(name: 'widgets', icon: Icons.widgets, bodyBuilder: (_) => MaterialWidgetsColors()),
 ];
 
+// TODO: move to test project
 class ThemePlayground extends StatefulWidget {
   const ThemePlayground({super.key});
 

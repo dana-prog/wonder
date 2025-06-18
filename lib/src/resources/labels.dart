@@ -1,4 +1,4 @@
-import 'package:wonder/src/utils/string_extension.dart';
+import 'package:recase/recase.dart';
 
 import '../data/facility_item.dart';
 import '../data/item.dart';
@@ -19,7 +19,7 @@ class Labels {
   static const String selectOption = 'Select Option';
   static const String searchHint = 'Search...';
   static String facilityRoomCount(int count) => count == 1 ? '$count Bedroom' : '$count Bedrooms';
-  static String noItem(String? typeName) => '${typeName?.capitalize() ?? 'Item'} Not Set';
+  static String noItem(String? typeName) => '${typeName?.titleCase ?? 'Item'} Not Set';
   static String newItem(String itemType) => 'New ${ItemsLabels.getSingularLabel(itemType)}';
 }
 
@@ -46,11 +46,11 @@ class NotificationMessages {
     }
   }
 
-  static String created(Item item) => '${ItemsLabels.getShortTitle(item)} created.'.capitalize();
+  static String created(Item item) => '${ItemsLabels.getShortTitle(item)} created.'.sentenceCase;
 
-  static String deleted(Item item) => '${ItemsLabels.getShortTitle(item)} deleted.'.capitalize();
+  static String deleted(Item item) => '${ItemsLabels.getShortTitle(item)} deleted.'.sentenceCase;
 
-  static String updated(Item item) => '${ItemsLabels.getShortTitle(item)} updated.'.capitalize();
+  static String updated(Item item) => '${ItemsLabels.getShortTitle(item)} updated.'.sentenceCase;
 }
 
 class ItemsLabels {
