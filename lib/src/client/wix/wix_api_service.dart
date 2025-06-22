@@ -42,9 +42,9 @@ abstract class WixRestEndpoint<T> {
     final response = await _call(uri, headers: headers, body: bodyStr);
 
     if (response.statusCode != 200) {
-      throw Exception('''Error when calling wix api:
-      statusCode: ${response.statusCode}
-      response.body: ${response.body}''');
+      logger.e('''[WixRestEndpoint.call] Error: $uri
+          status: ${response.statusCode} ${response.reasonPhrase}
+          ${response.body}''');
     }
 
     final formattedResponse = responseBodyFormatter(response.body);
@@ -84,7 +84,7 @@ abstract class WixRestEndpoint<T> {
   }
 }
 
-class GenerateAnonymousTokenEndpoint extends WixRestEndpoint<Token> {
+class GenerateAnonymousTokenEndpoint extends WixRestEndpoint<Token?> {
   GenerateAnonymousTokenEndpoint()
       : super(
           path: 'oauth2/token',
@@ -94,7 +94,7 @@ class GenerateAnonymousTokenEndpoint extends WixRestEndpoint<Token> {
         );
 }
 
-class GenerateMemberTokenEndpoint extends WixRestEndpoint<Token> {
+class GenerateMemberTokenEndpoint extends WixRestEndpoint<Token?> {
   GenerateMemberTokenEndpoint(
       {required String redirectUri, required String code, required String codeVerifier})
       : super(
@@ -111,7 +111,7 @@ class GenerateMemberTokenEndpoint extends WixRestEndpoint<Token> {
         );
 }
 
-class RenewTokenEndpoint extends WixRestEndpoint<Token> {
+class RenewTokenEndpoint extends WixRestEndpoint<Token?> {
   RenewTokenEndpoint({required Token token})
       : super(
           path: 'oauth2/token',
@@ -294,17 +294,17 @@ class GenerateUploadUrlEndpoint extends WixRestEndpoint<String> {
 class FetchStaticListsEndpoint extends WixRestEndpoint<Map<String, List<Item>>> {
   FetchStaticListsEndpoint({required super.accessToken})
       : super(
-          path: 'velo/v1/http/invoke/staticLists',
+          path: 'velo/v1/http/invoke/static_lists',
           methodType: 'GET',
           responseBodyFormatter: _ResponseBodyFormatters.toItemsLists,
         );
 }
 
 class _ResponseBodyFormatters {
-  static Token toAnonymousToken(String bodyStr) =>
+  static Token? toAnonymousToken(String bodyStr) =>
       _responseBodyToToken(GrantType.anonymous, bodyStr);
 
-  static Token toMemberToken(String bodyStr) => _responseBodyToToken(GrantType.member, bodyStr);
+  static Token? toMemberToken(String bodyStr) => _responseBodyToToken(GrantType.member, bodyStr);
 
   static String toRedirectUrl(String bodyStr) {
     final Map<String, dynamic> responseBody = jsonDecode(bodyStr);
@@ -343,9 +343,19 @@ class _ResponseBodyFormatters {
   //   return responseBody['sessionToken'] as String;
   // }
 
-  static Token _responseBodyToToken(GrantType grantType, String bodyStr) {
+  static Token? _responseBodyToToken(GrantType grantType, String bodyStr) {
+    if (bodyStr.isEmpty) {
+      logger.w('[WixRestApi._responseBodyToToken] Empty bodyStr');
+      return null;
+    }
+
     logger.t('[WixRestApi._responseBodyToToken] bodyStr: $bodyStr');
     final Map<String, dynamic> body = jsonDecode(bodyStr);
+    if (body['error'] != null) {
+      logger.e('[WixRestApi._responseBodyToToken] Error: bodyStr: $bodyStr');
+      return null;
+    }
+
     return Token(
       grantType: grantType,
       accessToken: body['access_token'] as String,

@@ -10,10 +10,10 @@ import 'src/providers/lists_values_provider.dart';
 import 'src/providers/users_provider.dart';
 
 void main() async {
-  run(_getProviderOverrides);
+  run(_loadProviderOverrides);
 }
 
-Future<List<Override>> _getProviderOverrides() async {
+Future<List<Override>> _loadProviderOverrides() async {
   final client = await WixClient.create(authRedirectUrl: 'wonderapp://authorization');
 
   final lists = await client.fetchStaticLists();

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../data/item.dart';
 import '../../providers/event_provider.dart';
@@ -20,11 +18,6 @@ class EventMessenger extends ConsumerWidget {
           final overlay = Overlay.of(context, rootOverlay: true);
           final messenger = ScaffoldMessenger.of(context);
           final message = NotificationMessages.itemEvent(next.$1, next.$2);
-
-          showTopSnackBar(
-            overlay,
-            CustomSnackBar.success(message: message),
-          );
 
           messenger.showSnackBar(
             SnackBar(

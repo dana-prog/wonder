@@ -7,6 +7,7 @@ final logger = Logger(
     methodCount: 0,
     printEmojis: false,
     lineLength: 200,
+    errorMethodCount: 20,
     // noBoxingByDefault: true,
   ),
   // filterType: FilterType.excludeDomains,

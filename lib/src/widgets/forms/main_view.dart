@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wonder/src/logger.dart';
-import 'package:wonder/src/widgets/forms/debug/more_view.dart';
 
+import '../../logger.dart';
 import '../../resources/labels.dart';
 import '../../router/routes_names.dart';
 import '../items/facility/facilities_main_view.dart';
 import '../items/ticket/ticket_list.dart';
+import 'more_view.dart';
 
 class _Page {
   final String name;

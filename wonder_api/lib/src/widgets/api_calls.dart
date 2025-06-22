@@ -8,11 +8,15 @@ import 'package:wonder/src/widgets/platform/dropdown.dart';
 import '../logger.dart';
 import 'platform/data_viewer.dart';
 
-const _callTypes = ['items', 'staticLists', 'images'];
-const _itemTypes = ['facility', 'ticket', 'user'];
-const _itemsOperations = ['fetchAll', 'fetchSingle', 'create', 'update', 'delete'];
-const _listsOperations = ['users', 'listsValues', 'users&ListsValues'];
-const _imageOperations = ['generateUploadUrl', 'upload'];
+enum CallTypes { items, staticLists, images }
+
+enum ItemTypes { facility, ticket, user, listValue }
+
+enum ItemsOperations { fetchAll, fetchSingle, create, update, delete }
+
+enum ListsOperations { users, listsValues, usersAndListsValues }
+
+enum ImageOperations { generateUploadUrl, upload }
 
 var _newItemFields = {
   'itemType': 'facility',
@@ -32,7 +36,6 @@ var _updatedItem = FacilityItem(
   owner: '1246fe4d-c2e4-406b-9cb9-b2fedbf52c3d',
   roomCount: 1,
 );
-var _fetchItemId = 'beba71a9-1af7-484e-b2f9-27080cf84047';
 
 class ApiCalls extends StatefulWidget {
   final Client client;
@@ -45,14 +48,14 @@ class ApiCalls extends StatefulWidget {
 
 class _ApiCallsState extends State<ApiCalls> {
   List<_ApiCall> calls = [];
-  String _selectedCallType = _callTypes.first;
-  String _selectedItemType = _itemTypes.first;
-  String _selectedItemOperation = _itemsOperations.first;
-  String _selectedListsOperation = _listsOperations.first;
-  String _selectedImageOperation = _imageOperations.first;
-  Map<String, Map<String, dynamic>> params = {
-    'staticLists_listsValues': {'listName': _listNames.first},
-  };
+  String _selectedCallType = CallTypes.values.first.name;
+  String _selectedItemType = ItemTypes.values.first.name;
+  String _selectedItemOperation = ItemsOperations.values.first.name;
+  String _selectedListsOperation = ListsOperations.values.first.name;
+  String _selectedImageOperation = ImageOperations.values.first.name;
+
+  String _fetchItemId = '';
+  String? _fetchListName = _listNames.first;
 
   @override
   Widget build(BuildContext context) {
@@ -105,31 +108,31 @@ class _ApiCallsState extends State<ApiCalls> {
   }
 
   Widget buildCallTypesChips() => buildChipsRow(
-    options: _callTypes,
+    options: CallTypes.values.map((e) => e.name).toList(),
     selectedValue: _selectedCallType,
     onSelected: (value) => _selectedCallType = value,
   );
 
   Widget buildItemTypesChips() => buildChipsRow(
-    options: _itemTypes,
+    options: ItemTypes.values.map((e) => e.name).toList(),
     selectedValue: _selectedItemType,
     onSelected: (value) => _selectedItemType = value,
   );
 
   Widget buildItemOperationsChips() => buildChipsRow(
-    options: _itemsOperations,
+    options: ItemsOperations.values.map((e) => e.name).toList(),
     selectedValue: _selectedItemOperation,
     onSelected: (value) => _selectedItemOperation = value,
   );
 
   Widget buildListOperationsChips() => buildChipsRow(
-    options: _listsOperations,
+    options: ListsOperations.values.map((e) => e.name).toList(),
     selectedValue: _selectedListsOperation,
     onSelected: (value) => _selectedListsOperation = value,
   );
 
   Widget buildImageOperationsChips() => buildChipsRow(
-    options: _imageOperations,
+    options: ImageOperations.values.map((e) => e.name).toList(),
     selectedValue: _selectedImageOperation,
     onSelected: (value) => _selectedImageOperation = value,
   );
@@ -162,15 +165,27 @@ class _ApiCallsState extends State<ApiCalls> {
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return _ListsValuesParams(
-            listName: params['staticLists_listsValues']!['listName'],
+            listName: _fetchListName,
             onChanged: (value) {
               setState(() {
-                params['staticLists_listsValues']!['listName'] = value;
-                logger.d('[ApiCalls.setState] params: ${params['staticLists_listsValues']}');
+                _fetchListName = value;
               });
             },
           );
         },
+      );
+    }
+
+    if (_selectedCallType == 'items' && _selectedItemOperation == 'fetchSingle') {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Fetch Item ID:'),
+          TextField(
+            onChanged: (value) => _fetchItemId = value,
+            decoration: InputDecoration(hintText: 'Enter item ID to fetch'),
+          ),
+        ],
       );
     }
     return SizedBox.shrink();
@@ -207,7 +222,7 @@ class _ApiCallsState extends State<ApiCalls> {
       case 'fetchSingle':
         return await widget.client.fetchItem<FacilityItem>(
           itemType: _selectedItemType,
-          id: _fetchItemId,
+          id: _fetchItemId!,
         );
       case 'create':
         return await widget.client.createItem<FacilityItem>(_newItemFields);
@@ -227,7 +242,7 @@ class _ApiCallsState extends State<ApiCalls> {
       case 'users':
         return res['user'];
       case 'listsValues':
-        final listName = params['staticLists_listsValues']!['listName'];
+        final listName = _fetchListName;
         return listName != null
             ? res['listValue']!.where((value) => value['type'] == listName).toList()
             : res['listValue'];
@@ -274,10 +289,11 @@ const _listNames = [
 ];
 
 class _ListsValuesParams extends StatefulWidget {
-  final String listName;
+  final String? listName;
+  final String? id;
   final ValueChanged<String?> onChanged;
 
-  const _ListsValuesParams({required this.listName, required this.onChanged});
+  const _ListsValuesParams({this.listName, this.id, required this.onChanged});
 
   @override
   State<_ListsValuesParams> createState() => _ListsValuesParamsState();

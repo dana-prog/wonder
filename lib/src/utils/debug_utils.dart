@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../logger.dart';
+
 void showNavigationDialog(BuildContext context) async {
   final controller = TextEditingController();
 
@@ -25,4 +27,17 @@ void showNavigationDialog(BuildContext context) async {
       );
     },
   );
+}
+
+typedef AsyncFunc<T> = Future<T> Function();
+
+AsyncFunc<T> wrapWithErrorLogging<T>({required AsyncFunc<T> function, String? errorMessage}) {
+  return () async {
+    try {
+      return await function();
+    } catch (e, stackTrace) {
+      logger.e('[wrapWithErrorLogging] Error: $errorMessage', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  };
 }

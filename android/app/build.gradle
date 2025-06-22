@@ -46,6 +46,11 @@ android {
             debuggable = false // Make sure it's not debuggable
         }
     }
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
 }
 
 flutter {

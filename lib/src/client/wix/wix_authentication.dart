@@ -58,6 +58,9 @@ class WixAuthentication extends Authentication {
   static Future<WixAuthentication> create({required String authRedirectUrl, Token? token}) async {
     final instance = WixAuthentication._(authRedirectUrl);
     await instance._init(token: token);
+    logger.d(
+      '[WixAuthentication.create] created instance with token: ${instance.token.toString()}',
+    );
     return instance;
   }
 
@@ -257,7 +260,7 @@ class WixAuthentication extends Authentication {
   Future<void> renewToken() async {
     logger.t('[WixAuthentication._renewToken] renewing token: $_token');
     assert(_token != null, 'Token must not be null to renew it');
-    assert(_token?.isValid == true, 'Token must be expired to renew it');
+    assert(_token?.isValid == false, 'Token must be expired to renew it');
 
     final renewedToken = await RenewTokenEndpoint(token: _token!).call();
     await _setToken(renewedToken);

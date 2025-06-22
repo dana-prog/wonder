@@ -30,7 +30,7 @@ class FacilityCard extends ConsumerWidget {
 
     return ItemCard(
       item: item,
-      body: buildCardBody(
+      body: buildBody(
         imageWidget: SizedBox(
             width: _cardHeight,
             height: _cardHeight,
@@ -54,27 +54,27 @@ class FacilityCard extends ConsumerWidget {
           id: item.owner,
           width: double.infinity,
         ),
-        typeWidget: ListValueChipConsumer(id: item.type, labelStyle: smallChipStyle),
-        subtypeWidget: ListValueChipConsumer(id: item.subtype, labelStyle: smallChipStyle),
-        roomCountWidget: RoomCountChip(roomCount: item.roomCount, labelStyle: smallChipStyle),
         statusWidget: ListValueChipConsumer(
           id: item.status,
           labelStyle: TextStyle(fontWeight: FontWeight.bold),
           width: double.infinity,
           textAlign: TextAlign.center,
         ),
+        typeWidget: ListValueChipConsumer(id: item.type, labelStyle: smallChipStyle),
+        subtypeWidget: ListValueChipConsumer(id: item.subtype, labelStyle: smallChipStyle),
+        roomCountWidget: RoomCountChip(roomCount: item.roomCount, labelStyle: smallChipStyle),
       ),
     );
   }
 
-  Widget buildCardBody({
+  Widget buildBody({
     required Widget imageWidget,
     required Widget numberWidget,
     required Widget ownerWidget,
+    required Widget statusWidget,
     required Widget typeWidget,
     required Widget subtypeWidget,
     required Widget roomCountWidget,
-    required Widget statusWidget,
   }) {
     return Row(
       mainAxisSize: MainAxisSize.max,
@@ -90,7 +90,21 @@ class FacilityCard extends ConsumerWidget {
             children: [
               imageWidget,
               numberWidget,
-              Flexible(child: ownerWidget),
+              Flexible(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 250),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ownerWidget,
+                      buildSubsection(
+                          typeWidget: typeWidget,
+                          subtypeWidget: subtypeWidget,
+                          roomCountWidget: roomCountWidget)
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -98,6 +112,22 @@ class FacilityCard extends ConsumerWidget {
           flex: 1,
           child: statusWidget,
         ),
+      ],
+    );
+  }
+
+  Widget buildSubsection({
+    required Widget typeWidget,
+    required Widget subtypeWidget,
+    required Widget roomCountWidget,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      spacing: 10,
+      children: [
+        typeWidget,
+        subtypeWidget,
+        roomCountWidget,
       ],
     );
   }

@@ -35,7 +35,7 @@ class ItemCard extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(child: body),
-              buildButtons(context, ref),
+              // buildButtons(context, ref),
             ],
           ),
         ),

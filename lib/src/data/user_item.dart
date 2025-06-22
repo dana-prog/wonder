@@ -13,9 +13,9 @@ class UserItem extends Item {
         lastName,
       ].whereType<String>().join(' ');
 
-  String get firstName => this['firstName'];
+  String get firstName => this['firstName'] ?? '';
 
-  String get lastName => this['lastName'];
+  String get lastName => this['lastName'] ?? '';
 
   String get middleName => getFieldValue('middleName', defaultValue: '') ?? '';
 

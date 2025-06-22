@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:recase/recase.dart';
-import 'package:wonder/src/widgets/forms/debug/theme/color_scheme_colors.dart';
-import 'package:wonder/src/widgets/forms/debug/theme/theme_data_colors.dart';
 
+import 'color_scheme_colors.dart';
 import 'material_widgets_colors.dart';
+import 'theme_data_colors.dart';
 
 class _Page {
   final String name;
