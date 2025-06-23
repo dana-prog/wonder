@@ -116,6 +116,7 @@ class RenewTokenEndpoint extends WixRestEndpoint<Token?> {
       : super(
           path: 'oauth2/token',
           methodType: 'POST',
+          accessToken: token.accessToken,
           body: {
             'grant_type': 'refresh_token',
             'client_id': _clientId,
