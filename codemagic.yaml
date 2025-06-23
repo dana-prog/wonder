@@ -12,15 +12,6 @@ workflows:
         BUILD_NAME: 1.0.$PROJECT_BUILD_NUMBER
         BUILD_NUMBER: $PROJECT_BUILD_NUMBER
 
-    signing:
-      xcode_team_id: $APP_STORE_TEAM_ID
-      bundle_identifier: com.example.wonder
-      app_store_connect_issuer_id: $APPSTORE_ISSUER_ID
-      app_store_connect_key_identifier: $APPSTORE_KEY_ID
-      app_store_connect_private_key: $APPSTORE_KEY
-      certificate_url: null
-      provisioning_profile_url: null
-
     scripts:
       - name: Get dependencies
         script: flutter pub get
