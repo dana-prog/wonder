@@ -1,33 +1,65 @@
 workflows:
-  release:
-    name: Release workflow
+  dynamic_build_publish:
+    name: Build & Publish
     environment:
       flutter: stable
+      groups:
+        - credentials
+        - app_store_credentials
+        - global
+        - config
       vars:
         BUILD_NAME: 1.0.$PROJECT_BUILD_NUMBER
         BUILD_NUMBER: $PROJECT_BUILD_NUMBER
-      groups:
-        - google_play
-        - app_store_credentials
+
+    signing:
+      xcode_team_id: $APP_STORE_TEAM_ID
+      bundle_identifier: com.example.wonder
+      app_store_connect_issuer_id: $APPSTORE_ISSUER_ID
+      app_store_connect_key_identifier: $APPSTORE_KEY_ID
+      app_store_connect_private_key: $APPSTORE_KEY
+      certificate_url: null
+      provisioning_profile_url: null
+
     scripts:
       - name: Get dependencies
         script: flutter pub get
 
-      - name: Build Android App Bundle
-        script: flutter build appbundle --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER
+      - name: Build app based on BUILD_TARGET
+        script: |
+          echo "BUILD_TARGET=$BUILD_TARGET"
+          echo "PUBLISH=$PUBLISH"
+          echo "BUILD_NAME=$BUILD_NAME"
+          echo "BUILD_NUMBER=$BUILD_NUMBER"
+          echo "GOOGLE_PLAY_CREDENTIALS=$GOOGLE_PLAY_CREDENTIALS"
 
-      - name: Build iOS IPA
-        script: flutter build ipa --export-options-plist=ios/ExportOptions.plist --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER
+          if [[ "$BUILD_TARGET" == "google_play" || "$BUILD_TARGET" == "both" ]]; then
+            echo "Building AAB..."
+            flutter build appbundle --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER
+          fi
+
+          if [[ "$BUILD_TARGET" == "app_store" || "$BUILD_TARGET" == "both" ]]; then
+            echo "Building IPA..."
+            flutter build ipa --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER
+          fi
+
+      - name: Conditionally disable publishing
+        script: |
+          if [[ "$PUBLISH" != "true" ]]; then
+            echo "PUBLISH != true → Skipping publishing by removing output path"
+            rm -rf /tmp/codemagic_output/publishing || true
+          fi
 
     artifacts:
-      - build/**/outputs/**/*.aab
+      - build/app/outputs/**/*.aab
       - build/ios/ipa/*.ipa
 
     publishing:
+#      google_play:
+#        credentials: $GOOGLE_PLAY_CREDENTIALS
+#        track: internal
+
       app_store_connect:
-        api_key: $APP_STORE_API_KEY
-        issuer_id: $APP_STORE_ISSUER_ID
-        key_id: $APP_STORE_KEY_ID
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal
+        api_key: $APPSTORE_API_KEY
+        issuer_id: $APPSTORE_ISSUER_ID
+        key_id: $APPSTORE_KEY_ID
