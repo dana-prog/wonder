@@ -11,27 +11,33 @@ workflows:
       vars:
         BUILD_NAME: 1.0.$PROJECT_BUILD_NUMBER
         BUILD_NUMBER: $PROJECT_BUILD_NUMBER
-        ios_signing:
-          provisioning_profiles:
-            - wonder_apple_provisioning_profile
-          certificates:
-            - wonder_apple_distribution_certificate
-#            - ~/Library/MobileDevice/Certificates
-#            - ~/Library/MobileDevice/Provisioning Profiles
-#      ios_signing:
-#        distribution_type: app_store # or: ad_hoc | development | enterprise
-#        bundle_identifier: com.wonder.manage
-#      ios_signing:
-#        provisioning_profiles:
-#          - profile: wonder_apple_provisioning_profile   # must match the profile name in UI
-#            environment_variable: PROFILE_PATH
-#        certificates:
-#          - certificate: wonder_apple_distribution_certificate  # must match the cert name in UI
-#            environment_variable: CERT_PATH
+      ios_signing:
+        distribution_type: app_store # or: ad_hoc | development | enterprise
+        bundle_identifier: com.wonder.manage
 
     scripts:
+      - name: List available certificates
+        script: |
+          security find-identity -v -p codesigning
+          security find-certificate -a -p
+      - name: List provisioning profiles
+        script: ls -la ~/Library/MobileDevice/Provisioning\ Profiles
       - name: Get dependencies
         script: flutter pub get
+      - name: Debug signing config
+        script: |
+          echo "Checking provisioning profiles:"
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles
+          echo
+          echo "Checking installed certs:"
+          security find-identity -p codesigning -v
+          echo
+          echo "Dumping default build settings:"
+          xcodebuild -showBuildSettings -workspace ios/Runner.xcworkspace -scheme Runner || true
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Check code signing identities
+        script: security find-identity -v -p codesigning
       - name: Build app based on BUILD_TARGET
         script: |
           echo "BUILD_TARGET=$BUILD_TARGET"
@@ -47,7 +53,7 @@ workflows:
 
           if [[ "$BUILD_TARGET" == "app_store" || "$BUILD_TARGET" == "both" ]]; then
             echo "Building IPA..."
-            flutter build ipa --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER
+            flutter build ipa -v --release --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER
           fi
 
       - name: Conditionally disable publishing
@@ -57,16 +63,14 @@ workflows:
             rm -rf /tmp/codemagic_output/publishing || true
           fi
 
-      - name: Set up code signing settings on Xcode project
-        script: xcode-project use-profiles
     artifacts:
       - build/app/outputs/**/*.aab
       - build/ios/ipa/*.ipa
 
     publishing:
-#      google_play:
-#        credentials: $GOOGLE_PLAY_CREDENTIALS
-#        track: internal
+      #      google_play:
+      #        credentials: $GOOGLE_PLAY_CREDENTIALS
+      #        track: internal
 
       app_store_connect:
         api_key: $APPSTORE_API_KEY
