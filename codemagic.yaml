@@ -34,6 +34,19 @@ workflows:
           echo
           echo "Dumping default build settings:"
           xcodebuild -showBuildSettings -workspace ios/Runner.xcworkspace -scheme Runner || true
+      - name: Check available certificates and profiles
+        script: |
+          echo "Available signing identities:"
+          security find-identity -p codesigning -v
+          echo
+          echo "Provisioning profiles:"
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles
+          echo
+          echo "List provisioning profile details:"
+          for f in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
+            echo "==> $f"
+            security cms -D -i "$f" | plutil -extract Name xml1 -o - - | grep '<string>'
+          done
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
       - name: Check code signing identities
