@@ -11,6 +11,14 @@ workflows:
       vars:
         BUILD_NAME: 1.0.$PROJECT_BUILD_NUMBER
         BUILD_NUMBER: $PROJECT_BUILD_NUMBER
+#      ios_signing:
+#        provisioning_profiles:
+#          - profile: wonder_ios_app_store_dist_prov_profile
+#            environment_variable: PROFILE_PATH
+#        certificates:
+#          - certificate: wonder_ios_dist_certificate
+#            environment_variable: CERT_PATH
+# TODO: check why the following config does not work (maybe its related to - Signing Style: manual which can be seen in the Set up code signing settings on Xcode project step)
       ios_signing:
         distribution_type: app_store # or: ad_hoc | development | enterprise
         bundle_identifier: com.wonder.manage
@@ -66,7 +74,7 @@ workflows:
 
           if [[ "$BUILD_TARGET" == "app_store" || "$BUILD_TARGET" == "both" ]]; then
             echo "Building IPA..."
-            flutter build ipa -v --release --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER
+            flutter build ipa -v --release --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER --export-options-plist=/Users/builder/export_options.plist
           fi
 
       - name: Conditionally disable publishing
