@@ -11,11 +11,27 @@ workflows:
       vars:
         BUILD_NAME: 1.0.$PROJECT_BUILD_NUMBER
         BUILD_NUMBER: $PROJECT_BUILD_NUMBER
+        ios_signing:
+          provisioning_profiles:
+            - wonder_apple_provisioning_profile
+          certificates:
+            - wonder_apple_distribution_certificate
+#            - ~/Library/MobileDevice/Certificates
+#            - ~/Library/MobileDevice/Provisioning Profiles
+#      ios_signing:
+#        distribution_type: app_store # or: ad_hoc | development | enterprise
+#        bundle_identifier: com.wonder.manage
+#      ios_signing:
+#        provisioning_profiles:
+#          - profile: wonder_apple_provisioning_profile   # must match the profile name in UI
+#            environment_variable: PROFILE_PATH
+#        certificates:
+#          - certificate: wonder_apple_distribution_certificate  # must match the cert name in UI
+#            environment_variable: CERT_PATH
 
     scripts:
       - name: Get dependencies
         script: flutter pub get
-
       - name: Build app based on BUILD_TARGET
         script: |
           echo "BUILD_TARGET=$BUILD_TARGET"
@@ -41,6 +57,8 @@ workflows:
             rm -rf /tmp/codemagic_output/publishing || true
           fi
 
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
     artifacts:
       - build/app/outputs/**/*.aab
       - build/ios/ipa/*.ipa
