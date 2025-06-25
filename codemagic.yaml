@@ -20,29 +20,22 @@ workflows:
         script: flutter pub get
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
-      - name: Build
+      - name: Print build variables to log
         script: |
-          echo "BUILD_TARGET=$BUILD_TARGET"
-          echo "PUBLISH=$PUBLISH"
           echo "BUILD_NAME=$BUILD_NAME"
           echo "BUILD_NUMBER=$BUILD_NUMBER"
-          echo "GOOGLE_PLAY_CREDENTIALS=$GOOGLE_PLAY_CREDENTIALS"
-
-          if [[ "$BUILD_TARGET" == "google_play" || "$BUILD_TARGET" == "both" || -z "$BUILD_TARGET" ]]; then
-            echo "Building AAB..."
+      - name: Build AAB
+        script:
             flutter build appbundle --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER
-          fi
-
-          if [[ "$BUILD_TARGET" == "app_store" || "$BUILD_TARGET" == "both" || -z "$BUILD_TARGET" ]]; then
-            echo "Building IPA..."
-            flutter build ipa -v --release --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER --export-options-plist=/Users/builder/export_options.plist
-          fi
+#      - name: Build IPA
+#        script:
+#            flutter build ipa --release --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/app/outputs/**/*.aab
       - build/ios/ipa/*.ipa
     publishing:
-      app_store_connect:
-        auth: integration
+#      app_store_connect:
+#        auth: integration
       google_play:
         credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
         track: internal
