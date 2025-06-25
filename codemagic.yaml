@@ -1,6 +1,8 @@
 workflows:
   dynamic_build_publish:
     name: Build & Publish
+    integrations:
+      app_store_connect: codemagic
     environment:
       flutter: stable
       groups:
@@ -22,7 +24,6 @@ workflows:
       ios_signing:
         distribution_type: app_store # or: ad_hoc | development | enterprise
         bundle_identifier: com.wonder.manage
-
     scripts:
       - name: List available certificates
         script: |
@@ -87,13 +88,6 @@ workflows:
     artifacts:
       - build/app/outputs/**/*.aab
       - build/ios/ipa/*.ipa
-
     publishing:
-      #      google_play:
-      #        credentials: $GOOGLE_PLAY_CREDENTIALS
-      #        track: internal
-
       app_store_connect:
-        api_key: $APPSTORE_API_KEY
-        issuer_id: $APPSTORE_ISSUER_ID
-        key_id: $APPSTORE_KEY_ID
+        auth: integration
