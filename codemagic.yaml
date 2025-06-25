@@ -1,15 +1,12 @@
 workflows:
-  dynamic_build_publish:
+  build_and_publish:
     name: Build & Publish
     integrations:
       app_store_connect: codemagic
     environment:
       flutter: stable
       groups:
-        - credentials
-        - app_store_credentials
-        - global
-        - config
+        - google_play
       vars:
         BUILD_NAME: 1.0.$PROJECT_BUILD_NUMBER
         BUILD_NUMBER: $PROJECT_BUILD_NUMBER
@@ -17,44 +14,13 @@ workflows:
         distribution_type: app_store # or: ad_hoc | development | enterprise
         bundle_identifier: com.wonder.manage
       android_signing:
-        - wonder_android_keystore
+        - wonder_android_upload_keystore
     scripts:
-      - name: List available certificates
-        script: |
-          security find-identity -v -p codesigning
-          security find-certificate -a -p
-      - name: List provisioning profiles
-        script: ls -la ~/Library/MobileDevice/Provisioning\ Profiles
       - name: Get dependencies
         script: flutter pub get
-      - name: Debug signing config
-        script: |
-          echo "Checking provisioning profiles:"
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles
-          echo
-          echo "Checking installed certs:"
-          security find-identity -p codesigning -v
-          echo
-          echo "Dumping default build settings:"
-          xcodebuild -showBuildSettings -workspace ios/Runner.xcworkspace -scheme Runner || true
-      - name: Check available certificates and profiles
-        script: |
-          echo "Available signing identities:"
-          security find-identity -p codesigning -v
-          echo
-          echo "Provisioning profiles:"
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles
-          echo
-          echo "List provisioning profile details:"
-          for f in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
-            echo "==> $f"
-            security cms -D -i "$f" | plutil -extract Name xml1 -o - - | grep '<string>'
-          done
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
-      - name: Check code signing identities
-        script: security find-identity -v -p codesigning
-      - name: Build app based on BUILD_TARGET
+      - name: Build
         script: |
           echo "BUILD_TARGET=$BUILD_TARGET"
           echo "PUBLISH=$PUBLISH"
@@ -62,26 +28,21 @@ workflows:
           echo "BUILD_NUMBER=$BUILD_NUMBER"
           echo "GOOGLE_PLAY_CREDENTIALS=$GOOGLE_PLAY_CREDENTIALS"
 
-          if [[ "$BUILD_TARGET" == "google_play" || "$BUILD_TARGET" == "both" ]]; then
+          if [[ "$BUILD_TARGET" == "google_play" || "$BUILD_TARGET" == "both" || -z "$BUILD_TARGET" ]]; then
             echo "Building AAB..."
             flutter build appbundle --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER
           fi
 
-          if [[ "$BUILD_TARGET" == "app_store" || "$BUILD_TARGET" == "both" ]]; then
+          if [[ "$BUILD_TARGET" == "app_store" || "$BUILD_TARGET" == "both" || -z "$BUILD_TARGET" ]]; then
             echo "Building IPA..."
             flutter build ipa -v --release --build-name=$BUILD_NAME --build-number=$BUILD_NUMBER --export-options-plist=/Users/builder/export_options.plist
           fi
-
-      - name: Conditionally disable publishing
-        script: |
-          if [[ "$PUBLISH" != "true" ]]; then
-            echo "PUBLISH != true → Skipping publishing by removing output path"
-            rm -rf /tmp/codemagic_output/publishing || true
-          fi
-
     artifacts:
       - build/app/outputs/**/*.aab
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
         auth: integration
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal

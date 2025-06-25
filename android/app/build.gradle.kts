@@ -14,6 +14,7 @@ fun loadKeyStoreProperties(): Properties {
         props["storeFile"] = getEnvVar("CM_KEYSTORE_PATH")
         props["storePassword"] = getEnvVar("CM_KEYSTORE_PASSWORD")
     } else {
+        // TODO: should we move the upload-keystore.jks, upload_certificate.pem and key.properties to a safer location?
         val keystorePropertiesFile = rootProject.file("key.properties")
         println("Running in LOCAL environment, loading keystore properties from: ${keystorePropertiesFile.absolutePath}.")
         if (!keystorePropertiesFile.exists()) {
