@@ -8,13 +8,14 @@ fun getEnvVar(name: String): String =
 fun loadKeyStoreProperties(): Properties {
     val props = Properties()
     if (System.getenv("CI").toBoolean()) {
+        println("Running in CI environment, loading keystore properties from environment variables.")
         props["keyAlias"] = getEnvVar("CM_KEY_ALIAS")
         props["keyPassword"] = getEnvVar("CM_KEY_PASSWORD")
         props["storeFile"] = getEnvVar("CM_KEYSTORE_PATH")
         props["storePassword"] = getEnvVar("CM_KEYSTORE_PASSWORD")
     } else {
         val keystorePropertiesFile = rootProject.file("key.properties")
-        println("Running in local environment, loading keystore properties from: ${keystorePropertiesFile.absolutePath}.")
+        println("Running in LOCAL environment, loading keystore properties from: ${keystorePropertiesFile.absolutePath}.")
         if (!keystorePropertiesFile.exists()) {
             throw GradleException("Missing keystore file: ${keystorePropertiesFile.absolutePath}")
         }
@@ -55,6 +56,7 @@ android {
         versionName = flutter.versionName
 
         ndk {
+            // TODO: added because of a build error (probably we can leave it as is but need to understand the reason and verify)
             abiFilters += listOf("armeabi-v7a", "arm64-v8a")
         }
     }
