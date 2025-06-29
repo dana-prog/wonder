@@ -1,6 +1,3 @@
-# custom
-keys/
-
 # Miscellaneous
 *.class
 *.log
@@ -47,7 +44,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-/wonder_api/android
-/wonder_api/ios
-/wonder_widgetbook/android
-/wonder_widgetbook/ios
+/android
+/ios
