@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wonder/src/widgets/items/facility/fields/facility_dropdowns.dart';
-import 'package:wonder/src/widgets/platform/error_view.dart';
 
 import '../../../data/facility_item.dart';
 import '../../../data/item.dart';
 import '../../../logger.dart';
-import '../../../providers/items_provider.dart';
 import '../../../resources/labels.dart';
+import '../../../storage/file_storage_plugin.dart';
 import '../../media/image_manager.dart';
 import '../../platform/constants.dart';
 import '../../platform/field_label.dart';
@@ -140,10 +138,16 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
       );
 
   Widget _picturesBuilder() {
+    // TODO: new item should not have pictures
     return FieldLabel(
       label: fields['pictures']!,
       child: ImageManager(
-        ids: _pictures ?? [],
+        fileUrls: _pictures ?? [],
+        fileContext: FileContext(
+          itemType: 'facility',
+          itemId: widget.initialItem?.id ?? '',
+          fieldName: 'pictures',
+        ),
         onAdd: (String id) async {
           onChanged(context, () {
             _pictures = _pictures ?? [];
@@ -207,38 +211,6 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
       'roomCount': _roomCount,
       'pictures': _pictures ?? [],
     }));
-  }
-}
-
-class FacilityDetailsPageConsumer extends ConsumerWidget {
-  final String? id;
-  final SaveCallback<FacilityItem>? save;
-
-  const FacilityDetailsPageConsumer({
-    required this.id,
-    this.save,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncItem =
-        id != null ? ref.watch(itemProvider(('facility', id!))) : AsyncValue.data(null);
-    final notifier = ref.watch(itemListProvider('facility').notifier);
-
-    return asyncItem.when(
-      data: (initialItem) => FacilityDetailsPage(
-        initialItem: initialItem,
-        save: (item) {
-          logger.d(
-            '[FacilityDetailsPageConsumer] save: ${item.toString()}',
-          );
-          initialItem == null ? notifier.add(item.fields) : notifier.update(item);
-        },
-      ),
-      loading: LoadingFacilityDetailsPage.new,
-      error: ErrorView.new,
-    );
   }
 }
 

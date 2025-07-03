@@ -2,27 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart';
-import 'package:wonder/mock/mock_client.dart';
-import 'package:wonder/mock/mock_data.dart';
-import 'package:wonder/src/providers/client_provider.dart';
-import 'package:wonder/src/providers/lists_values_provider.dart';
-import 'package:wonder/src/providers/users_provider.dart';
+// import 'package:wonder/mock/mock_provider_overrides.dart';
+import 'package:wonder/mock/mock_token.dart';
+import 'package:wonder/run.dart';
 import 'package:wonder/src/theme/app_theme.dart';
+import 'package:wonder_widgetbook/src/folders.dart';
 
 import './src/logger.dart';
-import 'main.directories.g.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final overrides = _getProviderOverrides();
-
-  runApp(
-    ProviderScope(
-      overrides: overrides,
-      child: const WidgetbookApp(),
-    ),
-  );
-}
 
 @App()
 class WidgetbookApp extends StatelessWidget {
@@ -33,13 +19,14 @@ class WidgetbookApp extends StatelessWidget {
     logger.d('[WidgetbookApp.build]');
 
     return Widgetbook.material(
-      initialRoute: '?path=client/authentication/all',
+      initialRoute: '?path=[platform]/wixfileurlimage',
+      // initialRoute: '?path=client/authentication/all',
       // initialRoute: '?path=facility/facilitydetailspage/new',
       // initialRoute: '?path=facility/facilitycard/default',
       // initialRoute: '?path=facility/editors/facilitystatusdropdown/status',
       // initialRoute: '?path=user/all/all',
       // initialRoute: '?path=debug/unboundedwidth/not_working',
-      directories: getDirectories(),
+      directories: folders,
       addons: [
         _RouteLoggerAddon(),
         MaterialThemeAddon(themes: [
@@ -78,10 +65,18 @@ class _RouteLoggerAddon extends WidgetbookAddon<String> {
   String valueFromQueryGroup(Map<String, String> group) => '';
 }
 
-List<Override> _getProviderOverrides() {
-  return [
-    listsValuesProvider.overrideWithValue(ListsValuesCache(MockData.listValues)),
-    usersProvider.overrideWithValue(UsersCache(MockData.users)),
-    clientProvider.overrideWithValue(MockClient()),
-  ];
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final providerOverridesFactory = getWixProviderOverridesFactory(
+    authRedirectUrl: '',
+    token: mockToken,
+  );
+  final overrides = await providerOverridesFactory();
+
+  runApp(
+    ProviderScope(
+      overrides: overrides,
+      child: const WidgetbookApp(),
+    ),
+  );
 }

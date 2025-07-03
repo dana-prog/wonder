@@ -1,7 +1,7 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
-// TODO: remove hard coded value (user in image manager)
+// TODO: remove hard coded value (used in image manager)
 const defaultBorderRadius = 10.0;
 
 abstract final class AppTheme {

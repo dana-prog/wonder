@@ -50,6 +50,14 @@ abstract class Fields {
     return containsField(fieldName) ? _fields[fieldName] : defaultValue;
   }
 
+  String getStringField(String fieldName) {
+    if (!containsField(fieldName) || fieldName.isEmpty) {
+      return '';
+    }
+
+    return _fields[fieldName]?.toString() ?? '';
+  }
+
   dynamic operator [](String fieldName) {
     assert(fieldName.isNotEmpty, 'Field $fieldName for $this must not be empty');
     return _fields[fieldName];

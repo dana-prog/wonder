@@ -29,10 +29,11 @@ Widget newFacility(BuildContext context) {
 
   return StatefulBuilder(
     builder: (context, setState) => FacilityDetailsPage(
-        initialItem: initialItem,
-        save: (item) {
-          setState(() => initialItem = item);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Saved Item')));
-        }),
+      initialItem: initialItem,
+      save: (item) {
+        setState(() => initialItem = item);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Saved Item')));
+      },
+    ),
   );
 }

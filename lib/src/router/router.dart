@@ -51,12 +51,13 @@ final router = GoRouter(
           return MainView(morePageName);
         },
         routes: []),
-    // image
+    // file
     GoRoute(
-      path: RouteNames.image,
+      path: RouteNames.file,
       builder: (context, state) {
-        final path = state.pathParameters['path']!;
-        return ImagePage(path: path);
+        final fileUrl = state.pathParameters['fileUrl']!;
+        // TODO: handle non image files (in the meantime display an error)
+        return ImagePage(fileUrl: fileUrl);
       },
     ),
     // new item

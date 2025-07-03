@@ -8,7 +8,7 @@ class RouteNames {
   static const facilities = '/facilities';
   static const editItem = '/item/:itemType/:itemId';
   static const newItem = '/new_item/:itemType';
-  static const image = '/image/:path';
+  static const file = '/file/:fileUrl';
   static const more = '/more';
 }
 

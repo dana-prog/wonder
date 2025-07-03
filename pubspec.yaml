@@ -44,6 +44,13 @@ dependencies:
   deep_collection: ^1.0.2
   flutter_custom_tabs: ^2.4.0
   app_links: ^6.4.0
+  path: ^1.9.1
+  mime: ^2.0.0
+  http_parser: ^4.1.2
+  file_saver: ^0.3.0
+  cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.4.1
+  cached_network_image_platform_interface: ^4.1.1
 
 flutter_launcher_icons:
   android: true

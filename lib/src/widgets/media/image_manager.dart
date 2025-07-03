@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
+import 'package:wonder/src/storage/file_storage_plugin.dart';
 
 import '../../logger.dart';
 import '../../providers/file_provider.dart';
@@ -21,7 +23,8 @@ typedef AddImageCallback = Future<void> Function(String id);
 typedef RemoveImageCallback = void Function(String id);
 
 class ImageManager extends StatelessWidget {
-  final List<String> ids;
+  final List<String> fileUrls;
+  final FileContext fileContext;
   final Future<String> Function(Stream<Uint8List> stream, String name)? save;
   final AddImageCallback? onAdd;
   final RemoveImageCallback? onRemove;
@@ -29,9 +32,10 @@ class ImageManager extends StatelessWidget {
   final Decoration? decoration;
 
   const ImageManager({
-    required this.ids,
+    required this.fileUrls,
     required this.onAdd,
     required this.onRemove,
+    required this.fileContext,
     this.save,
     this.padding,
     this.decoration,
@@ -63,9 +67,14 @@ class ImageManager extends StatelessWidget {
           spacing: _imagesHorizontalSpace,
           runSpacing: _imagesVerticalSpace,
           children: [
-            ...ids.map((id) => buildImage(id: id, width: size, height: size)),
+            ...fileUrls.map((fileUrl) => buildImage(fileUrl: fileUrl, width: size, height: size)),
             onAdd != null
-                ? _AddImagePlaceholder(onAdd: onAdd!, width: size, height: size)
+                ? AddImagePlaceholder(
+                    onAdd: onAdd!,
+                    fileContext: fileContext,
+                    width: size,
+                    height: size,
+                  )
                 : SizedBox.shrink(),
           ],
         );
@@ -73,12 +82,12 @@ class ImageManager extends StatelessWidget {
     );
   }
 
-  Widget buildImage({required String id, double? width, double? height}) {
+  Widget buildImage({required String fileUrl, double? width, double? height}) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = (constraints.maxWidth - _imagesHorizontalSpace) / 2;
         return _ImageThumbnail(
-          path: id,
+          fileUrl: fileUrl,
           width: width ?? size,
           height: height ?? size,
           onRemove: onRemove,
@@ -89,13 +98,13 @@ class ImageManager extends StatelessWidget {
 }
 
 class _ImageThumbnail extends StatelessWidget {
-  final String path;
+  final String fileUrl;
   final double? width;
   final double? height;
   final RemoveImageCallback? onRemove;
 
   const _ImageThumbnail({
-    required this.path,
+    required this.fileUrl,
     this.onRemove,
     this.width,
     this.height,
@@ -108,17 +117,17 @@ class _ImageThumbnail extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () {
-            context.push(RouteNames.image.replaceFirst(':path', path));
+            context.push(RouteNames.file.replaceFirst(':path', fileUrl));
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(defaultBorderRadius),
-            child: AppImage(filePath: path, width: width, height: height),
+            child: AppImage(fileUrl: fileUrl, width: width, height: height),
           ),
         ),
         onRemove != null
             ? Padding(
                 padding: EdgeInsets.all(_removeBtnPadding),
-                child: _RemoveButton(path: path, onRemove: onRemove!),
+                child: _RemoveButton(path: fileUrl, onRemove: onRemove!),
               )
             : SizedBox.shrink(),
       ],
@@ -135,20 +144,22 @@ const _removeBtnIconSize = 12.0;
 final _removeBtnBackgroundColor = WidgetStateProperty.all<Color>(Colors.white);
 final _removeBtnForegroundColor = WidgetStateProperty.all(Colors.grey.shade700);
 
-class _AddImagePlaceholder extends ConsumerWidget {
+class AddImagePlaceholder extends ConsumerWidget {
   final AddImageCallback onAdd;
+  final FileContext fileContext;
   final double? width;
   final double? height;
 
-  const _AddImagePlaceholder({
+  const AddImagePlaceholder({
     required this.onAdd,
+    required this.fileContext,
     this.width,
     this.height,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fileStorage = ref.watch(fileStorageProvider);
+    final fileService = ref.watch(fileStorageProvider);
 
     return InkWell(
       onTap: () async {
@@ -159,7 +170,24 @@ class _AddImagePlaceholder extends ConsumerWidget {
           return;
         }
 
-        final id = await fileStorage.saveFile(picked.openRead(), picked.name);
+        final mimeType = picked.mimeType ?? lookupMimeType(picked.name);
+        if (mimeType == null) {
+          logger.e('[ImageManager] Unidentified mime type for ${picked.name}');
+          return;
+        }
+        final fileBytes = await picked.readAsBytes();
+        final id = await fileService.add(
+          fileBytes: fileBytes,
+          name: picked.name,
+          mimeType: picked.mimeType ?? lookupMimeType(picked.name) ?? '',
+          fileContext: fileContext,
+        );
+
+        if (id == null || id.isEmpty) {
+          logger.w('[ImageManager] Failed to add image: ${picked.name}');
+          return;
+        }
+
         await onAdd(id);
       },
       child: Container(

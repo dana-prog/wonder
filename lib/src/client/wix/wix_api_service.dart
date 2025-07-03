@@ -1,10 +1,15 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
+import '../../data/file_item.dart';
 import '../../data/item.dart';
 import '../../data/metadata.dart';
 import '../../logger.dart';
+import '../../storage/file_storage_plugin.dart';
 import '../token.dart';
 import 'wix_utils.dart';
 
@@ -12,17 +17,24 @@ const _clientId = '1ac77337-faee-4233-8f67-d700faa547da';
 const _scheme = 'https';
 const _host = 'www.wixapis.com';
 
+class HeaderNames {
+  static final contentType = 'Content-Type';
+  static final authorization = 'Authorization';
+}
+
 abstract class WixRestEndpoint<T> {
   final String methodType;
   final String path;
   final String? accessToken;
   final Map<String, dynamic>? queryParams;
-  final Map<String, dynamic>? body;
+  final dynamic body;
+  final String contentType;
   final T Function(String responseBodyStr) responseBodyFormatter;
 
   const WixRestEndpoint({
     required this.path,
     required this.methodType,
+    this.contentType = 'application/json',
     this.accessToken,
     this.queryParams,
     this.body,
@@ -30,21 +42,22 @@ abstract class WixRestEndpoint<T> {
   });
 
   Future<T> call() async {
-    String? bodyStr = body != null ? jsonEncode(body) : null;
+    logger.t('[WixRestEndpoint.call] uri: $uri\n'
+        'methodType: $methodType\n'
+        'headers: $headers\n'
+        'body: $body\n');
 
-    logger.t('''[WixRestEndpoint.call] 
-      uri: $uri
-      headers: $headers
-      method: $methodType
-      request body: $bodyStr
-     ''');
-
-    final response = await _call(uri, headers: headers, body: bodyStr);
+    final response = await sendRequest();
 
     if (response.statusCode != 200) {
-      logger.e('''[WixRestEndpoint.call] Error: $uri
-          status: ${response.statusCode} ${response.reasonPhrase}
-          ${response.body}''');
+      final errorData = {
+        'statusCode': response.statusCode,
+        'reasonPhrase': response.reasonPhrase,
+        'uri': uri.toString(),
+        'headers': response.headers,
+        'body': response.body,
+      };
+      logger.e('[WixRestEndpoint.call] Error:\n${JsonEncoder.withIndent('  ').convert(errorData)}');
     }
 
     final formattedResponse = responseBodyFormatter(response.body);
@@ -56,45 +69,112 @@ abstract class WixRestEndpoint<T> {
     return formattedResponse;
   }
 
-  Future<http.Response> _call(Uri url, {Map<String, String>? headers, String? body}) async {
-    switch (methodType) {
-      case 'GET':
-        return await http.get(uri, headers: headers);
-      case 'POST':
-        return await http.post(uri, headers: headers, body: body);
-      case 'PUT':
-        return await http.put(uri, headers: headers, body: body);
-      case 'DELETE':
-        return await http.delete(uri, headers: headers, body: body);
-      default:
-        throw Exception('Unexpected methodType: $methodType');
-    }
-  }
+  @protected
+  Future<http.Response> sendRequest();
 
   Uri get uri => Uri(scheme: _scheme, host: _host, path: path, queryParameters: queryParams);
 
+  dynamic get requestBody {
+    if (contentType == 'application/json' && body != null) {
+      return jsonEncode(body);
+    }
+    return body;
+  }
+
+  @protected
+  String authorizationHeader() {
+    if (accessToken != null) {
+      return 'Bearer $accessToken';
+    }
+    return '';
+  }
+
   Map<String, String> get headers {
     final headers = <String, String>{};
-    headers['Content-Type'] = 'application/json';
+    headers[HeaderNames.contentType] = 'application/json';
     if (accessToken != null) {
-      headers['Authorization'] = 'Bearer $accessToken';
+      headers[HeaderNames.authorization] = authorizationHeader();
     }
 
     return headers;
   }
 }
 
-class GenerateAnonymousTokenEndpoint extends WixRestEndpoint<Token?> {
+abstract class WixRawRequestEndpoint<T> extends WixRestEndpoint<T> {
+  const WixRawRequestEndpoint({
+    required super.path,
+    required super.methodType,
+    required super.responseBodyFormatter,
+    super.contentType,
+    super.accessToken,
+    super.queryParams,
+    super.body,
+  }) : super();
+
+  @override
+  Future<http.Response> sendRequest() async {
+    switch (methodType) {
+      case 'GET':
+        return await http.get(uri, headers: headers);
+      case 'POST':
+        return await http.post(uri, headers: headers, body: requestBody);
+      case 'PUT':
+        return await http.put(uri, headers: headers, body: requestBody);
+      case 'DELETE':
+        return await http.delete(uri, headers: headers, body: requestBody);
+      default:
+        throw Exception('Unexpected methodType: $methodType');
+    }
+  }
+}
+
+abstract class WixStreamedRequestEndpoint<T> extends WixRestEndpoint<T> {
+  final Stream<Uint8List> stream;
+
+  const WixStreamedRequestEndpoint({
+    required super.path,
+    // required super.methodType,
+    required super.responseBodyFormatter,
+    required this.stream,
+    super.contentType,
+    super.accessToken,
+    super.queryParams,
+  }) : super(methodType: 'PUT');
+
+  @override
+  Future<http.Response> sendRequest() async {
+    final byteStream = http.ByteStream(stream);
+    final request = http.StreamedRequest(methodType, uri);
+    request.headers.addAll(headers);
+
+    logger.t('[WixStreamedRequestEndpoint.sendRequest] 1');
+    try {
+      await byteStream.pipe(request.sink);
+    } catch (e) {
+      logger.e('[WixStreamedRequestEndpoint.sendRequest] Error while piping stream');
+      rethrow;
+    }
+    logger.t('[WixStreamedRequestEndpoint.sendRequest] 2');
+
+    final streamedResponse = await request.send();
+    logger.t('[WixStreamedRequestEndpoint.sendRequest] 3');
+    logger.d('[WixStreamedRequestEndpoint.sendRequest] '
+        'Response status: ${streamedResponse.statusCode} ${streamedResponse.reasonPhrase}');
+    return http.Response.fromStream(streamedResponse);
+  }
+}
+
+class GenerateAnonymousTokenEndpoint extends WixRawRequestEndpoint<Token?> {
   GenerateAnonymousTokenEndpoint()
       : super(
           path: 'oauth2/token',
           methodType: 'POST',
           body: {'grant_type': 'anonymous', 'client_id': _clientId},
-          responseBodyFormatter: _ResponseBodyFormatters.toAnonymousToken,
+          responseBodyFormatter: ResponseBodyFormatters.toAnonymousToken,
         );
 }
 
-class GenerateMemberTokenEndpoint extends WixRestEndpoint<Token?> {
+class GenerateMemberTokenEndpoint extends WixRawRequestEndpoint<Token?> {
   GenerateMemberTokenEndpoint(
       {required String redirectUri, required String code, required String codeVerifier})
       : super(
@@ -107,11 +187,11 @@ class GenerateMemberTokenEndpoint extends WixRestEndpoint<Token?> {
             'redirectUri': redirectUri,
             'grantType': 'authorization_code',
           },
-          responseBodyFormatter: _ResponseBodyFormatters.toMemberToken,
+          responseBodyFormatter: ResponseBodyFormatters.toMemberToken,
         );
 }
 
-class RenewTokenEndpoint extends WixRestEndpoint<Token?> {
+class RenewTokenEndpoint extends WixRawRequestEndpoint<Token?> {
   RenewTokenEndpoint({required Token token})
       : super(
           path: 'oauth2/token',
@@ -123,12 +203,12 @@ class RenewTokenEndpoint extends WixRestEndpoint<Token?> {
             'refresh_token': token.refreshToken
           },
           responseBodyFormatter: token.grantType == GrantType.anonymous
-              ? _ResponseBodyFormatters.toAnonymousToken
-              : _ResponseBodyFormatters.toMemberToken,
+              ? ResponseBodyFormatters.toAnonymousToken
+              : ResponseBodyFormatters.toMemberToken,
         );
 }
 
-class FetchLoginUrlEndpoint extends WixRestEndpoint<String> {
+class FetchLoginUrlEndpoint extends WixRawRequestEndpoint<String> {
   FetchLoginUrlEndpoint({
     required super.accessToken,
     String? redirectUri,
@@ -153,11 +233,11 @@ class FetchLoginUrlEndpoint extends WixRestEndpoint<String> {
               },
             },
           },
-          responseBodyFormatter: _ResponseBodyFormatters.toRedirectUrl,
+          responseBodyFormatter: ResponseBodyFormatters.toRedirectUrl,
         );
 }
 
-class FetchLogoutUrlEndpoint extends WixRestEndpoint<String> {
+class FetchLogoutUrlEndpoint extends WixRawRequestEndpoint<String> {
   FetchLogoutUrlEndpoint({super.accessToken})
       : super(
           path: '_api/redirects-api/v1/redirect-session',
@@ -165,42 +245,21 @@ class FetchLogoutUrlEndpoint extends WixRestEndpoint<String> {
           body: {
             'logout': {'clientId': _clientId},
           },
-          responseBodyFormatter: _ResponseBodyFormatters.toRedirectUrl,
+          responseBodyFormatter: ResponseBodyFormatters.toRedirectUrl,
         );
 }
 
-// class LoginEndpoint extends WixRestEndpoint<String> {
-//   final String email;
-//   final String password;
-//
-//   LoginEndpoint({
-//     required super.accessToken,
-//     required this.email,
-//     required this.password,
-//   }) : super(
-//           path: '_api/iam/authentication/v2/login',
-//           methodType: 'POST',
-//           body: {
-//             'loginId': {
-//               'email': email,
-//             },
-//             'password': password,
-//           },
-//           responseBodyFormatter: _ResponseBodyFormatters.toSessionToken,
-//         );
-// }
-
-class FetchItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
+class FetchItemEndpoint<T extends Item> extends WixRawRequestEndpoint<T> {
   FetchItemEndpoint({required super.accessToken, required String itemType, required String id})
       : super(
           path: 'wix-data/v2/items/$id',
           methodType: 'GET',
           queryParams: {'dataCollectionId': Metadata().getByName(itemType).dataCollectionId},
-          responseBodyFormatter: _ResponseBodyFormatters.toItem<T>,
+          responseBodyFormatter: ResponseBodyFormatters.toItem<T>,
         );
 }
 
-class FetchItemsEndpoint<T extends Item> extends WixRestEndpoint<List<T>> {
+class FetchItemsEndpoint<T extends Item> extends WixRawRequestEndpoint<List<T>> {
   FetchItemsEndpoint({required String accessToken, required String itemType})
       : super(
           path: ['user', 'listValue'].contains(itemType)
@@ -216,11 +275,11 @@ class FetchItemsEndpoint<T extends Item> extends WixRestEndpoint<List<T>> {
                 .map((e) => {'fieldName': e.$1, 'order': e.$2.toString()})
                 .toList(),
           },
-          responseBodyFormatter: _ResponseBodyFormatters.toItems<T>,
+          responseBodyFormatter: ResponseBodyFormatters.toItems<T>,
         );
 }
 
-class CreateItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
+class CreateItemEndpoint<T extends Item> extends WixRawRequestEndpoint<T> {
   final Map<String, dynamic> fields;
 
   CreateItemEndpoint({required super.accessToken, required this.fields})
@@ -231,11 +290,11 @@ class CreateItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
             'dataCollectionId': Metadata().getByName(fields['itemType']).dataCollectionId,
             'dataItem': {'data': fields},
           },
-          responseBodyFormatter: _ResponseBodyFormatters.toItem<T>,
+          responseBodyFormatter: ResponseBodyFormatters.toItem<T>,
         );
 }
 
-class UpdateItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
+class UpdateItemEndpoint<T extends Item> extends WixRawRequestEndpoint<T> {
   UpdateItemEndpoint({required super.accessToken, required T item})
       : super(
           path: 'wix-data/v2/items/${item.id}',
@@ -244,68 +303,187 @@ class UpdateItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
             'dataCollectionId': Metadata().getByName(item.itemType).dataCollectionId,
             'dataItem': {'data': item.fields},
           },
-          responseBodyFormatter: _ResponseBodyFormatters.toItem<T>,
+          responseBodyFormatter: ResponseBodyFormatters.toItem<T>,
         );
 }
 
-class DeleteItemEndpoint<T extends Item> extends WixRestEndpoint<T> {
+class DeleteItemEndpoint<T extends Item> extends WixRawRequestEndpoint<T> {
   DeleteItemEndpoint({required super.accessToken, required String itemType, required String id})
       : super(
           path: 'wix-data/v2/items/$id',
           methodType: 'DELETE',
           queryParams: {'dataCollectionId': Metadata().getByName(itemType).dataCollectionId},
-          responseBodyFormatter: _ResponseBodyFormatters.toItem<T>,
+          responseBodyFormatter: ResponseBodyFormatters.toItem<T>,
         );
 }
 
-class GenerateUploadUrlEndpoint extends WixRestEndpoint<String> {
-  GenerateUploadUrlEndpoint({
-    required super.accessToken,
-    required String fileName,
-    String? folderPath,
-  }) : super(
-          path: 'site-media/v1/files/generate-upload-url',
-          methodType: 'POST',
-          body: {
-            "mimeType": "image/jpeg",
-            "fileName": "T-shirt.jpg",
-            "sizeInBytes": "2608831",
-            "parentFolderId": "25284aa06584441ea94338fdcfbaba12",
-            "private": false,
-            "labels": ["AMS:external_file_id", "woman", "bicycle"]
-          },
-          // {
-          //           'fileName': fileName,
-          //           // 'filePath': folderPath,
-          //           'private': false,
-          //         },
-          responseBodyFormatter: _ResponseBodyFormatters.toUploadUrl,
-        );
-}
-
-// class FetchUsersEndpoint extends WixRestEndpoint<List<UserItem>> {
-//   FetchUsersEndpoint({required super.accessToken})
-//       : super(
-//           path: 'velo/v1/http/invoke/users',
-//           methodType: 'GET',
-//           responseBodyFormatter: _ResponseBodyFormatters.toItems<UserItem>,
-//         );
-// }
-
-class FetchStaticListsEndpoint extends WixRestEndpoint<Map<String, List<Item>>> {
+class FetchStaticListsEndpoint extends WixRawRequestEndpoint<Map<String, List<Item>>> {
   FetchStaticListsEndpoint({required super.accessToken})
       : super(
           path: 'velo/v1/http/invoke/static_lists',
+          // TODO: should we change to POST? (like all collections)
           methodType: 'GET',
-          responseBodyFormatter: _ResponseBodyFormatters.toItemsLists,
+          responseBodyFormatter: ResponseBodyFormatters.toItemsLists,
         );
 }
 
-class _ResponseBodyFormatters {
-  static Token? toAnonymousToken(String bodyStr) =>
-      _responseBodyToToken(GrantType.anonymous, bodyStr);
+class GenerateUploadUrlEndpoint extends WixRawRequestEndpoint<String> {
+  GenerateUploadUrlEndpoint({
+    required super.accessToken,
+    required String fileName,
+    required String mimeType,
+    required FileContext context,
+  }) : super(
+            path: 'velo/v1/http/invoke/generate_upload_url',
+            methodType: 'POST',
+            body: {
+              'fileName': fileName,
+              'mimeType': mimeType,
+              'context': {
+                'dataCollectionId': Metadata().getByName(context.itemType).dataCollectionId,
+                'itemId': context.itemId,
+                'fieldName': context.fieldName,
+              }
+            },
+            responseBodyFormatter: (String url) {
+              if (url.isEmpty) {
+                logger.w(
+                    '[GenerateUploadUrlEndpoint.responseBodyFormatter] Response has an empty body - returning an empty upload url');
+                return '';
+              }
 
-  static Token? toMemberToken(String bodyStr) => _responseBodyToToken(GrantType.member, bodyStr);
+              return url;
+            });
+}
+
+class GenerateDownloadUrlEndpoint extends WixRawRequestEndpoint<String> {
+  GenerateDownloadUrlEndpoint({
+    required super.accessToken,
+    required String fileUrl,
+    // assetKey specifies which version (asset) of the file you want to download
+    // A "file" in Wix can have multiple assets—for example:
+    // - The original format (default, "src")
+    // - Resized versions (e.g. "thumbnail")
+    // - Different encodings or sizes depending on mediaType
+    // List<String>? assetKeys,
+  }) : super(
+            path: 'velo/v1/http/invoke/generate_download_url',
+            methodType: 'POST',
+            body: {
+              'fileUrl': fileUrl,
+            },
+            responseBodyFormatter: (String bodyStr) {
+              if (bodyStr.isEmpty) {
+                logger.w(
+                    '[GenerateUploadUrlEndpoint.responseBodyFormatter] Response has an empty body - returning an empty upload url');
+              }
+
+              return bodyStr;
+            });
+}
+
+class UploadedFileProps {
+  final String fileName;
+  final String originalFileName;
+  final int width;
+  final int height;
+
+  UploadedFileProps({
+    required this.fileName,
+    required this.originalFileName,
+    required this.width,
+    required this.height,
+  });
+}
+
+class UploadFileEndpoint extends WixRawRequestEndpoint<Map<String, dynamic>> {
+  final String uploadUrl;
+  final Uint8List fileBytes;
+  final String fileName;
+  final String mimeType;
+
+  UploadFileEndpoint({
+    required this.uploadUrl,
+    required this.fileBytes,
+    required this.fileName,
+    required this.mimeType,
+  }) : super(
+          path: uploadUrl,
+          contentType: 'multipart/form-data',
+          methodType: 'POST',
+          responseBodyFormatter: (bodyStr) {
+            final json = jsonDecode(bodyStr);
+            final fileData = json[0];
+            final fileName = fileData['fileName'];
+            final originalFileName = fileData['originalFileName'];
+            final width = fileData['width'];
+            final height = fileData['height'];
+
+            final fileUrl =
+                'wix:image://v1/$fileName/$originalFileName#originWidth=$width&originHeight=$height';
+
+            return {
+              ...fileData,
+              'id': fileUrl,
+              'fileUrl': fileUrl,
+              'mimeType': mimeType,
+            };
+          },
+        );
+
+  @override
+  Future<http.Response> sendRequest() async {
+    final multipartFile = http.MultipartFile.fromBytes(
+      'file',
+      fileBytes,
+      contentType: MediaType.parse(mimeType),
+      filename: fileName,
+    );
+
+    final request = http.MultipartRequest('POST', uri);
+    request.files.add(multipartFile);
+
+    final response = await request.send();
+    logger.t(
+        '[UploadFileEndpoint.sendRequest] Response status: ${response.statusCode}, reason: ${response.reasonPhrase}');
+    return http.Response.fromStream(response);
+  }
+
+  @override
+  Map<String, String> get headers => {};
+
+  @override
+  Uri get uri => Uri.parse(uploadUrl);
+}
+
+class FileInfoEndpoint extends WixRawRequestEndpoint<FileItem?> {
+  FileInfoEndpoint({
+    required super.accessToken,
+    required String fileUrl,
+  }) : super(
+            path: 'velo/v1/http/invoke/file_info',
+            methodType: 'GET',
+            queryParams: {'fileUrl': fileUrl},
+            responseBodyFormatter: ResponseBodyFormatters.toFileItem);
+}
+
+class FolderInfoEndpoint extends WixRawRequestEndpoint<FolderItem?> {
+  FolderInfoEndpoint({
+    required super.accessToken,
+    required String folderId,
+  }) : super(
+            path: 'velo/v1/http/invoke/folder_info',
+            methodType: 'GET',
+            queryParams: {'folderId': folderId},
+            responseBodyFormatter: ResponseBodyFormatters.toFolderItem);
+}
+
+class ResponseBodyFormatters {
+  static Token? toAnonymousToken(String bodyStr) =>
+      responseBodyToToken(grantType: GrantType.anonymous, bodyStr: bodyStr);
+
+  static Token? toMemberToken(String bodyStr) =>
+      responseBodyToToken(grantType: GrantType.member, bodyStr: bodyStr);
 
   static String toRedirectUrl(String bodyStr) {
     final Map<String, dynamic> responseBody = jsonDecode(bodyStr);
@@ -334,9 +512,45 @@ class _ResponseBodyFormatters {
     return lists;
   }
 
-  static String toUploadUrl(String bodyStr) {
-    final Map<String, dynamic> responseBody = jsonDecode(bodyStr);
-    return responseBody['uploadUrl'] as String;
+  static FileItem? toFileItem(String bodyStr) {
+    if (bodyStr.isEmpty) {
+      return null;
+    }
+
+    final fileInfo = jsonDecode(bodyStr)['file'];
+    return FileItem({
+      'id': fileInfo['fileUrl'],
+      'name': fileInfo['fileName'],
+      'parentFolderId': fileInfo['parentFolderId'],
+      'url': fileInfo['url'],
+      'hash': fileInfo['hash'],
+      'height': fileInfo['height'],
+      'width': fileInfo['width'],
+      'iconUrl': fileInfo['iconUrl'],
+      'isPrivate': fileInfo['isPrivate'],
+      'labels': fileInfo['labels'],
+      'mediaType': fileInfo['mediaType'],
+      'mimeType': fileInfo['mimeType'],
+      'opStatus': fileInfo['opStatus'],
+      'originalFileName': fileInfo['originalFileName'],
+      'sizeInBytes': fileInfo['sizeInBytes'],
+      'sourceURL': fileInfo['sourceURL'],
+      'createdDate': DateTime.parse(fileInfo['_createdDate']),
+      'updatedDate': DateTime.parse(fileInfo['_updatedDate']),
+    });
+  }
+
+  static FolderItem? toFolderItem(String bodyStr) {
+    if (bodyStr.isEmpty) {
+      return null;
+    }
+
+    final folder = jsonDecode(bodyStr)['folder'];
+    return FolderItem({
+      'id': folder['id'],
+      'name': folder['folderName'],
+      'parentFolderId': folder['parentFolderId'],
+    });
   }
 
   // static String toSessionToken(String bodyStr) {
@@ -344,15 +558,27 @@ class _ResponseBodyFormatters {
   //   return responseBody['sessionToken'] as String;
   // }
 
-  static Token? _responseBodyToToken(GrantType grantType, String bodyStr) {
-    if (bodyStr.isEmpty) {
-      logger.w('[WixRestApi._responseBodyToToken] Empty bodyStr');
-      return null;
+  static Token? responseBodyToToken({
+    required GrantType grantType,
+    Map<String, dynamic>? body,
+    String? bodyStr,
+  }) {
+    assert(
+      body != null || bodyStr != null,
+      '[WixRestApi._responseBodyToToken] Either body or bodyStr must be provided',
+    );
+
+    if (bodyStr != null) {
+      if (bodyStr.isEmpty) {
+        logger.w('[WixRestApi._responseBodyToToken] Empty bodyStr');
+        return null;
+      }
+
+      logger.t('[WixRestApi._responseBodyToToken] bodyStr: $bodyStr');
+      body = jsonDecode(bodyStr);
     }
 
-    logger.t('[WixRestApi._responseBodyToToken] bodyStr: $bodyStr');
-    final Map<String, dynamic> body = jsonDecode(bodyStr);
-    if (body['error'] != null) {
+    if (body!['error'] != null) {
       logger.e('[WixRestApi._responseBodyToToken] Error: bodyStr: $bodyStr');
       return null;
     }

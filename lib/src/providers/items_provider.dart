@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../client/client.dart';
+import '../client/items_client.dart';
 import '../data/item.dart';
 import '../logger.dart';
 import 'client_provider.dart';
 
 class ItemListNotifier extends StateNotifier<AsyncValue<List<Item>>> {
-  final Client client;
+  final ItemsClient client;
   final String itemType;
 
   ItemListNotifier(Ref ref, this.itemType)

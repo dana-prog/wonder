@@ -36,7 +36,11 @@ class ItemForm extends StatelessWidget {
         spacing: kFormTitleBodySpacing,
         children: [
           _FormTitle(title: item?.title ?? Labels.newItem(resolvedItemType)),
-          _FormBody(item: item, itemType: resolvedItemType, save: save),
+          _FormBody(
+            item: item,
+            itemType: resolvedItemType,
+            save: save,
+          ),
         ],
       ),
     );

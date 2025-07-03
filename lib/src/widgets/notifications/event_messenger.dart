@@ -15,7 +15,6 @@ class EventMessenger extends ConsumerWidget {
       if (next != null) {
         // defer UI interaction to after build
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final overlay = Overlay.of(context, rootOverlay: true);
           final messenger = ScaffoldMessenger.of(context);
           final message = NotificationMessages.itemEvent(next.$1, next.$2);
 

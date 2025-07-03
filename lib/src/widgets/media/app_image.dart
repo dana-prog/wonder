@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image_platform_interface/cached_network_image_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,13 +7,9 @@ import '../../globals.dart';
 import '../../logger.dart';
 import '../../providers/file_provider.dart';
 
-class AppAssetImage extends AssetImage {
-  const AppAssetImage(super.name) : super(package: assetsPackage);
-}
-
-class AppImage extends StatelessWidget {
+class AppImage extends ConsumerWidget {
   final String? assetName;
-  final String? filePath;
+  final String? fileUrl;
   final double? width;
   final double? height;
   final BoxFit? fit;
@@ -19,16 +17,16 @@ class AppImage extends StatelessWidget {
   const AppImage({
     super.key,
     this.assetName,
-    this.filePath,
+    this.fileUrl,
     this.width,
     this.height,
     this.fit,
   }) : assert(
-            assetName != null || filePath != null, 'Either assetName or filePath must be provided');
+            assetName != null || fileUrl != null, 'Either assetName or filePath must be provided');
 
   @override
-  Widget build(BuildContext context) {
-    return assetName != null ? buildAssetImage(assetName!) : buildFileImage(filePath!);
+  Widget build(BuildContext context, WidgetRef ref) {
+    return assetName != null ? buildAssetImage(assetName!) : buildFileImage(fileUrl!, ref);
   }
 
   // Builds an image from a flutter asset
@@ -40,40 +38,31 @@ class AppImage extends StatelessWidget {
       height: height,
       fit: fit,
       errorBuilder: (context, error, stackTrace) {
-        logger.e('[AppAssetImage:build]: Error loading asset image: $name: $error',
+        logger.e('[AppAssetImage:buildAssetImage]: Error loading asset image: $name: $error',
             stackTrace: stackTrace);
         return Text(error.toString());
       },
     );
   }
 
-  // Builds an image from a file path
-  Widget buildFileImage(String path) {
-    logger.t('[AppFileImage:build]: path: $path');
-    return Consumer(
-      builder: (context, ref, child) {
-        final asyncFile = ref.watch(fileProvider(path));
+  Widget buildFileImage(String id, WidgetRef ref) {
+    logger.t('[AppFileImage.buildFileImage]: fileUrl: $id');
+    final cacheManager = ref.watch(cacheManagerProvider);
 
-        return asyncFile.when(
-            data: (file) => Image.file(
-                  file,
-                  width: width,
-                  height: height,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    logger.e('[AppFileImage:build]: Error loading file: ${file.path}: $error',
-                        stackTrace: stackTrace);
-                    return Text(error.toString());
-                  },
-                ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stackTrace) {
-              logger.e(
-                '[AppFileImage:build]: Error loading file: $path: $error',
-                stackTrace: stackTrace,
-              );
-              return Text(error.toString());
-            });
+    return CachedNetworkImage(
+      imageUrl: id,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.cover,
+      imageRenderMethodForWeb: ImageRenderMethodForWeb.HttpGet,
+      cacheManager: cacheManager,
+      progressIndicatorBuilder: (context, url, downloadProgress) {
+        return Center(
+          child: CircularProgressIndicator(value: downloadProgress.progress),
+        );
+      },
+      errorWidget: (context, url, error) {
+        return Text(error.toString());
       },
     );
   }

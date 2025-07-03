@@ -1,4 +1,4 @@
-import 'package:wonder/src/client/client.dart';
+import 'package:wonder/src/client/items_client.dart';
 import 'package:wonder/src/client/wix/wix_utils.dart';
 import 'package:wonder/src/data/item.dart';
 
@@ -19,7 +19,7 @@ final defaultMockItems = [
 
 var _nextItemId = 1;
 
-class MockClient extends Client {
+class MockClient extends ItemsClient {
   late List<Item> initialItems;
 
   MockClient({List<Item>? items}) : super(authentication: MockAuthentication()) {

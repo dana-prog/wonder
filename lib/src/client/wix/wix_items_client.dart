@@ -5,7 +5,7 @@ import 'package:wonder/src/client/wix/wix_authentication.dart';
 
 import '../../data/item.dart';
 import '../../logger.dart';
-import '../client.dart';
+import '../items_client.dart';
 import '../token.dart';
 
 enum _HeaderContentType {
@@ -28,13 +28,13 @@ final defaultFieldValues = {
   'facility': {'type': 'd9c1d2a1-17fe-4f3f-b035-dcbe4905e444'},
 };
 
-class WixClient extends Client {
-  WixClient({required super.authentication});
+class WixItemsClient extends ItemsClient {
+  WixItemsClient({required super.authentication});
 
-  static Future<WixClient> create({required String authRedirectUrl, Token? token}) async {
+  static Future<WixItemsClient> create({required String authRedirectUrl, Token? token}) async {
     final authentication =
         await WixAuthentication.create(authRedirectUrl: authRedirectUrl, token: token);
-    return WixClient(authentication: authentication);
+    return WixItemsClient(authentication: authentication);
   }
 
   @override
@@ -122,14 +122,5 @@ class WixClient extends Client {
   Future<Map<String, List<Item>>> fetchStaticLists() async {
     await authentication.login();
     return await FetchStaticListsEndpoint(accessToken: authentication.accessToken).call();
-  }
-
-  Future<String> generateUploadUrl({required String fileName, String? folderPath}) async {
-    await authentication.login();
-    return await GenerateUploadUrlEndpoint(
-      accessToken: authentication.accessToken,
-      fileName: fileName,
-      folderPath: folderPath,
-    ).call();
   }
 }

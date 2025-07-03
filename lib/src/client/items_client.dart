@@ -7,9 +7,9 @@ import 'authentication.dart';
 
 typedef ItemCallback = void Function(Item);
 
-abstract class Client {
+abstract class ItemsClient {
   final Authentication authentication;
-  Client({required this.authentication});
+  ItemsClient({required this.authentication});
 
   final List<ItemCallback> _itemCreatedCallbacks = [];
   final List<ItemCallback> _itemUpdatedCallbacks = [];
