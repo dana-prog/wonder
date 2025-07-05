@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 // import 'package:wonder/mock/mock_provider_overrides.dart';
-import 'package:wonder/mock/mock_token.dart';
+import 'package:wonder/mock/wix_mock_token.dart';
 import 'package:wonder/run.dart';
+import 'package:wonder/src/client/client.dart';
+import 'package:wonder/src/data/facility_item.dart';
+import 'package:wonder/src/data/list_value_item.dart';
+import 'package:wonder/src/data/user_item.dart';
 import 'package:wonder/src/theme/app_theme.dart';
+import 'package:wonder/src/widgets/async/deferred_provider_scope.dart';
 import 'package:wonder_widgetbook/src/folders.dart';
 
 import './src/logger.dart';
+import 'src/utils/widgetbook_data.dart';
 
 @App()
 class WidgetbookApp extends StatelessWidget {
@@ -19,13 +24,7 @@ class WidgetbookApp extends StatelessWidget {
     logger.d('[WidgetbookApp.build]');
 
     return Widgetbook.material(
-      initialRoute: '?path=[platform]/wixfileurlimage',
-      // initialRoute: '?path=client/authentication/all',
-      // initialRoute: '?path=facility/facilitydetailspage/new',
-      // initialRoute: '?path=facility/facilitycard/default',
-      // initialRoute: '?path=facility/editors/facilitystatusdropdown/status',
-      // initialRoute: '?path=user/all/all',
-      // initialRoute: '?path=debug/unboundedwidth/not_working',
+      initialRoute: '?path=platform/media/appimage/appimage',
       directories: folders,
       addons: [
         _RouteLoggerAddon(),
@@ -54,7 +53,7 @@ class _RouteLoggerAddon extends WidgetbookAddon<String> {
   ) {
     // Log the path on each use case build
     final path = WidgetbookState.of(context).path;
-    logger.d('📍 Widgetbook route: $path');
+    logger.d('[_RouteLoggerAddon.buildUseCase ] Widgetbook route: $path');
     return child;
   }
 
@@ -67,16 +66,48 @@ class _RouteLoggerAddon extends WidgetbookAddon<String> {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final providerOverridesFactory = getWixProviderOverridesFactory(
+
+  // final loadOverrides = getMockProviderOverridesFactory(
+  //   onClientCreated: onClientCreated,
+  //   onUsersLoaded: onUsersLoaded,
+  //   onListsLoaded: onListsLoaded,
+  // );
+  final loadOverrides = loadWixProviderOverridesFactory(
+    // TODO: to enable real login use a real authRedirectUrl (and then we can remove the wixMockToken)
     authRedirectUrl: '',
-    token: mockToken,
+    // TODO: now that we enable saving the toekn also on web check if we can remove the wixMockToken
+    token: wixMockToken,
+    onClientCreated: onClientCreated,
+    onUsersLoaded: onUsersLoaded,
+    onListsLoaded: onListsLoaded,
   );
-  final overrides = await providerOverridesFactory();
 
   runApp(
-    ProviderScope(
-      overrides: overrides,
+    DeferredProviderScope(
+      loadOverrides: loadOverrides,
       child: const WidgetbookApp(),
     ),
   );
+}
+
+Future<void> onClientCreated(Client client) async {
+  final files = await client.fileStoragePlugin.listFiles(includeSubfolders: true);
+  WidgetbookData.files.addAll(files);
+  WidgetbookData.facilities.addAll(
+    await client.itemsClient.fetchItems<FacilityItem>(itemType: 'facility'),
+  );
+}
+
+Future<void> onUsersLoaded(List<UserItem> loadedUsers) async {
+  for (final user in loadedUsers) {
+    final key = '${user['firstName'].toLowerCase()}.${user['lastName'].toLowerCase()}';
+    WidgetbookData.users[key] = user;
+  }
+}
+
+Future<void> onListsLoaded(List<ListValueItem> loadedListsValues) async {
+  for (final listValue in loadedListsValues) {
+    WidgetbookData.lists[listValue.type] ??= {};
+    WidgetbookData.lists[listValue.type]![listValue.name] = listValue;
+  }
 }

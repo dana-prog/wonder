@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Chip;
 import 'package:wonder/src/client/authentication.dart';
-import 'package:wonder/src/client/wix/wix_file_storage.dart';
+import 'package:wonder/src/client/wix/wix_file_storage_plugin.dart';
 import 'package:wonder/src/client/wix/wix_items_client.dart';
 import 'package:wonder/src/storage/file_storage.dart';
 
@@ -11,11 +11,11 @@ const _title = 'Wonder API Playground';
 
 class Home extends StatelessWidget {
   final WixItemsClient itemsClient;
-  final WixFileStorage fileStorage;
+  final WixFileStoragePlugin fileStorage;
 
   Home({required Authentication authentication, super.key})
     : itemsClient = WixItemsClient(authentication: authentication),
-      fileStorage = WixFileStorage(authentication: authentication),
+      fileStorage = WixFileStoragePlugin(authentication: authentication),
       super();
 
   @override

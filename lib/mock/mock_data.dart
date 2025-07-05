@@ -2,6 +2,9 @@ import 'package:wonder/src/data/facility_item.dart';
 import 'package:wonder/src/data/list_value_item.dart';
 import 'package:wonder/src/data/user_item.dart';
 
+import '../src/data/file_item.dart';
+
+// do not import this class - for internal use only
 class MockData {
   static final facilities = [
     {
@@ -1160,4 +1163,18 @@ class MockData {
   ].map(ListValueItem.fromFields).toList();
 
   static final allItems = [...facilities, ...users, ...listValues];
+
+  static final _numberImageHeight = 100.0;
+  static final _numberImageWidth = 100.0;
+
+  static FileItem _getNumberFileItem(int number) => FileItem.fromFields({
+        'id':
+            'https://dummyimage.com/${_numberImageWidth.toInt()}x${_numberImageHeight.toInt()}/ffcccb/000000&text=$number',
+        'fileName': '$number.png',
+        'mimeType': 'image/png',
+        'height': _numberImageHeight,
+        'width': _numberImageWidth,
+      });
+
+  static final allFiles = [1, 2, 3].map(_getNumberFileItem).toList();
 }

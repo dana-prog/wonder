@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:recase/recase.dart';
+import 'package:widgetbook/widgetbook.dart';
 
 import 'color_scheme_colors.dart';
 import 'material_widgets_colors.dart';
@@ -74,3 +75,11 @@ class _ThemePlaygroundState extends State<ThemePlayground> {
     );
   }
 }
+
+final themePlayground = WidgetbookLeafComponent(
+  name: 'Theme Playuground',
+  useCase: WidgetbookUseCase(
+    name: 'Theme Playuground',
+    builder: (_) => const ThemePlayground(),
+  ),
+);

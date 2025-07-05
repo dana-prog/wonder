@@ -21,6 +21,7 @@ class Labels {
   static String facilityRoomCount(int count) => count == 1 ? '$count Bedroom' : '$count Bedrooms';
   static String noItem(String? typeName) => '${typeName?.titleCase ?? 'Item'} Not Set';
   static String newItem(String itemType) => 'New ${ItemsLabels.getSingularLabel(itemType)}';
+  static String saveItemToAddPictures = 'Save the item first to add pictures.';
 }
 
 class ConfirmationMessages {

@@ -478,6 +478,22 @@ class FolderInfoEndpoint extends WixRawRequestEndpoint<FolderItem?> {
             responseBodyFormatter: ResponseBodyFormatters.toFolderItem);
 }
 
+class ListFilesEndpoint extends WixRawRequestEndpoint<List<FileItem>> {
+  ListFilesEndpoint({
+    required super.accessToken,
+    String? parentFolderId,
+    bool? includeSubfolders = false,
+  }) : super(
+          path: 'velo/v1/http/invoke/list_files',
+          methodType: 'POST',
+          body: {
+            'parentFolderId': parentFolderId,
+            'includeSubfolders': includeSubfolders,
+          },
+          responseBodyFormatter: ResponseBodyFormatters.toFileItems,
+        );
+}
+
 class ResponseBodyFormatters {
   static Token? toAnonymousToken(String bodyStr) =>
       responseBodyToToken(grantType: GrantType.anonymous, bodyStr: bodyStr);
@@ -499,10 +515,27 @@ class ResponseBodyFormatters {
     return dataItems.map<T>((dataItem) => dataItemToItem<T>(dataItem)).toList();
   }
 
+  static List<FileItem> toFileItems(String bodyStr) {
+    final List<Map<String, dynamic>> files =
+        (jsonDecode(bodyStr)['files'] as List).cast<Map<String, dynamic>>();
+    return files
+        .map<FileItem>(
+          (dataItem) => FileItem.fromFields(
+            {
+              'id': dataItem['fileUrl'],
+              'name': dataItem['name'] ?? 'no name',
+              ...dataItem,
+            },
+          ),
+        )
+        .toList();
+  }
+
   static Map<String, List<Item>> toItemsLists(String bodyStr) {
     final lists = <String, List<Item>>{};
 
     for (final MapEntry entry in jsonDecode(bodyStr).entries) {
+      // we are changing the key to the lists from the collection id (snake_case) to the item type (camelCase)
       final String itemType = Metadata().getByCollectionId(entry.key).name;
       lists[itemType] = (entry.value as List)
           .map((dataItem) => dataItemToItem<Item>(dataItem as Map<String, dynamic>))
@@ -518,7 +551,7 @@ class ResponseBodyFormatters {
     }
 
     final fileInfo = jsonDecode(bodyStr)['file'];
-    return FileItem({
+    return FileItem.fromFields({
       'id': fileInfo['fileUrl'],
       'name': fileInfo['fileName'],
       'parentFolderId': fileInfo['parentFolderId'],

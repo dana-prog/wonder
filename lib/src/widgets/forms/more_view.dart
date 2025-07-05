@@ -34,7 +34,7 @@ final _moreItems = [
     icon: Icons.person,
     onTap: (BuildContext context, WidgetRef ref) {
       final client = ref.watch(clientProvider);
-      client.printMyMember();
+      client.itemsClient.printMyMember();
     },
   ),
   MoreItem(
@@ -43,7 +43,7 @@ final _moreItems = [
     icon: Icons.logout,
     onTap: (BuildContext context, WidgetRef ref) async {
       final client = ref.watch(clientProvider);
-      await client.logout();
+      await client.itemsClient.logout();
     },
   ),
 ];

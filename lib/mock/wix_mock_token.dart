@@ -1,0 +1,17 @@
+import '../src/client/token.dart';
+
+Map<String, dynamic> _mockJson = {
+  "access_token":
+      "OauthNG.JWS.eyJraWQiOiJZSEJzdUpwSCIsImFsZyI6IkhTMjU2In0.eyJkYXRhIjoie1wiaW5zdGFuY2VcIjp7XCJpbnN0YW5jZUlkXCI6XCI5ZjRhNDMwNy02NzVlLTQ0ZjMtOGUwZi04NWEzNzdkYWZmM2RcIixcImFwcERlZklkXCI6XCIxYWM3NzMzNy1mYWVlLTQyMzMtOGY2Ny1kNzAwZmFhNTQ3ZGFcIixcInNpZ25EYXRlXCI6XCIyMDI1LTA3LTA1VDEzOjUzOjQwLjkxNVpcIixcInVpZFwiOlwiMTI0NmZlNGQtYzJlNC00MDZiLTljYjktYjJmZWRiZjUyYzNkXCIsXCJwZXJtaXNzaW9uc1wiOlwib2ZmbGluZV9hY2Nlc3NcIixcImRlbW9Nb2RlXCI6ZmFsc2UsXCJzaXRlT3duZXJJZFwiOlwiMTI0NmZlNGQtYzJlNC00MDZiLTljYjktYjJmZWRiZjUyYzNkXCIsXCJzaXRlTWVtYmVySWRcIjpcIjEyNDZmZTRkLWMyZTQtNDA2Yi05Y2I5LWIyZmVkYmY1MmMzZFwiLFwibWV0YVNpdGVJZFwiOlwiZDAzYTMwOWYtNTIwZi00YjdlLTkxNjItZGJiOTkyNDRjZWI3XCIsXCJleHBpcmF0aW9uRGF0ZVwiOlwiMjAyNS0wNy0wNVQxNzo1Mzo0MC45MTVaXCIsXCJoYXNVc2VyUm9sZVwiOmZhbHNlLFwiYW9yXCI6ZmFsc2UsXCJzaWRcIjpcIjBmY2QyMTMzLTMzNDQtNGIzMy1hYmJiLTdhZTlhYTczMGFmMVwiLFwic2N0XCI6XCIyMDI1LTA2LTIyVDEwOjM4OjE5LjY5M1pcIn19IiwiaWF0IjoxNzUxNzIzNjIwLCJleHAiOjE3NTE3MzgwMjB9.LjB5K1HljYmLN16mbdJct9x87T_qOokerM8crPl7Whc",
+  "token_type": "Bearer",
+  "expires_in": 14400,
+  "refresh_token":
+      "JWS.eyJraWQiOiJZSEJzdUpwSCIsImFsZyI6IkhTMjU2In0.eyJkYXRhIjoiXCJiMmJjZDQ0MS02NDljLTQxMDMtODllZC02ZTBkYjY3MGQ5NWRcIiIsImlhdCI6MTc1MTcyMzYyMCwiZXhwIjoxNzgzMjU5NjIwfQ.rvQPXot9_uZSAnjljvnVaMHgRz-24s05iNZvOSrOgEc"
+};
+
+Token wixMockToken = Token(
+  grantType: GrantType.member,
+  accessToken: _mockJson['access_token'] as String,
+  refreshToken: _mockJson['refresh_token'] as String,
+  expiresAt: DateTime.now().add(Duration(seconds: _mockJson['expires_in'] as int)),
+);

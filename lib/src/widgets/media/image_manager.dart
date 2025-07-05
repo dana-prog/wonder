@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:wonder/src/storage/file_storage_plugin.dart';
+import 'package:wonder/src/widgets/progress_indicator/app_progress_indicator.dart';
 
 import '../../logger.dart';
 import '../../providers/file_provider.dart';
@@ -43,17 +44,7 @@ class ImageManager extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DottedBorder(
-      child: InputDecorator(
-        decoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            // borderRadius: BorderRadius.circular(8)),
-          ),
-        ),
-        child: buildImages(),
-      ),
-    );
+    return ImageManagerBorder(child: buildImages());
   }
 
   Widget buildImages() {
@@ -93,6 +84,27 @@ class ImageManager extends StatelessWidget {
           onRemove: onRemove,
         );
       },
+    );
+  }
+}
+
+class ImageManagerBorder extends StatelessWidget {
+  final Widget child;
+
+  const ImageManagerBorder({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return DottedBorder(
+      child: InputDecorator(
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderSide: BorderSide.none,
+            // borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        child: child,
+      ),
     );
   }
 }
@@ -141,10 +153,10 @@ const _removeBtnPadding = 3.0;
 const _removeBtnIconSize = 12.0;
 
 // TODO: [THEME]
-final _removeBtnBackgroundColor = WidgetStateProperty.all<Color>(Colors.white);
-final _removeBtnForegroundColor = WidgetStateProperty.all(Colors.grey.shade700);
+// final _removeBtnBackgroundColor = WidgetStateProperty.all<Color>(Colors.white);
+// final _removeBtnForegroundColor = WidgetStateProperty.all(Colors.grey.shade700);
 
-class AddImagePlaceholder extends ConsumerWidget {
+class AddImagePlaceholder extends ConsumerStatefulWidget {
   final AddImageCallback onAdd;
   final FileContext fileContext;
   final double? width;
@@ -158,8 +170,15 @@ class AddImagePlaceholder extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final fileService = ref.watch(fileStorageProvider);
+  ConsumerState<ConsumerStatefulWidget> createState() => _AddImagePlaceholderState();
+}
+
+class _AddImagePlaceholderState extends ConsumerState<AddImagePlaceholder> {
+  bool isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final fileStorage = ref.watch(fileStorageProvider);
 
     return InkWell(
       onTap: () async {
@@ -175,12 +194,15 @@ class AddImagePlaceholder extends ConsumerWidget {
           logger.e('[ImageManager] Unidentified mime type for ${picked.name}');
           return;
         }
+
+        setState(() => isLoading = true);
+
         final fileBytes = await picked.readAsBytes();
-        final id = await fileService.add(
+        final id = await fileStorage.add(
           fileBytes: fileBytes,
           name: picked.name,
           mimeType: picked.mimeType ?? lookupMimeType(picked.name) ?? '',
-          fileContext: fileContext,
+          fileContext: widget.fileContext,
         );
 
         if (id == null || id.isEmpty) {
@@ -188,16 +210,17 @@ class AddImagePlaceholder extends ConsumerWidget {
           return;
         }
 
-        await onAdd(id);
+        await widget.onAdd(id);
+        isLoading = false;
       },
       child: Container(
-        width: width,
-        height: height,
+        width: widget.width,
+        height: widget.height,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(defaultBorderRadius),
         ),
-        child: const Icon(Icons.add_a_photo),
+        child: isLoading ? AppProgressIndicator(size: 24) : const Icon(Icons.add_a_photo),
       ),
     );
   }
@@ -214,6 +237,8 @@ class _RemoveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final deleteIconColor = ChipTheme.of(context).deleteIconColor ?? Colors.black87;
+
     return SizedBox(
       width: _removeBtnSize,
       height: _removeBtnSize,
@@ -221,8 +246,8 @@ class _RemoveButton extends StatelessWidget {
         style: ButtonStyle(
           shape: WidgetStateProperty.all(const CircleBorder()),
           padding: WidgetStateProperty.all(EdgeInsets.all(0)),
-          backgroundColor: _removeBtnBackgroundColor,
-          foregroundColor: _removeBtnForegroundColor,
+          backgroundColor: WidgetStateProperty.all<Color>(deleteIconColor),
+          // foregroundColor: _removeBtnForegroundColor,
         ),
         onPressed: () {
           logger.d('[ImageManager] Removing image with path: $path');

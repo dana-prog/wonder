@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:app_links/app_links.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_secure_storage_web/flutter_secure_storage_web.dart';
 import 'package:http/http.dart' as http;
 import 'package:pkce/pkce.dart';
 import 'package:uuid/uuid.dart';
@@ -14,59 +16,44 @@ import '../token.dart';
 import 'wix_api_service.dart';
 
 class WixAuthentication extends Authentication {
-  // String get _siteId => 'd03a309f-520f-4b7e-9162-dbb99244ceb7';
-
-  // String get _apiKeyAuth =>
-  //     'IST.eyJraWQiOiJQb3pIX2FDMiIsImFsZyI6IlJTMjU2In0.eyJkYXRhIjoie1wiaWRcIjpcIjEyZjhlMWQ1LTRmOWQtNDM0Ni1hNzk4LTA2ZGE1MjFhMzRmNVwiLFwiaWRlbnRpdHlcIjp7XCJ0eXBlXCI6XCJhcHBsaWNhd*GlvblwiLFwiaWRcIjpcIjk2NDlhYWM2LTgwMzAtNDlmMy1iMmYzLTBjNTFiYTk5ZTY3MlwifSxcInRlbmFudFwiOntcInR5cGVcIjpcImFjY291bnRcIixcImlkXCI6XCIxMjQ2ZmU0ZC1jMmU0LTQwNmItOWNiOS1iMmZlZGJmNTJjM2RcIn19IiwiaWF0IjoxNzQ3NDE5NDI1fQ.fxH6Kq8Udf9N_2eXS0l0Zd9ahNldSxleA8KHwCpOSo-yhMiD2pdJN4d3sVVED-vY_r8OF9Z7QzslNv8OSLuRvdadEPkdP6xatVCQ4U72TOnK-NAzStftyBJ5TsDCJRL-wsKqQ8Q29ZTgWMCBBLnmAJS0pGLZ6QLcaA1DWRK6SwhpKf3TBjqY7QmUG0TtdUQsfiaKxlZn0U2EjFz5A-yDQZ4UaV9k5Rb8LTaZTyJxxymPhOJVYeZdQ5ej3U6mwSuxhPpS7S6G6XN77CLsTU7iODb5PPrIkSF3nllZ4H2x_Q4FL5IIjDnqvkjit8hMi-fQBjP8uMIQR5MsoYn3Q9Zx_Q';
   static const _tokenStorageKey = 'token';
   static final String _state = Uuid().v4();
 
+  final _storage = TokenStorage();
   final String authRedirectUrl;
   Token? _token;
 
-  final _storage = const FlutterSecureStorage();
-
   WixAuthentication._(this.authRedirectUrl);
 
-  Future<void> _init({Token? token}) async {
+  Future<void> _initToken({Token? token}) async {
     if (token != null) {
+      // set the token passed as an argument
       logger.t('[WixAuthentication._init] setting token: ${token.toJson()}');
       await _setToken(token);
-      return;
-    }
-
-    final tokenString = await _storage.read(key: _tokenStorageKey);
-    if (tokenString != null) {
-      try {
-        final token = jsonDecode(tokenString);
-        _token = Token(
-          grantType: GrantType.values.byName(token['grantType']),
-          accessToken: token['accessToken'],
-          refreshToken: token['refreshToken'],
-          expiresAt: DateTime.parse(token['expiresAt']),
-        );
-        logger.t(
-          '[WixAuthentication._init] ${_token == null ? 'No tokens found in storage' : 'loaded tokens from storage: ${jsonEncode(_token!.toJson())}'}',
-        );
-      } catch (e) {
-        logger.w('[WixAuthentication._init] Failed to parse token from storage');
-        _token = null;
+    } else {
+      // set the token from storage if it exists
+      final tokenString = await _storage.read(_tokenStorageKey);
+      if (tokenString != null) {
+        _token = Token.fromJsonStr(tokenString);
       }
     }
+
+    // if the token is not valid, renew it
+    if (_token?.isValid == false) await renewToken();
   }
 
   static Future<WixAuthentication> create({required String authRedirectUrl, Token? token}) async {
     final instance = WixAuthentication._(authRedirectUrl);
-    await instance._init(token: token);
+    await instance._initToken(token: token);
     logger.d(
-      '[WixAuthentication.create] created instance with token: ${instance.token.toString()}',
+      '[WixAuthentication.create] token: ${instance.token.toString()}',
     );
     return instance;
   }
 
   @override
   Future<void> login() async {
-    logger.d('[WixAuthentication.login]');
+    logger.t('[WixAuthentication.login]');
 
     if (_token?.isValid == false) {
       await renewToken();
@@ -88,19 +75,19 @@ class WixAuthentication extends Authentication {
       codeChallenge: pkcePair.codeChallenge,
       state: _state,
     ).call();
-    logger.t('[WixAuthentication.login] redirecting to loginUrl: $loginUrl');
+    logger.d('[WixAuthentication.login] redirecting to loginUrl: $loginUrl');
     final code = await _navigateToLoginUrl(loginUrl);
     if (code == null) {
       logger.d('no code received from loginUrl, abort login');
       return;
     }
 
-    logger.t('[WixAuthentication.login] code received from loginUrl: $code');
+    logger.d('[WixAuthentication.login] code received from loginUrl: $code');
     final token = await GenerateMemberTokenEndpoint(
             code: code, codeVerifier: pkcePair.codeVerifier, redirectUri: authRedirectUrl)
         .call();
     await _setToken(token);
-    logger.t('[WixAuthentication.login] token was set: $token');
+    logger.d('[WixAuthentication.login] token was set: $token');
   }
 
   @override
@@ -143,7 +130,7 @@ class WixAuthentication extends Authentication {
     _token = token;
 
     if (_token == null) {
-      await _storage.delete(key: _tokenStorageKey);
+      await _storage.delete(_tokenStorageKey);
       return;
     }
 
@@ -264,6 +251,39 @@ class WixAuthentication extends Authentication {
 
     final renewedToken = await RenewTokenEndpoint(token: _token!).call();
     await _setToken(renewedToken);
+  }
+}
+
+class TokenStorage {
+  final _storage = const FlutterSecureStorage();
+  final _webStorage = FlutterSecureStorageWeb();
+
+  Future<String?> read(String key) => kIsWeb
+      ? _webStorage.read(key: key, options: {
+          'publicKey': 'wonderApp',
+        })
+      : _storage.read(key: key);
+
+  Future<void> write({required String key, required String value}) async {
+    logger.t('[TokenStorage.write] key: $key, value: $value');
+    if (kIsWeb) {
+      await _webStorage.write(key: key, value: value, options: {
+        'publicKey': 'wonderApp',
+      });
+    } else {
+      await _storage.write(key: key, value: value);
+    }
+  }
+
+  Future<void> delete(String key) async {
+    logger.t('[TokenStorage.delete] key: $key');
+    if (kIsWeb) {
+      await _webStorage.delete(key: key, options: {
+        'publicKey': 'wonderApp',
+      });
+    } else {
+      await _storage.delete(key: key);
+    }
   }
 }
 

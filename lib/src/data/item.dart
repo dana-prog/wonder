@@ -3,14 +3,14 @@ import '../logger.dart';
 class Item extends Fields {
   Item(super.fields);
 
-  String? get id => getFieldValue<String>('id');
+  String get id => this['id'] ?? '';
 
   // TODO: pass as a separate prop or consider removing since each type is created with its own class
   String get itemType => this['itemType'];
 
   String get title {
     if (!containsField('title')) {
-      logger.w('Item $this does not have a title field.');
+      logger.w('Item with id $id does not have a title field.');
       return '';
     }
 

@@ -91,7 +91,7 @@ class WixItemsClient extends ItemsClient {
     ).call();
 
     notifyItemCreated(item); // updates cache
-    return cache[item.id!];
+    return cache[item.id];
   }
 
   @override
@@ -102,7 +102,7 @@ class WixItemsClient extends ItemsClient {
     ).call();
 
     notifyItemUpdated(item); // updates cache
-    return cache[item.id!];
+    return cache[item.id];
   }
 
   @override
@@ -112,13 +112,14 @@ class WixItemsClient extends ItemsClient {
     await DeleteItemEndpoint<T>(
       accessToken: authentication.accessToken,
       itemType: item.itemType,
-      id: item.id!,
+      id: item.id,
     ).call();
 
     notifyItemDeleted(item); // updates cache
     return item;
   }
 
+  @override
   Future<Map<String, List<Item>>> fetchStaticLists() async {
     await authentication.login();
     return await FetchStaticListsEndpoint(accessToken: authentication.accessToken).call();

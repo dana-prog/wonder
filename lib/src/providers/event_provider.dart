@@ -1,15 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/item.dart';
-import 'client_provider.dart';
+import 'items_provider.dart';
 
 class EventNotifier extends StateNotifier<(String, Item)?> {
   EventNotifier(this.ref) : super(null) {
-    final client = ref.read(clientProvider);
+    final itemsClient = ref.read(itemsClientProvider);
 
-    client.addItemCreatedCallback((item) => state = ('create', item));
-    client.addItemUpdatedCallback((item) => state = ('update', item));
-    client.addItemDeletedCallback((item) => state = ('delete', item));
+    itemsClient.addItemCreatedCallback((item) => state = ('create', item));
+    itemsClient.addItemUpdatedCallback((item) => state = ('update', item));
+    itemsClient.addItemDeletedCallback((item) => state = ('delete', item));
   }
 
   final Ref ref;

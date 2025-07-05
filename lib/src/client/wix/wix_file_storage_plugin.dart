@@ -8,10 +8,10 @@ import '../../data/file_item.dart';
 import '../../logger.dart';
 import '../authentication.dart';
 
-class WixFileStorage extends FileStoragePlugin {
+class WixFileStoragePlugin extends FileStoragePlugin {
   final Authentication authentication;
 
-  WixFileStorage({required this.authentication});
+  WixFileStoragePlugin({required this.authentication});
 
   @override
   Future<String> add({
@@ -77,5 +77,25 @@ class WixFileStorage extends FileStoragePlugin {
     ).call();
 
     return fcm.HttpFileService().get(downloadUrl, headers: headers);
+  }
+
+  @override
+  Future<List<FileItem>> listFiles({String? parentFolderId, bool includeSubfolders = false}) async {
+    await authentication.login();
+
+    try {
+      final files = await ListFilesEndpoint(
+        accessToken: authentication.accessToken,
+        parentFolderId: parentFolderId,
+        includeSubfolders: includeSubfolders,
+      ).call();
+
+      logger.t(
+          '[WixFileStorage.listFiles] Found ${files.length} files with params: parentFolderId: $parentFolderId, includeSubfolders: $includeSubfolders');
+      return files;
+    } catch (e, stackTrace) {
+      logger.e('[WixFileStorage.listFiles] Error listing files: $e\n$stackTrace');
+      return [];
+    }
   }
 }

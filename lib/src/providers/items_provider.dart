@@ -5,19 +5,23 @@ import '../data/item.dart';
 import '../logger.dart';
 import 'client_provider.dart';
 
+final itemsClientProvider = Provider<ItemsClient>((ref) {
+  return ref.watch(clientProvider).itemsClient;
+});
+
 class ItemListNotifier extends StateNotifier<AsyncValue<List<Item>>> {
-  final ItemsClient client;
+  final ItemsClient itemsClient;
   final String itemType;
 
   ItemListNotifier(Ref ref, this.itemType)
-      : client = ref.read(clientProvider),
+      : itemsClient = ref.read(itemsClientProvider),
         super(const AsyncLoading()) {
     _load();
   }
 
   Future<void> _load() async {
     try {
-      final items = await client.fetchItems<Item>(itemType: itemType);
+      final items = await itemsClient.fetchItems<Item>(itemType: itemType);
       state = AsyncData(items);
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -34,14 +38,14 @@ class ItemListNotifier extends StateNotifier<AsyncValue<List<Item>>> {
   Future<Item> add(Map<String, dynamic> fields) async {
     logger.d('[FacilityListNotifier.create] $fields');
     final items = state.asData?.value ?? [];
-    final newItem = await client.createItem(fields);
+    final newItem = await itemsClient.createItem(fields);
     state = AsyncData([newItem, ...items]);
     return newItem;
   }
 
   Future<Item> update(Item item) async {
     logger.d('[FacilityListNotifier.update] $item');
-    final updatedItem = await client.updateItem(item);
+    final updatedItem = await itemsClient.updateItem(item);
     state = AsyncData(
       state.asData!.value.map((i) => i.id == updatedItem.id ? updatedItem : i).toList(),
     );
@@ -50,7 +54,7 @@ class ItemListNotifier extends StateNotifier<AsyncValue<List<Item>>> {
 
   Future<void> delete(Item item) async {
     logger.d('[FacilityListNotifier.delete] $item');
-    await client.deleteItem(item);
+    await itemsClient.deleteItem(item);
     state = state.whenData((items) {
       return [
         for (final i in items)
@@ -69,8 +73,8 @@ final itemProvider = FutureProvider.family<Item, (String, String)>((
   ref,
   itemKey,
 ) async {
-  final wixClient = ref.watch(clientProvider);
-  return await wixClient.fetchItem<Item>(
+  final itemsClient = ref.watch(itemsClientProvider);
+  return await itemsClient.fetchItem<Item>(
     itemType: itemKey.$1,
     id: itemKey.$2,
   );

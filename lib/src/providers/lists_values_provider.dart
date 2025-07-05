@@ -26,12 +26,12 @@ class ListsValuesCache {
 
     for (var item in valueItems) {
       assert(
-        item.id != null,
-        'ListValueItem id must not be null (cannot add new items without id to the cache)',
+        item.id.isNotEmpty,
+        'ListValueItem id cannot be empty (cannot add new items without id to the cache)',
       );
       _listsByType[item.type] ??= {};
 
-      _itemsById[item.id!] = item;
+      _itemsById[item.id] = item;
       _listsByType[item.type]![item.name] = item;
     }
   }
@@ -51,6 +51,18 @@ class ListsValuesCache {
       throw Exception('No items found for type $type');
     }
     return list.values.toList();
+  }
+
+  ListValueItem getValueByName(String type, String name) {
+    final list = _listsByType[type];
+    if (list == null) {
+      throw Exception('No items found for type $type');
+    }
+    final item = list[name];
+    if (item == null) {
+      throw Exception('Item with name $name not found in type $type');
+    }
+    return item;
   }
 
   bool get empty => _itemsById.isEmpty;

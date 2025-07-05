@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../storage/file_storage.dart';
 import '../storage/file_storage_plugin.dart';
+import 'client_provider.dart';
 
-final fileStoragePluginProvider = Provider<FileStoragePlugin>(
-    (ref) => throw Exception('fileStoragePluginProvider state was not set'));
+final fileStoragePluginProvider = Provider<FileStoragePlugin>((ref) {
+  final client = ref.watch(clientProvider);
+  return client.fileStoragePlugin;
+});
 
 final fileStorageProvider = Provider<FileStorage>((ref) {
   final fileStoragePlugin = ref.watch(fileStoragePluginProvider);

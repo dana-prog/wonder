@@ -30,4 +30,6 @@ abstract class FileStoragePlugin extends fcm.FileService {
 
   @override
   Future<fcm.FileServiceResponse> get(String id, {Map<String, String>? headers});
+
+  Future<List<FileItem>> listFiles({String? parentFolderId, bool includeSubfolders = false});
 }

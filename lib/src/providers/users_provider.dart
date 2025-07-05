@@ -7,7 +7,7 @@ final usersProvider =
 
 final userListProvider = Provider<List<UserItem>>((ref) {
   final userList = ref.watch(usersProvider);
-  return userList.users;
+  return userList.allUsers;
 });
 
 // TODO: check caching
@@ -24,10 +24,10 @@ class UsersCache {
     _users = users;
     _usersById = {};
     for (var item in users) {
-      assert(item.id != null,
-          'UserItem id must not be null (cannot add new items without id to the cache)');
+      assert(item.id.isNotEmpty,
+          'UserItem id cannot by empty (cannot add new items without id to the cache)');
 
-      _usersById[item.id!] = item;
+      _usersById[item.id] = item;
     }
   }
 
@@ -39,5 +39,5 @@ class UsersCache {
     return item;
   }
 
-  List<UserItem> get users => _users;
+  List<UserItem> get allUsers => _users;
 }

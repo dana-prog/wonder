@@ -1,32 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 import 'package:wonder/src/widgets/items/facility/fields/facility_dropdowns.dart';
 import 'package:wonder/src/widgets/items/facility/fields/facility_number_text_box.dart';
 import 'package:wonder/src/widgets/items/user/users_dropdown.dart';
-import 'package:wonder_widgetbook/src/folders.dart';
+import 'package:wonder_widgetbook/src/utils/widgetbook_data.dart';
 
-const _folder = '${FolderNames.facility}/${FolderNames.editors}';
-
-final _typeId = 'facilityType_villa';
-@UseCase(name: 'Type', type: FacilityTypeDropdown, path: _folder)
+final _typeId = WidgetbookData.lists['facilityType']!['villa']!.id;
 Widget type(BuildContext _) => FacilityTypeDropdown(selectedId: _typeId);
 
-final _subtypeId = 'facilitySubtype_a';
-@UseCase(name: 'Subtype', type: FacilitySubtypeDropdown, path: _folder)
+final _subtypeId = WidgetbookData.lists['facilitySubtype']!['a']!.id;
 Widget subtype(BuildContext _) => FacilitySubtypeDropdown(selectedId: _subtypeId);
 
-final _statusId = 'facilityStatus_operational';
-@UseCase(name: 'Status', type: FacilityStatusDropdown, path: _folder)
+final _statusId = WidgetbookData.lists['facilityStatus']!['operational']!.id;
 Widget facilityStatus(BuildContext _) => FacilityStatusDropdown(selectedId: _statusId);
 
 final _roomCount = 3;
-@UseCase(name: '# Rooms', type: FacilityRoomCountDropdown, path: _folder)
 Widget roomCount(BuildContext _) => FacilityRoomCountDropdown(value: _roomCount);
 
 final _number = 104;
-@UseCase(name: 'number', type: FacilityNumberTextBox, path: _folder)
 Widget number(BuildContext _) => FacilityNumberTextBox(initialValue: _number);
 
-final _ownerId = 'dana_shalev';
-@UseCase(name: 'Owner', type: UsersDropdownConsumer, path: _folder)
+final _ownerId = WidgetbookData.users['danashalev100@gmail.com']!.id;
 Widget owner(BuildContext _) => UsersDropdownConsumer(selectedId: _ownerId);

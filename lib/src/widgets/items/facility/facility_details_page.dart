@@ -138,36 +138,41 @@ class _FacilityDetailsPageState extends State<FacilityDetailsPage> {
       );
 
   Widget _picturesBuilder() {
-    // TODO: new item should not have pictures
     return FieldLabel(
-      label: fields['pictures']!,
-      child: ImageManager(
-        fileUrls: _pictures ?? [],
-        fileContext: FileContext(
-          itemType: 'facility',
-          itemId: widget.initialItem?.id ?? '',
-          fieldName: 'pictures',
-        ),
-        onAdd: (String id) async {
-          onChanged(context, () {
-            _pictures = _pictures ?? [];
-            _pictures!.add(id);
-          });
-        },
-        onRemove: (String id) async {
-          logger.d('[FacilityDetailsPage.onRemove] Removing picture with id: $id from $_pictures');
-          onChanged(context, () {
-            final exists = _pictures?.contains(id) ?? false;
-            assert(exists, 'Picture with id $id does not exist in the list');
-            if (!exists) return;
+      label: ItemsLabels.getFieldLabels('facility')['pictures']!,
+      child: widget.initialItem?.id != null
+          ? ImageManager(
+              fileUrls: _pictures ?? [],
+              fileContext: FileContext(
+                itemType: 'facility',
+                itemId: widget.initialItem!.id,
+                fieldName: 'pictures',
+              ),
+              onAdd: (String id) async {
+                onChanged(context, () {
+                  _pictures = _pictures ?? [];
+                  _pictures!.add(id);
+                });
+              },
+              onRemove: (String id) async {
+                logger.d(
+                    '[FacilityDetailsPage.onRemove] Removing picture with id: $id from $_pictures');
+                onChanged(context, () {
+                  final exists = _pictures?.contains(id) ?? false;
+                  assert(exists, 'Picture with id $id does not exist in the list');
+                  if (!exists) return;
 
-            logger
-                .d('[FacilityDetailsPage.onRemove] Removing picture with id: $id from $_pictures');
-            _pictures!.removeWhere((pic) => pic == id);
-            logger.d('[FacilityDetailsPage.onRemove] Removed picture with id: $id from $_pictures');
-          });
-        },
-      ),
+                  logger.d(
+                      '[FacilityDetailsPage.onRemove] Removing picture with id: $id from $_pictures');
+                  _pictures!.removeWhere((pic) => pic == id);
+                  logger.d(
+                      '[FacilityDetailsPage.onRemove] Removed picture with id: $id from $_pictures');
+                });
+              },
+            )
+          : ImageManagerBorder(
+              child: Text(Labels.saveItemToAddPictures),
+            ),
     );
   }
 

@@ -23,5 +23,5 @@ String getItemRoute({String? itemType, String? id, Item? item}) {
 
   return RouteNames.editItem
       .replaceFirst(':itemType', itemType ?? item!.itemType)
-      .replaceFirst(':itemId', id ?? item!.id!);
+      .replaceFirst(':itemId', id ?? item!.id);
 }

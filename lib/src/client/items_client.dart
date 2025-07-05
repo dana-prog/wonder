@@ -35,7 +35,7 @@ abstract class ItemsClient {
   }
 
   void notifyItemUpdated(Item item) {
-    Item cachedItem = cache.exists(item.id!) ? cache.update(item) : cache.set(item);
+    Item cachedItem = cache.exists(item.id) ? cache.update(item) : cache.set(item);
 
     for (var callback in _itemUpdatedCallbacks) {
       callback(cachedItem);
@@ -61,6 +61,8 @@ abstract class ItemsClient {
   Future<T> updateItem<T extends Item>(T newItem);
 
   Future<T> deleteItem<T extends Item>(T item);
+
+  Future<Map<String, List<Item>>> fetchStaticLists();
 
   T? getCachedItem<T extends Item>(String itemType, String id) =>
       cache.exists(id) ? cache[id] as T : null;
@@ -119,20 +121,20 @@ class _Cache {
   }
 
   T set<T extends Item>(T item) {
-    assert(
-        item.id != null, 'Item id must not be null (cannot add new items without id to the cache)');
-    itemsById[item.id!] = item;
+    assert(item.id.isNotEmpty,
+        'Item id cannot be empty (cannot add new items without id to the cache)');
+    itemsById[item.id] = item;
     return item;
   }
 
   T update<T extends Item>(T updatedItem) {
-    assert(updatedItem.id != null, 'Item id must not be null for update');
+    assert(updatedItem.id.isNotEmpty, 'Item id cannot be empty for update');
 
-    if (!exists(updatedItem.id!)) {
+    if (!exists(updatedItem.id)) {
       throw Exception('[_Cache.updateItem] Item with id ${updatedItem.id} not found in cache');
     }
 
-    final oldItem = this[updatedItem.id!] as T;
+    final oldItem = this[updatedItem.id] as T;
 
     for (MapEntry<String, dynamic> field in updatedItem.fields.entries) {
       oldItem[field.key] = field.value;
@@ -142,8 +144,8 @@ class _Cache {
   }
 
   T remove<T extends Item>(T deletedItem) {
-    assert(deletedItem.id != null, 'Item id must not be null for delete');
-    if (!exists(deletedItem.id!)) {
+    assert(deletedItem.id.isNotEmpty, 'Item id cannot be empty for delete');
+    if (!exists(deletedItem.id)) {
       throw Exception('[_Cache.deleteItem] Item with id ${deletedItem.id} not found in cache');
     }
 

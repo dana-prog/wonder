@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:widgetbook_annotation/widgetbook_annotation.dart';
-import 'package:wonder/mock/mock_data.dart';
 import 'package:wonder/src/data/facility_item.dart';
 import 'package:wonder/src/widgets/items/facility/facility_details_page.dart';
-import 'package:wonder_widgetbook/src/folders.dart';
 
-const _folder = FolderNames.facility;
+import '../../utils/widgetbook_data.dart';
 
-final _facility = MockData.facilities[1];
+final _facility = WidgetbookData.facilities[0];
 
-@UseCase(name: 'Edit', type: FacilityDetailsPage, path: _folder)
 Widget editFacility(BuildContext context) {
   FacilityItem? initialItem = _facility;
   return StatefulBuilder(builder: (context, setState) {
@@ -23,7 +19,6 @@ Widget editFacility(BuildContext context) {
   });
 }
 
-@UseCase(name: 'New', type: FacilityDetailsPage, path: _folder)
 Widget newFacility(BuildContext context) {
   FacilityItem? initialItem;
 
@@ -31,7 +26,8 @@ Widget newFacility(BuildContext context) {
     builder: (context, setState) => FacilityDetailsPage(
       initialItem: initialItem,
       save: (item) {
-        setState(() => initialItem = item);
+        // simulate item added
+        setState(() => initialItem = FacilityItem.fromFields({...item.fields, 'id': 'new-id'}));
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Saved Item')));
       },
     ),

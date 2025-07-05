@@ -18,6 +18,7 @@ class FileStorage {
     required String mimeType,
     required FileContext fileContext,
   }) async {
+    // we wait only in order to get the file id (we don't need the image to be uploaded immediately since we already have the file bytes)
     final fileId = await fileStoragePlugin.add(
       fileBytes: fileBytes,
       name: name,

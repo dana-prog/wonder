@@ -21,8 +21,8 @@ class AppImage extends ConsumerWidget {
     this.width,
     this.height,
     this.fit,
-  }) : assert(
-            assetName != null || fileUrl != null, 'Either assetName or filePath must be provided');
+  }) : assert(assetName != null || fileUrl != null,
+            'Either assetName or fileUrl must be provided, assetName: $assetName, fileUrl: $fileUrl');
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
