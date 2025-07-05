@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   wonder:
-    path: ../
+    path: ../wonder_app
   wonder_api:
     path: ../wonder_api
   assets:
