@@ -5,7 +5,6 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_secure_storage_web/flutter_secure_storage_web.dart';
 import 'package:http/http.dart' as http;
 import 'package:pkce/pkce.dart';
 import 'package:uuid/uuid.dart';
@@ -256,34 +255,17 @@ class WixAuthentication extends Authentication {
 
 class TokenStorage {
   final _storage = const FlutterSecureStorage();
-  final _webStorage = FlutterSecureStorageWeb();
 
-  Future<String?> read(String key) => kIsWeb
-      ? _webStorage.read(key: key, options: {
-          'publicKey': 'wonderApp',
-        })
-      : _storage.read(key: key);
+  Future<String?> read(String key) {
+    return _storage.read(key: key);
+  }
 
   Future<void> write({required String key, required String value}) async {
-    logger.t('[TokenStorage.write] key: $key, value: $value');
-    if (kIsWeb) {
-      await _webStorage.write(key: key, value: value, options: {
-        'publicKey': 'wonderApp',
-      });
-    } else {
-      await _storage.write(key: key, value: value);
-    }
+    await _storage.write(key: key, value: value);
   }
 
   Future<void> delete(String key) async {
-    logger.t('[TokenStorage.delete] key: $key');
-    if (kIsWeb) {
-      await _webStorage.delete(key: key, options: {
-        'publicKey': 'wonderApp',
-      });
-    } else {
-      await _storage.delete(key: key);
-    }
+    await _storage.delete(key: key);
   }
 }
 

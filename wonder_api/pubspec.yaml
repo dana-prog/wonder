@@ -19,7 +19,7 @@ dependencies:
   mime: ^2.0.0
   recase: ^4.1.0
   wonder:
-    path: ../
+    path: ../wonder_app/
 
 dev_dependencies:
   flutter_test:

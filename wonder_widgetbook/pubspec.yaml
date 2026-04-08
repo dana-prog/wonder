@@ -14,7 +14,7 @@ dependencies:
   wonder_api:
     path: ../wonder_api
   assets:
-    path: ../assets
+    path: ../wonder_app/assets
 
   flutter_riverpod: ^2.6.1
   widgetbook: ^3.14.2
